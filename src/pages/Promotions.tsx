@@ -27,11 +27,16 @@ export default function Promotions() {
   });
 
   useEffect(() => {
-    if (!session) {
-      navigate("/");
-      toast.error("Please login to access this page");
-    }
-  }, [session, navigate]);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/");
+        toast.error("Please login to access this page");
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   const { data: malls, refetch: refetchMalls } = useQuery({
     queryKey: ["shopping-malls"],

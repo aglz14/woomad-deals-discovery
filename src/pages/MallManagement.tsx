@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -16,11 +15,16 @@ export default function MallManagement() {
   const { session } = useSession();
 
   useEffect(() => {
-    if (!session) {
-      navigate("/");
-      toast.error("Please login to access this page");
-    }
-  }, [session, navigate]);
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/");
+        toast.error("Please login to access this page");
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   const { data: mall } = useQuery({
     queryKey: ["mall", mallId],
@@ -65,8 +69,8 @@ export default function MallManagement() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold">{mall.name}</h1>
-              <p className="text-gray-600">{mall.address}</p>
+              <h1 className="text-2xl font-bold">{mall?.name}</h1>
+              <p className="text-gray-600">{mall?.address}</p>
             </div>
             <AddStoreDialog 
               mallId={mallId!} 
