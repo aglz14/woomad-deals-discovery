@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,8 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
 import { StoresList } from "@/components/mall/StoresList";
-import { EditMallDialog } from "@/components/mall/EditMallDialog";
-import { ArrowLeft, Trash2, Pencil } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -23,16 +22,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 export default function MallManagement() {
   const { mallId } = useParams();
   const navigate = useNavigate();
   const { session } = useSession();
   const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
-  const [isEditingMall, setIsEditingMall] = useState(false);
 
   // Fetch mall data
-  const { data: mall, refetch: refetchMall, isLoading: isMallLoading } = useQuery({
+  const { data: mall, isLoading: isMallLoading } = useQuery({
     queryKey: ["mall", mallId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -151,19 +150,10 @@ export default function MallManagement() {
               <h1 className="text-2xl font-bold">{mall?.name}</h1>
               <p className="text-gray-600">{mall?.address}</p>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setIsEditingMall(true)}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <AddStoreDialog 
-                mallId={mallId!} 
-                onStoreAdded={refetchStores} 
-              />
-            </div>
+            <AddStoreDialog 
+              mallId={mallId!} 
+              onStoreAdded={refetchStores} 
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -212,18 +202,6 @@ export default function MallManagement() {
           </div>
         </div>
       </main>
-
-      {mall && (
-        <EditMallDialog
-          mall={mall}
-          isOpen={isEditingMall}
-          onClose={() => setIsEditingMall(false)}
-          onSuccess={() => {
-            refetchMall();
-            setIsEditingMall(false);
-          }}
-        />
-      )}
 
       <Footer />
     </div>
