@@ -18,7 +18,7 @@ export type Database = {
           id: string
           image_url: string | null
           start_date: string
-          store_id: string
+          store_id: string | null
           terms_conditions: string | null
           title: string
           type: string
@@ -31,7 +31,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           start_date: string
-          store_id: string
+          store_id?: string | null
           terms_conditions?: string | null
           title: string
           type: string
@@ -44,7 +44,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           start_date?: string
-          store_id?: string
+          store_id?: string | null
           terms_conditions?: string | null
           title?: string
           type?: string
@@ -90,6 +90,7 @@ export type Database = {
           latitude: number
           longitude: number
           name: string
+          user_id: string
         }
         Insert: {
           address: string
@@ -100,6 +101,7 @@ export type Database = {
           latitude: number
           longitude: number
           name: string
+          user_id: string
         }
         Update: {
           address?: string
@@ -110,6 +112,7 @@ export type Database = {
           latitude?: number
           longitude?: number
           name?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -124,7 +127,7 @@ export type Database = {
           id: string
           location_in_mall: string | null
           logo_url: string | null
-          mall_id: string
+          mall_id: string | null
           name: string
           website: string | null
         }
@@ -138,7 +141,7 @@ export type Database = {
           id?: string
           location_in_mall?: string | null
           logo_url?: string | null
-          mall_id: string
+          mall_id?: string | null
           name: string
           website?: string | null
         }
@@ -152,7 +155,7 @@ export type Database = {
           id?: string
           location_in_mall?: string | null
           logo_url?: string | null
-          mall_id?: string
+          mall_id?: string | null
           name?: string
           website?: string | null
         }

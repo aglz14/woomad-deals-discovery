@@ -38,7 +38,11 @@ export default function Promotions() {
       const { data, error } = await supabase
         .from("shopping_malls")
         .select("*");
-      if (error) throw error;
+      
+      if (error) {
+        toast.error("Failed to fetch shopping malls");
+        throw error;
+      }
       return data;
     },
   });
@@ -53,6 +57,7 @@ export default function Promotions() {
           description: newMall.description,
           latitude: parseFloat(newMall.latitude),
           longitude: parseFloat(newMall.longitude),
+          user_id: session?.user.id,
         },
       ]);
 
