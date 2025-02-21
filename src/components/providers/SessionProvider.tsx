@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface SessionContextType {
   session: Session | null;
+  isLoading: boolean;
 }
 
-const SessionContext = createContext<SessionContextType>({ session: null });
+const SessionContext = createContext<SessionContextType>({ session: null, isLoading: true });
 
 export const useSession = () => {
   return useContext(SessionContext);
@@ -29,18 +30,21 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  if (isLoading) {
-    return null; // Or a loading spinner
-  }
-
   return (
-    <SessionContext.Provider value={{ session }}>
-      {children}
+    <SessionContext.Provider value={{ session, isLoading }}>
+      {isLoading ? (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-pulse text-gray-600">Loading...</div>
+        </div>
+      ) : (
+        children
+      )}
     </SessionContext.Provider>
   );
 };

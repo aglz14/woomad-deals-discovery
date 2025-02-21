@@ -19,7 +19,7 @@ import { Button } from "./ui/button";
 
 export const Header = () => {
   const { t } = useTranslation();
-  const { session } = useSession();
+  const { session, isLoading } = useSession();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -31,6 +31,9 @@ export const Header = () => {
       toast.success("Signed out successfully");
     }
   };
+
+  // Don't render anything while loading
+  if (isLoading) return null;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -46,26 +49,32 @@ export const Header = () => {
               
               {session?.user ? (
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      className="flex items-center gap-2 text-white hover:text-white/90 transition-colors"
+                  <DropdownMenuTrigger>
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 px-4 py-2 text-white hover:text-white/90 transition-colors rounded-md"
                     >
                       <User className="h-4 w-4" />
                       <span>{session.user.email}</span>
                       <ChevronDown className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
-                    className="w-56 bg-white" 
+                    className="w-56 bg-white shadow-lg" 
                     align="end"
                   >
-                    <DropdownMenuItem onClick={() => navigate("/promotions")}>
+                    <DropdownMenuItem 
+                      className="cursor-pointer"
+                      onClick={() => navigate("/promotions")}
+                    >
                       <Star className="mr-2 h-4 w-4" />
                       <span>Promotions</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
+                    <DropdownMenuItem 
+                      className="cursor-pointer"
+                      onClick={handleLogout}
+                    >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
