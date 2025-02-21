@@ -10,14 +10,14 @@ export const Footer = () => {
     <footer className="bg-white border-t border-gray-200">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
+          <div className="text-left">
             <h3 className="text-lg font-semibold mb-4 text-gray-900">Woomad</h3>
             <p className="text-gray-600">
               Discover the world with Woomad - your companion for exploring new places and connecting with fellow travelers.
             </p>
           </div>
           
-          <div>
+          <div className="text-left">
             <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
@@ -38,7 +38,7 @@ export const Footer = () => {
             </ul>
           </div>
           
-          <div>
+          <div className="text-left">
             <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('connect')}</h3>
             <ul className="space-y-2">
               <li>
