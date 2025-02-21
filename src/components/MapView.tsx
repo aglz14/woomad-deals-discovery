@@ -26,8 +26,8 @@ export const MapView = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [userLocation, setUserLocation] = useState<Location>({
-    lng: -74.006,
-    lat: 40.7128,
+    lng: -100.3161,  // Default to a central location
+    lat: 25.6714,
   });
   const [isMapLoading, setIsMapLoading] = useState(true);
 
@@ -35,31 +35,24 @@ export const MapView = () => {
   const { data: mapboxToken, isLoading: isTokenLoading, error: tokenError } = useQuery({
     queryKey: ['mapbox-token'],
     queryFn: async () => {
-      console.log('Fetching Mapbox token...');
       const { data, error } = await supabase
         .from('secrets')
         .select('value')
         .eq('name', 'MAPBOX_TOKEN')
-        .maybeSingle();
+        .limit(1)
+        .single();
       
       if (error) {
         console.error('Error fetching token:', error);
         throw error;
       }
       
-      if (!data) {
-        console.error('No token found in secrets');
-        throw new Error('Mapbox token not found');
-      }
-      
-      console.log('Token retrieved successfully');
       return data.value;
     },
-    retry: 1,
   });
 
   // Fetch nearby malls
-  const { data: malls } = useQuery({
+  const { data: malls = [] } = useQuery({
     queryKey: ['shopping-malls'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -75,18 +68,17 @@ export const MapView = () => {
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken || map.current) return;
 
-    console.log('Initializing map with token:', mapboxToken.substring(0, 8) + '...');
-    
     try {
       mapboxgl.accessToken = mapboxToken;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/mapbox/light-v11",
+        style: "mapbox://styles/mapbox/streets-v12",  // Changed to streets style for better visibility
         center: [userLocation.lng, userLocation.lat],
-        zoom: 12,
+        zoom: 11,
       });
 
+      // Add navigation controls
       map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
       // Get user location
@@ -99,37 +91,38 @@ export const MapView = () => {
           setUserLocation(newLocation);
           map.current?.flyTo({
             center: [newLocation.lng, newLocation.lat],
-            zoom: 12,
+            zoom: 11,
+            essential: true
           });
         },
         (error) => {
-          console.error("Error getting location:", error);
-          toast.error("Could not get your location. Using default location.");
+          console.log("Using default location, geolocation error:", error);
         }
       );
 
-      map.current.on('style.load', () => {
-        console.log('Map style loaded successfully');
-        setIsMapLoading(false);
-      });
-
-      // Add markers for malls when they're loaded
-      if (malls) {
-        malls.forEach((mall) => {
-          const marker = new mapboxgl.Marker()
+      // Add markers for malls
+      malls.forEach((mall) => {
+        if (mall.latitude && mall.longitude) {
+          console.log('Adding marker for mall:', mall.name, 'at:', mall.latitude, mall.longitude);
+          new mapboxgl.Marker({ color: '#FF0000' })
             .setLngLat([mall.longitude, mall.latitude])
             .setPopup(
               new mapboxgl.Popup({ offset: 25 })
                 .setHTML(`
-                  <h3 class="text-lg font-semibold">${mall.name}</h3>
-                  <p class="text-sm text-gray-600">${mall.address}</p>
-                  ${mall.description ? `<p class="text-sm mt-2">${mall.description}</p>` : ''}
-                  <a href="/mall/${mall.id}" class="text-purple-600 hover:underline text-sm block mt-2">View Details →</a>
+                  <h3 style="font-weight: 600; margin-bottom: 4px;">${mall.name}</h3>
+                  <p style="font-size: 14px; color: #666;">${mall.address}</p>
+                  ${mall.description ? `<p style="font-size: 14px; margin-top: 8px;">${mall.description}</p>` : ''}
+                  <a href="/mall/${mall.id}" style="color: #6366f1; text-decoration: none; display: block; margin-top: 8px; font-size: 14px;">View Details →</a>
                 `)
             )
             .addTo(map.current!);
-        });
-      }
+        }
+      });
+
+      map.current.on('load', () => {
+        console.log('Map loaded successfully');
+        setIsMapLoading(false);
+      });
     } catch (error) {
       console.error("Error initializing map:", error);
       toast.error("Could not initialize the map. Please try again later.");
@@ -138,14 +131,12 @@ export const MapView = () => {
 
     return () => {
       if (map.current) {
-        console.log('Cleaning up map instance');
         map.current.remove();
       }
     };
-  }, [mapboxToken, malls]);
+  }, [mapboxToken, malls, userLocation.lat, userLocation.lng]);
 
   if (tokenError) {
-    toast.error("Could not load map: Missing Mapbox token");
     return (
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-red-500 text-center">
