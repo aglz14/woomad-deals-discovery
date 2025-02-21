@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface AddMallFormProps {
   onSuccess: () => void;
@@ -14,6 +15,7 @@ interface AddMallFormProps {
 }
 
 export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
+  const { t } = useTranslation();
   const { session } = useSession();
   const [newMall, setNewMall] = useState({
     name: "",
@@ -50,7 +52,7 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">Mall Name</Label>
+        <Label htmlFor="name">{t('storeName')}</Label>
         <Input
           id="name"
           value={newMall.name}
@@ -59,7 +61,7 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="address">Address</Label>
+        <Label htmlFor="address">{t('address')}</Label>
         <Input
           id="address"
           value={newMall.address}
@@ -68,7 +70,7 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t('description')}</Label>
         <Textarea
           id="description"
           value={newMall.description}
@@ -99,9 +101,9 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
       </div>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t('cancel')}
         </Button>
-        <Button type="submit">Add Mall</Button>
+        <Button type="submit">{t('addShoppingMall')}</Button>
       </div>
     </form>
   );

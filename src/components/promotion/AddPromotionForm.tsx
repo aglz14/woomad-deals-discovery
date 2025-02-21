@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface AddPromotionFormProps {
   onSuccess: () => void;
@@ -15,6 +16,7 @@ interface AddPromotionFormProps {
 }
 
 export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps) {
+  const { t } = useTranslation();
   const [selectedMall, setSelectedMall] = useState<string>("");
   const [selectedStore, setSelectedStore] = useState<string>("");
   const [newPromotion, setNewPromotion] = useState({
@@ -74,10 +76,10 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label>Select Mall</Label>
+        <Label>{t('selectMall')}</Label>
         <Select value={selectedMall} onValueChange={setSelectedMall}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a mall" />
+            <SelectValue placeholder={t('selectMall')} />
           </SelectTrigger>
           <SelectContent>
             {malls?.map((mall) => (
@@ -90,14 +92,14 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
       </div>
 
       <div>
-        <Label>Select Store</Label>
+        <Label>{t('selectStore')}</Label>
         <Select
           value={selectedStore}
           onValueChange={setSelectedStore}
           disabled={!selectedMall}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select a store" />
+            <SelectValue placeholder={t('selectStore')} />
           </SelectTrigger>
           <SelectContent>
             {stores?.map((store) => (
@@ -110,9 +112,10 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
       </div>
 
       <div>
-        <Label htmlFor="title">Promotion Title</Label>
+        <Label>
+          {newPromotion.type === "coupon" ? t('coupon') : t('promotion')}
+        </Label>
         <Input
-          id="title"
           value={newPromotion.title}
           onChange={(e) =>
             setNewPromotion({ ...newPromotion, title: e.target.value })
@@ -122,9 +125,8 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
       </div>
 
       <div>
-        <Label htmlFor="description">Description & Conditions</Label>
+        <Label>{t('description')}</Label>
         <Textarea
-          id="description"
           value={newPromotion.description}
           onChange={(e) =>
             setNewPromotion({ ...newPromotion, description: e.target.value })
@@ -134,7 +136,7 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
       </div>
 
       <div>
-        <Label>Promotion Type</Label>
+        <Label>{t('promotion')}</Label>
         <Select
           value={newPromotion.type}
           onValueChange={(value) =>
@@ -142,20 +144,19 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
           }
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select type" />
+            <SelectValue placeholder={t('selectType')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="promotion">Promotion</SelectItem>
-            <SelectItem value="coupon">Coupon</SelectItem>
-            <SelectItem value="sale">Sale</SelectItem>
+            <SelectItem value="promotion">{t('promotion')}</SelectItem>
+            <SelectItem value="coupon">{t('coupon')}</SelectItem>
+            <SelectItem value="sale">{t('sale')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div>
-        <Label htmlFor="start_date">Start Date</Label>
+        <Label>{t('startDate')}</Label>
         <Input
-          id="start_date"
           type="datetime-local"
           value={newPromotion.start_date}
           onChange={(e) =>
@@ -166,9 +167,8 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
       </div>
 
       <div>
-        <Label htmlFor="end_date">End Date</Label>
+        <Label>{t('endDate')}</Label>
         <Input
-          id="end_date"
           type="datetime-local"
           value={newPromotion.end_date}
           onChange={(e) =>
@@ -180,10 +180,10 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t('cancel')}
         </Button>
         <Button type="submit" disabled={!selectedStore}>
-          Add Promotion
+          {t('addPromotion')}
         </Button>
       </div>
     </form>
