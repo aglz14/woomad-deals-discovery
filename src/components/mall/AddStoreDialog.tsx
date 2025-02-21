@@ -1,127 +1,114 @@
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
 interface AddStoreDialogProps {
   mallId: string;
-  onStoreAdded: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
 }
 
-export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
-  const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [newStore, setNewStore] = useState({
+export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreDialogProps) {
+  const [store, setStore] = useState({
     name: "",
-    description: "",
     category: "",
+    description: "",
     location_in_mall: "",
     contact_number: "",
   });
 
-  const handleAddStore = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase.from("stores").insert([
-        {
-          ...newStore,
-          mall_id: mallId,
-        },
-      ]);
+      const { error } = await supabase
+        .from("stores")
+        .insert([
+          {
+            ...store,
+            mall_id: mallId,
+          },
+        ]);
 
       if (error) throw error;
 
-      toast.success("Store added successfully");
-      setIsOpen(false);
-      setNewStore({
+      toast.success("Tienda agregada exitosamente");
+      onSuccess();
+      onClose();
+      setStore({
         name: "",
-        description: "",
         category: "",
+        description: "",
         location_in_mall: "",
         contact_number: "",
       });
-      onStoreAdded();
     } catch (error) {
       console.error("Error adding store:", error);
-      toast.error("Failed to add store");
+      toast.error("Error al agregar la tienda");
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          {t('addStore')}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('newStore')}</DialogTitle>
+          <DialogTitle>Agregar Nueva Tienda</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleAddStore} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name">{t('storeName')}</Label>
+            <Label htmlFor="name">Nombre de la tienda</Label>
             <Input
               id="name"
-              value={newStore.name}
-              onChange={(e) =>
-                setNewStore({ ...newStore, name: e.target.value })
-              }
+              value={store.name}
+              onChange={(e) => setStore({ ...store, name: e.target.value })}
               required
             />
           </div>
           <div>
-            <Label htmlFor="category">{t('storeCategory')}</Label>
+            <Label htmlFor="category">Categoría</Label>
             <Input
               id="category"
-              value={newStore.category}
-              onChange={(e) =>
-                setNewStore({ ...newStore, category: e.target.value })
-              }
+              value={store.category}
+              onChange={(e) => setStore({ ...store, category: e.target.value })}
               required
             />
           </div>
           <div>
-            <Label htmlFor="description">{t('storeDescription')}</Label>
+            <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
-              value={newStore.description}
-              onChange={(e) =>
-                setNewStore({ ...newStore, description: e.target.value })
-              }
+              value={store.description}
+              onChange={(e) => setStore({ ...store, description: e.target.value })}
             />
           </div>
           <div>
-            <Label htmlFor="location">{t('storeLocation')}</Label>
+            <Label htmlFor="location">Ubicación en el centro comercial</Label>
             <Input
               id="location"
-              value={newStore.location_in_mall}
-              onChange={(e) =>
-                setNewStore({ ...newStore, location_in_mall: e.target.value })
-              }
+              value={store.location_in_mall}
+              onChange={(e) => setStore({ ...store, location_in_mall: e.target.value })}
             />
           </div>
           <div>
-            <Label htmlFor="contact">{t('storeContact')}</Label>
+            <Label htmlFor="contact">Número de contacto</Label>
             <Input
               id="contact"
-              value={newStore.contact_number}
-              onChange={(e) =>
-                setNewStore({ ...newStore, contact_number: e.target.value })
-              }
+              value={store.contact_number}
+              onChange={(e) => setStore({ ...store, contact_number: e.target.value })}
             />
           </div>
-          <Button type="submit" className="w-full">
-            {t('addStore')}
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="submit">Agregar</Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

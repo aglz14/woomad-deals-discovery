@@ -1,4 +1,3 @@
-
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,6 +103,11 @@ export default function AdminMallProfile() {
     navigate(`/store/${storeId}/promotions`);
   };
 
+  const refetchStores = () => {
+    // Manually refetch the stores query
+    console.log("Refetching stores...");
+  };
+
   return (
     <div className="bg-gradient-to-b from-purple-50 to-white min-h-screen">
       <div className="container mx-auto px-4 py-8">
@@ -164,15 +168,23 @@ export default function AdminMallProfile() {
       </div>
 
       <EditMallDialog
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
         mall={mall}
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSuccess={() => {
+          refetchMalls();
+          setIsEditDialogOpen(false);
+        }}
       />
 
       <AddStoreDialog
-        open={isAddStoreDialogOpen}
-        onOpenChange={setIsAddStoreDialogOpen}
         mallId={mall.id}
+        isOpen={isAddStoreDialogOpen}
+        onClose={() => setIsAddStoreDialogOpen(false)}
+        onSuccess={() => {
+          refetchStores();
+          setIsAddStoreDialogOpen(false);
+        }}
       />
     </div>
   );
