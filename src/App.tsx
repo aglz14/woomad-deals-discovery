@@ -10,27 +10,30 @@ import NotFound from "./pages/NotFound";
 import Promotions from "./pages/Promotions";
 import MallManagement from "./pages/MallManagement";
 import StoreProfile from "./pages/StoreProfile";
+import { useState } from "react";
 
-const queryClient = new QueryClient();
+function App() {
+  const [queryClient] = useState(() => new QueryClient());
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <SessionProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/promotions" element={<Promotions />} />
-            <Route path="/mall/:mallId/manage" element={<MallManagement />} />
-            <Route path="/store/:storeId" element={<StoreProfile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </SessionProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/promotions" element={<Promotions />} />
+              <Route path="/mall/:mallId/manage" element={<MallManagement />} />
+              <Route path="/store/:storeId" element={<StoreProfile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </SessionProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
