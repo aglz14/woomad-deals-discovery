@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -13,7 +13,7 @@ export const useSession = () => {
   return useContext(SessionContext);
 };
 
-export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
+export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
