@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface AddStoreDialogProps {
   mallId: string;
@@ -15,6 +16,7 @@ interface AddStoreDialogProps {
 }
 
 export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [newStore, setNewStore] = useState({
     name: "",
@@ -59,16 +61,16 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Add Store
+          {t('addStore')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Store</DialogTitle>
+          <DialogTitle>{t('newStore')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleAddStore} className="space-y-4">
           <div>
-            <Label htmlFor="name">Store Name</Label>
+            <Label htmlFor="name">{t('storeName')}</Label>
             <Input
               id="name"
               value={newStore.name}
@@ -79,7 +81,7 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
             />
           </div>
           <div>
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">{t('storeCategory')}</Label>
             <Input
               id="category"
               value={newStore.category}
@@ -90,7 +92,7 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
             />
           </div>
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('storeDescription')}</Label>
             <Textarea
               id="description"
               value={newStore.description}
@@ -100,7 +102,7 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
             />
           </div>
           <div>
-            <Label htmlFor="floor">Floor</Label>
+            <Label htmlFor="floor">{t('storeFloor')}</Label>
             <Input
               id="floor"
               value={newStore.floor}
@@ -110,7 +112,7 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
             />
           </div>
           <div>
-            <Label htmlFor="location">Location in Mall</Label>
+            <Label htmlFor="location">{t('storeLocation')}</Label>
             <Input
               id="location"
               value={newStore.location_in_mall}
@@ -120,7 +122,7 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
             />
           </div>
           <div>
-            <Label htmlFor="contact">Contact Number</Label>
+            <Label htmlFor="contact">{t('storeContact')}</Label>
             <Input
               id="contact"
               value={newStore.contact_number}
@@ -130,7 +132,7 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
             />
           </div>
           <Button type="submit" className="w-full">
-            Add Store
+            {t('addStore')}
           </Button>
         </form>
       </DialogContent>

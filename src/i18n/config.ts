@@ -1,4 +1,3 @@
-
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -73,7 +72,17 @@ const resources = {
       noPromotions: "No active promotions found",
       checkBack: "Check back later for new deals and promotions.",
       noResults: "No matches found",
-      adjustSearch: "Try adjusting your search terms to find more promotions."
+      adjustSearch: "Try adjusting your search terms to find more promotions.",
+
+      // Store Management
+      addStore: "Add Store",
+      newStore: "Add New Store",
+      storeName: "Store Name",
+      storeCategory: "Category",
+      storeDescription: "Description",
+      storeFloor: "Floor",
+      storeLocation: "Location in Mall",
+      storeContact: "Contact Number",
     }
   },
   es: {
@@ -146,7 +155,17 @@ const resources = {
       noPromotions: "No se encontraron promociones activas",
       checkBack: "Vuelve más tarde para ver nuevas ofertas y promociones.",
       noResults: "No se encontraron resultados",
-      adjustSearch: "Intenta ajustar los términos de búsqueda para encontrar más promociones."
+      adjustSearch: "Intenta ajustar los términos de búsqueda para encontrar más promociones.",
+
+      // Store Management
+      addStore: "Agregar Tienda",
+      newStore: "Agregar Nueva Tienda",
+      storeName: "Nombre de la Tienda",
+      storeCategory: "Categoría",
+      storeDescription: "Descripción",
+      storeFloor: "Piso",
+      storeLocation: "Ubicación en el Centro Comercial",
+      storeContact: "Número de Contacto",
     }
   }
 };
