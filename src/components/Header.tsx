@@ -28,6 +28,7 @@ export const Header = () => {
       toast.error("Error al cerrar sesión");
     } else {
       toast.success("Sesión cerrada con éxito");
+      navigate('/'); // Navigate to index page after successful logout
     }
   };
 
