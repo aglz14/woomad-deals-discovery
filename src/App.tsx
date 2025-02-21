@@ -24,6 +24,7 @@ export default function App() {
             <Route path="/mall/:mallId" element={<MallDetails />} />
             <Route path="/mall/:mallId/manage" element={<MallManagement />} />
             <Route path="/store/:storeId" element={<StoreProfile />} />
+            <Route path="/store/:storeId/promotions" element={<StoreProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
