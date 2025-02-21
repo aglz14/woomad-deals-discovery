@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, SearchIcon } from "lucide-react";
+import { Plus, Trash2, SearchIcon, Pencil } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { Footer } from "@/components/Footer";
 import { AddMallForm } from "@/components/mall/AddMallForm";
 import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 import { MallCard } from "@/components/mall/MallCard";
+import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import {
@@ -34,6 +35,7 @@ export default function Promotions() {
   const [isAddingMall, setIsAddingMall] = useState(false);
   const [isAddingPromotion, setIsAddingPromotion] = useState(false);
   const [mallToDelete, setMallToDelete] = useState<string | null>(null);
+  const [mallToEdit, setMallToEdit] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: malls, refetch: refetchMalls } = useQuery({
@@ -156,47 +158,75 @@ export default function Promotions() {
                     mall={mall}
                     onClick={() => handleMallClick(mall.id)}
                   />
-                  <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setMallToDelete(mall.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t('deleteMallDescription')}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                        <AlertDialogAction
+                  <div className="absolute top-2 right-2 z-10 flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMallToEdit(mall.id);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteMall(mall.id);
+                            setMallToDelete(mall.id);
                           }}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          {t('delete')}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {t('deleteMallDescription')}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteMall(mall.id);
+                            }}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            {t('delete')}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
       </main>
+
+      {malls?.map((mall) => (
+        mallToEdit === mall.id && (
+          <EditMallDialog
+            key={mall.id}
+            mall={mall}
+            isOpen={true}
+            onClose={() => setMallToEdit(null)}
+            onSuccess={() => {
+              refetchMalls();
+              setMallToEdit(null);
+            }}
+          />
+        )
+      ))}
 
       <Footer />
     </div>

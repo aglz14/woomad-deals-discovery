@@ -8,11 +8,14 @@ interface MallCardProps {
     name: string;
     address: string;
     description?: string;
+    latitude: number;
+    longitude: number;
   };
   onClick: () => void;
+  onEdit?: () => void;
 }
 
-export function MallCard({ mall, onClick }: MallCardProps) {
+export function MallCard({ mall, onClick, onEdit }: MallCardProps) {
   return (
     <Card
       className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group bg-white"
