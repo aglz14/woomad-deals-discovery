@@ -9,6 +9,56 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      promotions: {
+        Row: {
+          created_at: string
+          description: string
+          discount_value: string | null
+          end_date: string
+          id: string
+          image_url: string | null
+          start_date: string
+          store_id: string
+          terms_conditions: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          discount_value?: string | null
+          end_date: string
+          id?: string
+          image_url?: string | null
+          start_date: string
+          store_id: string
+          terms_conditions?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          discount_value?: string | null
+          end_date?: string
+          id?: string
+          image_url?: string | null
+          start_date?: string
+          store_id?: string
+          terms_conditions?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       secrets: {
         Row: {
           created_at: string
@@ -29,6 +79,92 @@ export type Database = {
           value?: string
         }
         Relationships: []
+      }
+      shopping_malls: {
+        Row: {
+          address: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          latitude: number
+          longitude: number
+          name: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          latitude: number
+          longitude: number
+          name: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          latitude?: number
+          longitude?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      stores: {
+        Row: {
+          category: string
+          contact_number: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          floor: string | null
+          id: string
+          location_in_mall: string | null
+          logo_url: string | null
+          mall_id: string
+          name: string
+          website: string | null
+        }
+        Insert: {
+          category: string
+          contact_number?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          floor?: string | null
+          id?: string
+          location_in_mall?: string | null
+          logo_url?: string | null
+          mall_id: string
+          name: string
+          website?: string | null
+        }
+        Update: {
+          category?: string
+          contact_number?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          floor?: string | null
+          id?: string
+          location_in_mall?: string | null
+          logo_url?: string | null
+          mall_id?: string
+          name?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stores_mall_id_fkey"
+            columns: ["mall_id"]
+            isOneToOne: false
+            referencedRelation: "shopping_malls"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

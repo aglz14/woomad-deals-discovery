@@ -4,10 +4,21 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface Location {
   lng: number;
   lat: number;
+}
+
+interface ShoppingMall {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  description?: string;
+  image_url?: string;
 }
 
 interface Secret {
@@ -22,12 +33,24 @@ export const MapView = () => {
     lat: 40.7128,
   });
 
+  // Fetch nearby malls
+  const { data: malls } = useQuery({
+    queryKey: ['shopping-malls'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('shopping_malls')
+        .select('*');
+      
+      if (error) throw error;
+      return data as ShoppingMall[];
+    }
+  });
+
   useEffect(() => {
     const initializeMap = async () => {
       if (!mapContainer.current) return;
 
       try {
-        // Get the Mapbox token from Supabase with proper type casting
         const { data, error } = await supabase
           .from('secrets')
           .select('value')
@@ -37,7 +60,6 @@ export const MapView = () => {
         if (error) throw error;
         if (!data) throw new Error('Mapbox token not found');
         
-        // Initialize map with the token
         mapboxgl.accessToken = data.value;
         
         map.current = new mapboxgl.Map({
@@ -47,7 +69,6 @@ export const MapView = () => {
           zoom: 12,
         });
 
-        // Add navigation controls
         map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
         // Get user location
@@ -68,6 +89,24 @@ export const MapView = () => {
             toast.error("Could not get your location. Using default location.");
           }
         );
+
+        // Add markers for malls when they're loaded
+        if (malls) {
+          malls.forEach((mall) => {
+            const marker = new mapboxgl.Marker()
+              .setLngLat([mall.longitude, mall.latitude])
+              .setPopup(
+                new mapboxgl.Popup({ offset: 25 })
+                  .setHTML(`
+                    <h3 class="text-lg font-semibold">${mall.name}</h3>
+                    <p class="text-sm text-gray-600">${mall.address}</p>
+                    ${mall.description ? `<p class="text-sm mt-2">${mall.description}</p>` : ''}
+                    <a href="/mall/${mall.id}" class="text-purple-600 hover:underline text-sm block mt-2">View Details →</a>
+                  `)
+              )
+              .addTo(map.current!);
+          });
+        }
       } catch (error) {
         console.error("Error initializing map:", error);
         toast.error("Could not initialize the map. Please try again later.");
@@ -79,7 +118,7 @@ export const MapView = () => {
     return () => {
       map.current?.remove();
     };
-  }, []);
+  }, [malls]);
 
   return (
     <div className="w-full h-[calc(100vh-4rem)] relative">
