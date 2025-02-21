@@ -1,5 +1,6 @@
 
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   const { t } = useTranslation();
@@ -25,9 +26,9 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
+                <Link to="/about" className="text-gray-600 hover:text-purple-600 transition-colors">
                   {t('about')}
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
