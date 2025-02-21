@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useSession } from "./providers/SessionProvider";
@@ -21,6 +21,7 @@ export const Header = () => {
   const { t } = useTranslation();
   const { session } = useSession();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -51,7 +52,7 @@ export const Header = () => {
                     <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/promotions")}>
                       <Star className="mr-2 h-4 w-4" />
                       <span>Promotions</span>
                     </DropdownMenuItem>
@@ -85,4 +86,3 @@ export const Header = () => {
     </header>
   );
 };
-

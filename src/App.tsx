@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Promotions from "./pages/Promotions";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/promotions" element={<Promotions />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
