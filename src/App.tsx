@@ -27,6 +27,7 @@ function App() {
               <Route path="/promotions" element={<Promotions />} />
               <Route path="/mall/:mallId/manage" element={<MallManagement />} />
               <Route path="/store/:storeId" element={<StoreProfile />} />
+              <Route path="/store/:storeId/promotions" element={<StoreProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
