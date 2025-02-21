@@ -10,6 +10,10 @@ interface Location {
   lat: number;
 }
 
+interface Secret {
+  value: string;
+}
+
 export const MapView = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -23,17 +27,18 @@ export const MapView = () => {
       if (!mapContainer.current) return;
 
       try {
-        // Get the Mapbox token from Supabase
-        const { data: config, error } = await supabase
+        // Get the Mapbox token from Supabase with proper type casting
+        const { data, error } = await supabase
           .from('secrets')
           .select('value')
           .eq('name', 'MAPBOX_TOKEN')
-          .single();
+          .maybeSingle<Secret>();
 
         if (error) throw error;
+        if (!data) throw new Error('Mapbox token not found');
         
         // Initialize map with the token
-        mapboxgl.accessToken = config.value;
+        mapboxgl.accessToken = data.value;
         
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
