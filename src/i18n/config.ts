@@ -1,3 +1,4 @@
+
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -42,7 +43,14 @@ const resources = {
       "startDate": "Fecha de Inicio",
       "endDate": "Fecha de Fin",
       "selectStore": "Seleccionar Tienda",
-      "backToHome": "Volver al Inicio"
+      "backToHome": "Volver al Inicio",
+      "editMall": "Editar Centro Comercial",
+      "mallName": "Nombre del Centro Comercial",
+      "latitude": "Latitud",
+      "longitude": "Longitud",
+      "update": "Actualizar",
+      "mallUpdatedSuccess": "Centro comercial actualizado con éxito",
+      "searchMalls": "Buscar centros comerciales"
     }
   }
 };
