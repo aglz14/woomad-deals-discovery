@@ -22,7 +22,6 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
     name: "",
     description: "",
     category: "",
-    floor: "",
     location_in_mall: "",
     contact_number: "",
   });
@@ -45,7 +44,6 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
         name: "",
         description: "",
         category: "",
-        floor: "",
         location_in_mall: "",
         contact_number: "",
       });
@@ -98,16 +96,6 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
               value={newStore.description}
               onChange={(e) =>
                 setNewStore({ ...newStore, description: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <Label htmlFor="floor">{t('storeFloor')}</Label>
-            <Input
-              id="floor"
-              value={newStore.floor}
-              onChange={(e) =>
-                setNewStore({ ...newStore, floor: e.target.value })
               }
             />
           </div>

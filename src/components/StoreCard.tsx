@@ -10,7 +10,6 @@ interface StoreCardProps {
     description?: string;
     logo_url?: string;
     location_in_mall?: string;
-    floor?: string;
     category: string;
     contact_number?: string;
   };
@@ -46,11 +45,10 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
       <CardContent>
         <div className="space-y-2 text-sm text-gray-600">
           {store.description && <p>{store.description}</p>}
-          {(store.location_in_mall || store.floor) && (
+          {store.location_in_mall && (
             <p className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               {store.location_in_mall}
-              {store.floor && ` - Floor ${store.floor}`}
             </p>
           )}
           {store.contact_number && (
