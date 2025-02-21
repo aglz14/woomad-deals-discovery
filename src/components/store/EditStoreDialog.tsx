@@ -49,12 +49,12 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
 
       if (error) throw error;
 
-      toast.success(t("storeUpdatedSuccess"));
+      toast.success("Tienda actualizada exitosamente");
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Error updating store:", error);
-      toast.error(t("errorTitle"));
+      toast.error("Error al actualizar la tienda");
     }
   };
 
@@ -62,11 +62,11 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('editStore')}</DialogTitle>
+          <DialogTitle>Editar Tienda</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name">{t('storeName')}</Label>
+            <Label htmlFor="name">Nombre de la tienda</Label>
             <Input
               id="name"
               value={editedStore.name}
@@ -75,7 +75,7 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             />
           </div>
           <div>
-            <Label htmlFor="category">{t('category')}</Label>
+            <Label htmlFor="category">Categoría</Label>
             <Input
               id="category"
               value={editedStore.category}
@@ -84,7 +84,7 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             />
           </div>
           <div>
-            <Label htmlFor="description">{t('description')}</Label>
+            <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
               value={editedStore.description}
@@ -92,7 +92,7 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             />
           </div>
           <div>
-            <Label htmlFor="location">{t('location')}</Label>
+            <Label htmlFor="location">Ubicación</Label>
             <Input
               id="location"
               value={editedStore.location_in_mall}
@@ -100,7 +100,7 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             />
           </div>
           <div>
-            <Label htmlFor="contact">{t('contact')}</Label>
+            <Label htmlFor="contact">Contacto</Label>
             <Input
               id="contact"
               value={editedStore.contact_number}
@@ -109,9 +109,9 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t('cancel')}
+              Cancelar
             </Button>
-            <Button type="submit">{t('update')}</Button>
+            <Button type="submit">Actualizar</Button>
           </div>
         </form>
       </DialogContent>
