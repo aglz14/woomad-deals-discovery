@@ -1,19 +1,19 @@
 
-import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tag, Store, Calendar, Percent } from "lucide-react";
+import { Store, Calendar } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 export default function StoreProfile() {
   const { storeId } = useParams();
   const navigate = useNavigate();
 
-  // Fetch store data
   const { data: store, isLoading: isStoreLoading } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
@@ -31,7 +31,6 @@ export default function StoreProfile() {
     },
   });
 
-  // Fetch promotions data
   const { data: promotions, isLoading: isPromotionsLoading } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
@@ -49,6 +48,12 @@ export default function StoreProfile() {
       return data;
     },
   });
+
+  const typeColors = {
+    coupon: 'bg-blue-100 text-blue-800',
+    promotion: 'bg-purple-100 text-purple-800',
+    sale: 'bg-red-100 text-red-800',
+  };
 
   if (isStoreLoading || isPromotionsLoading) {
     return (
@@ -111,10 +116,7 @@ export default function StoreProfile() {
                   )}
                   <div>
                     <CardTitle>{store.name}</CardTitle>
-                    <CardDescription className="flex items-center gap-2">
-                      <Tag className="h-4 w-4" />
-                      {store.category}
-                    </CardDescription>
+                    <CardDescription>{store.category}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -141,30 +143,23 @@ export default function StoreProfile() {
                   <Card key={promo.id}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="flex items-center gap-2">
-                            <Percent className="h-5 w-5 text-purple-500" />
-                            {promo.title}
-                          </CardTitle>
-                          <CardDescription>{promo.description}</CardDescription>
+                        <div className="space-y-2">
+                          <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
+                            {promo.type}
+                          </Badge>
+                          <CardTitle>{promo.title}</CardTitle>
                         </div>
-                        {promo.discount_value && (
-                          <span className="text-lg font-bold text-purple-600">
-                            {promo.discount_value}
-                          </span>
-                        )}
                       </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-4">
+                      <p className="text-gray-600 whitespace-pre-wrap">{promo.description}</p>
                       <div className="flex items-center gap-2 text-sm text-gray-500">
                         <Calendar className="h-4 w-4" />
-                        Valid until {new Date(promo.end_date).toLocaleDateString()}
+                        <span>
+                          {format(new Date(promo.start_date), 'MMM d')} -{' '}
+                          {format(new Date(promo.end_date), 'MMM d, yyyy')}
+                        </span>
                       </div>
-                      {promo.terms_conditions && (
-                        <p className="mt-2 text-sm text-gray-500">
-                          {promo.terms_conditions}
-                        </p>
-                      )}
                     </CardContent>
                   </Card>
                 ))

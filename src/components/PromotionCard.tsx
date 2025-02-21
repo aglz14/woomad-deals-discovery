@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, Tag, Percent, Store, MapPin } from 'lucide-react';
+import { Calendar, Store, MapPin } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { format } from 'date-fns';
 import { Badge } from './ui/badge';
@@ -13,8 +13,6 @@ interface PromotionCardProps {
     description: string;
     start_date: string;
     end_date: string;
-    discount_value?: string;
-    terms_conditions?: string;
     image_url?: string;
     store: {
       id: string;
@@ -78,22 +76,8 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {promotion.discount_value && (
-          <div className="flex items-center gap-2 text-lg font-semibold text-purple-600">
-            <Percent className="h-5 w-5" />
-            {promotion.discount_value}
-          </div>
-        )}
-
-        <p className="text-gray-600 text-sm">{promotion.description}</p>
-
-        {promotion.terms_conditions && (
-          <div className="pt-4 border-t text-xs text-gray-500">
-            <p className="font-medium mb-1">Terms & Conditions:</p>
-            <p>{promotion.terms_conditions}</p>
-          </div>
-        )}
+      <CardContent>
+        <p className="text-gray-600 text-sm whitespace-pre-wrap">{promotion.description}</p>
       </CardContent>
     </Card>
   );
