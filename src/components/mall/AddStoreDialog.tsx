@@ -23,8 +23,6 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
     floor: "",
     location_in_mall: "",
     contact_number: "",
-    email: "",
-    website: "",
   });
 
   const handleAddStore = async (e: React.FormEvent) => {
@@ -48,8 +46,6 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
         floor: "",
         location_in_mall: "",
         contact_number: "",
-        email: "",
-        website: "",
       });
       onStoreAdded();
     } catch (error) {
@@ -130,28 +126,6 @@ export function AddStoreDialog({ mallId, onStoreAdded }: AddStoreDialogProps) {
               value={newStore.contact_number}
               onChange={(e) =>
                 setNewStore({ ...newStore, contact_number: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={newStore.email}
-              onChange={(e) =>
-                setNewStore({ ...newStore, email: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <Label htmlFor="website">Website</Label>
-            <Input
-              id="website"
-              type="url"
-              value={newStore.website}
-              onChange={(e) =>
-                setNewStore({ ...newStore, website: e.target.value })
               }
             />
           </div>

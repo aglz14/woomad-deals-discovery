@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Store, Tag, Phone, Mail, Globe } from 'lucide-react';
+import { Store, Tag, Phone, MapPin } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface StoreCardProps {
@@ -13,8 +13,6 @@ interface StoreCardProps {
     floor?: string;
     category: string;
     contact_number?: string;
-    email?: string;
-    website?: string;
   };
   onClick: () => void;
 }
@@ -48,9 +46,10 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
       <CardContent>
         <div className="space-y-2 text-sm text-gray-600">
           {store.description && <p>{store.description}</p>}
-          {store.location_in_mall && (
-            <p>
-              Location: {store.location_in_mall}
+          {(store.location_in_mall || store.floor) && (
+            <p className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              {store.location_in_mall}
               {store.floor && ` - Floor ${store.floor}`}
             </p>
           )}
@@ -58,26 +57,6 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
             <p className="flex items-center gap-2">
               <Phone className="h-4 w-4" />
               {store.contact_number}
-            </p>
-          )}
-          {store.email && (
-            <p className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              {store.email}
-            </p>
-          )}
-          {store.website && (
-            <p className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              <a
-                href={store.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-600 hover:underline"
-                onClick={(e) => e.stopPropagation()}
-              >
-                Visit Website
-              </a>
             </p>
           )}
         </div>
