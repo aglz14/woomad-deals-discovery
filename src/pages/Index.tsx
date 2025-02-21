@@ -5,7 +5,8 @@ import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { HomeHero } from "@/components/home/HomeHero";
 import { PromotionsList } from "@/components/home/PromotionsList";
-import { DatabasePromotion } from "@/types/promotion";
+import { StoresNearby } from "@/components/home/StoresNearby";
+import { MallsNearby } from "@/components/home/MallsNearby";
 import { useLocation } from "@/hooks/use-location";
 import { getPromotions } from "@/services/promotions";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -33,7 +34,7 @@ export default function Index() {
     },
   });
 
-  const filterPromotions = (promotions: DatabasePromotion[]) => {
+  const filterPromotions = (promotions: any[]) => {
     if (!promotions) return [];
     let filtered = promotions;
     
@@ -89,17 +90,35 @@ export default function Index() {
           selectedMallId={selectedMallId}
         />
 
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-12 space-y-16">
           <ErrorBoundary>
-            <PromotionsList
-              isLoading={isLoading}
-              promotions={promotions}
-              currentItems={getCurrentPageItems()}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              setCurrentPage={setCurrentPage}
-              searchTerm={searchTerm}
-            />
+            <div className="space-y-16">
+              <section>
+                <PromotionsList
+                  isLoading={isLoading}
+                  promotions={promotions}
+                  currentItems={getCurrentPageItems()}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  setCurrentPage={setCurrentPage}
+                  searchTerm={searchTerm}
+                />
+              </section>
+
+              <section>
+                <StoresNearby 
+                  searchTerm={searchTerm}
+                  selectedMallId={selectedMallId}
+                />
+              </section>
+
+              <section>
+                <MallsNearby 
+                  searchTerm={searchTerm}
+                  selectedMallId={selectedMallId}
+                />
+              </section>
+            </div>
           </ErrorBoundary>
         </div>
       </main>
