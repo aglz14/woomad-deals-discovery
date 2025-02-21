@@ -1,88 +1,208 @@
 
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import "../i18n/config";
+import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { SearchBar } from "@/components/SearchBar";
-import { MapView } from "@/components/MapView";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader } from "lucide-react";
+import { PromotionCard } from "@/components/PromotionCard";
+import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { toast } from "sonner";
 
-const Index = () => {
-  const { t } = useTranslation();
+export default function Index() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const ITEMS_PER_PAGE = 10;
 
-  const handleSearch = (query: string) => {
-    console.log("Searching for:", query);
-    // We'll implement search functionality in the next iteration
+  useEffect(() => {
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          toast.error("Could not get your location. Showing all promotions instead.");
+        }
+      );
+    }
+  }, []);
+
+  // Fetch all promotions
+  const { data: promotions, isLoading } = useQuery({
+    queryKey: ["promotions", userLocation],
+    queryFn: async () => {
+      const { data: malls, error: mallsError } = await supabase
+        .from("shopping_malls")
+        .select("*");
+
+      if (mallsError) throw mallsError;
+
+      // If we have user location, sort malls by distance
+      const sortedMalls = userLocation
+        ? malls.sort((a, b) => {
+            const distA = calculateDistance(
+              userLocation.lat,
+              userLocation.lng,
+              a.latitude,
+              a.longitude
+            );
+            const distB = calculateDistance(
+              userLocation.lat,
+              userLocation.lng,
+              b.latitude,
+              b.longitude
+            );
+            return distA - distB;
+          })
+        : malls;
+
+      // Get all stores from these malls
+      const { data: stores, error: storesError } = await supabase
+        .from("stores")
+        .select("*")
+        .in(
+          "mall_id",
+          sortedMalls.map((m) => m.id)
+        );
+
+      if (storesError) throw storesError;
+
+      // Get all active promotions from these stores
+      const { data: promotions, error: promotionsError } = await supabase
+        .from("promotions")
+        .select(`
+          *,
+          store:stores (
+            *,
+            mall:shopping_malls (*)
+          )
+        `)
+        .in(
+          "store_id",
+          stores.map((s) => s.id)
+        )
+        .gte("end_date", new Date().toISOString())
+        .order("start_date", { ascending: true });
+
+      if (promotionsError) throw promotionsError;
+
+      return promotions;
+    },
+  });
+
+  // Calculate total pages
+  const totalPages = Math.ceil((promotions?.length || 0) / ITEMS_PER_PAGE);
+
+  // Get current page items
+  const getCurrentPageItems = () => {
+    if (!promotions) return [];
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return promotions.slice(start, end);
+  };
+
+  // Helper function to calculate distance between two points
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  };
+
+  const deg2rad = (deg: number) => {
+    return deg * (Math.PI / 180);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
-      
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <div className="relative pt-24 pb-12 md:pt-32 md:pb-16">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12 animate-fade-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-                Discover Amazing Places
-              </h1>
-              <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                Find and explore unique locations around you with our interactive map experience.
-              </p>
-            </div>
-            
-            <div className="relative z-10 animate-fade-up delay-150">
-              <SearchBar onSearch={handleSearch} />
-            </div>
+
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">
+          {userLocation ? "Promotions Near You" : "All Active Promotions"}
+        </h1>
+
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <Loader className="w-8 h-8 animate-spin" />
           </div>
-        </div>
-
-        {/* Map Section */}
-        <div className="container mx-auto px-4 pb-12">
-          <div className="rounded-2xl overflow-hidden shadow-2xl bg-white/50 backdrop-blur-sm border border-white/20 animate-fade-up delay-300">
-            <div className="h-[60vh] md:h-[70vh] lg:h-[75vh]">
-              <MapView />
-            </div>
+        ) : promotions?.length === 0 ? (
+          <div className="text-center text-gray-500">
+            <p>No active promotions found.</p>
           </div>
-        </div>
-
-        {/* Features Section */}
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-up delay-400">
-              <div className="text-purple-600 text-2xl mb-4">🗺️</div>
-              <h3 className="text-xl font-semibold mb-2">Interactive Maps</h3>
-              <p className="text-gray-600">
-                Explore locations with our intuitive interactive map interface.
-              </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {getCurrentPageItems().map((promotion) => (
+                <PromotionCard key={promotion.id} promotion={promotion} />
+              ))}
             </div>
 
-            {/* Feature 2 */}
-            <div className="p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-up delay-500">
-              <div className="text-purple-600 text-2xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold mb-2">Smart Search</h3>
-              <p className="text-gray-600">
-                Find exactly what you're looking for with our powerful search features.
-              </p>
-            </div>
+            {totalPages > 1 && (
+              <Pagination className="mt-8">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage((prev) => Math.max(1, prev - 1));
+                      }}
+                    />
+                  </PaginationItem>
 
-            {/* Feature 3 */}
-            <div className="p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-up delay-600">
-              <div className="text-purple-600 text-2xl mb-4">📍</div>
-              <h3 className="text-xl font-semibold mb-2">Real-time Location</h3>
-              <p className="text-gray-600">
-                Get instant updates and discover places near your current location.
-              </p>
-            </div>
-          </div>
-        </div>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href="#"
+                        isActive={page === currentPage}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(page);
+                        }}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                      }}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </>
+        )}
       </main>
 
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}
