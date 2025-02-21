@@ -26,7 +26,7 @@ export function MallCard({ mall, onClick, onEdit }: MallCardProps) {
           <div className="p-2 rounded-lg bg-purple-50 text-purple-600 group-hover:bg-purple-100 transition-colors">
             <Building2 className="h-5 w-5" />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 pr-20"> {/* Added right padding to prevent title from going under icons */}
             <CardTitle className="text-lg font-semibold line-clamp-2">{mall.name}</CardTitle>
           </div>
         </div>
