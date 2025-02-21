@@ -35,10 +35,9 @@ export const Header = () => {
           </div>
 
           <div className="flex items-center gap-6">
-            <LanguageSwitcher />
-            
             {session ? (
               <div className="flex items-center gap-4">
+                <LanguageSwitcher />
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-gray-500" />
                   <span className="text-sm text-gray-700">{session.user.email}</span>
@@ -52,26 +51,29 @@ export const Header = () => {
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setAuthMode("login");
-                    setIsAuthModalOpen(true);
-                  }}
-                  className="text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                >
-                  Log In
-                </Button>
-                <Button
-                  onClick={() => {
-                    setAuthMode("signup");
-                    setIsAuthModalOpen(true);
-                  }}
-                  className="bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600"
-                >
-                  Sign Up
-                </Button>
+              <div className="flex items-center gap-4">
+                <LanguageSwitcher />
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setAuthMode("login");
+                      setIsAuthModalOpen(true);
+                    }}
+                    className="text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  >
+                    Log In
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setAuthMode("signup");
+                      setIsAuthModalOpen(true);
+                    }}
+                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600"
+                  >
+                    Sign Up
+                  </Button>
+                </div>
               </div>
             )}
           </div>

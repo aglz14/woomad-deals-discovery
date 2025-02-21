@@ -14,7 +14,7 @@ export const LanguageSwitcher = () => {
     <Button
       onClick={toggleLanguage}
       variant="ghost"
-      className="fixed top-4 right-4 bg-white/80 backdrop-blur-sm hover:bg-white/90 z-50"
+      className="bg-white/80 backdrop-blur-sm hover:bg-white/90"
     >
       {t(i18n.language === "en" ? "switchToSpanish" : "switchToEnglish")}
     </Button>
