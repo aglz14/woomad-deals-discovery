@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -6,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader, MapPin } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
+import { SearchBar } from "@/components/search/SearchBar";
 import {
   Pagination,
   PaginationContent,
@@ -16,15 +16,12 @@ import {
 } from "@/components/ui/pagination";
 import { toast } from "sonner";
 
-// Define valid promotion types
 type ValidPromotionType = "promotion" | "coupon" | "sale";
 
-// Type guard to check if a string is a valid promotion type
 const isValidPromotionType = (type: string): type is ValidPromotionType => {
   return ["promotion", "coupon", "sale"].includes(type);
 };
 
-// Interface for the promotion data from the database
 interface DatabasePromotion {
   id: string;
   type: string;
@@ -50,10 +47,10 @@ interface DatabasePromotion {
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
-    // Get user's location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -70,7 +67,6 @@ export default function Index() {
     }
   }, []);
 
-  // Fetch all promotions
   const { data: promotions, isLoading } = useQuery({
     queryKey: ["promotions", userLocation],
     queryFn: async () => {
@@ -80,7 +76,6 @@ export default function Index() {
 
       if (mallsError) throw mallsError;
 
-      // If we have user location, sort malls by distance
       const sortedMalls = userLocation
         ? malls.sort((a, b) => {
             const distA = calculateDistance(
@@ -99,7 +94,6 @@ export default function Index() {
           })
         : malls;
 
-      // Get all stores from these malls
       const { data: stores, error: storesError } = await supabase
         .from("stores")
         .select("*")
@@ -110,7 +104,6 @@ export default function Index() {
 
       if (storesError) throw storesError;
 
-      // Get all active promotions from these stores
       const { data: rawPromotions, error: promotionsError } = await supabase
         .from("promotions")
         .select(`
@@ -129,7 +122,6 @@ export default function Index() {
 
       if (promotionsError) throw promotionsError;
 
-      // Filter and validate promotion types
       return (rawPromotions as DatabasePromotion[])
         .filter((promo) => isValidPromotionType(promo.type))
         .map((promo) => ({
@@ -139,20 +131,35 @@ export default function Index() {
     },
   });
 
-  // Calculate total pages
   const totalPages = Math.ceil((promotions?.length || 0) / ITEMS_PER_PAGE);
 
-  // Get current page items
-  const getCurrentPageItems = () => {
-    if (!promotions) return [];
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    return promotions.slice(start, end);
+  const filterPromotions = (promotions: DatabasePromotion[]) => {
+    if (!searchTerm) return promotions;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return promotions.filter(promotion => 
+      promotion.store.name.toLowerCase().includes(searchLower) ||
+      promotion.store.mall.name.toLowerCase().includes(searchLower) ||
+      promotion.title.toLowerCase().includes(searchLower) ||
+      promotion.description.toLowerCase().includes(searchLower)
+    );
   };
 
-  // Helper function to calculate distance between two points
+  const getCurrentPageItems = () => {
+    if (!promotions) return [];
+    const filteredPromotions = filterPromotions(promotions);
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return filteredPromotions.slice(start, end);
+  };
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a =
@@ -162,7 +169,7 @@ export default function Index() {
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+    return R * c;
   };
 
   const deg2rad = (deg: number) => {
@@ -174,27 +181,31 @@ export default function Index() {
       <Header />
 
       <main className="flex-grow">
-        {/* Hero Section - Added pt-24 for more top padding */}
         <div className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white py-16 pt-24">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center space-y-4 animate-fade-in">
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                {userLocation ? "Discover Deals Near You" : "Explore Amazing Deals"}
-              </h1>
-              <p className="text-lg md:text-xl text-white/90">
-                Find the best promotions, coupons, and sales from your favorite stores
-              </p>
-              {userLocation && (
-                <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                  <MapPin className="w-4 h-4" />
-                  <span>Location access enabled</span>
-                </div>
-              )}
+            <div className="max-w-3xl mx-auto text-center space-y-8 animate-fade-in">
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+                  {userLocation ? "Discover Deals Near You" : "Explore Amazing Deals"}
+                </h1>
+                <p className="text-lg md:text-xl text-white/90">
+                  Find the best promotions, coupons, and sales from your favorite stores
+                </p>
+                {userLocation && (
+                  <div className="flex items-center justify-center gap-2 text-sm text-white/80">
+                    <MapPin className="w-4 h-4" />
+                    <span>Location access enabled</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-8">
+                <SearchBar onSearch={handleSearch} />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Content Section */}
         <div className="container mx-auto px-4 py-12">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-64 space-y-4">
@@ -207,6 +218,15 @@ export default function Index() {
                 <h2 className="text-xl font-semibold text-gray-900">No active promotions found</h2>
                 <p className="text-gray-500">
                   Check back later for new deals and promotions from your favorite stores.
+                </p>
+              </div>
+            </div>
+          ) : getCurrentPageItems().length === 0 ? (
+            <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="max-w-md mx-auto space-y-4">
+                <h2 className="text-xl font-semibold text-gray-900">No matches found</h2>
+                <p className="text-gray-500">
+                  Try adjusting your search terms to find more promotions.
                 </p>
               </div>
             </div>
