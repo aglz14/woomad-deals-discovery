@@ -32,8 +32,9 @@ export const Header = () => {
     }
   };
 
-  // Don't render anything while loading
-  if (isLoading) return null;
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -49,18 +50,13 @@ export const Header = () => {
               
               {session?.user ? (
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 px-4 py-2 text-white hover:text-white/90 transition-colors rounded-md"
-                    >
-                      <User className="h-4 w-4" />
-                      <span>{session.user.email}</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
+                  <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 text-white hover:text-white/90 transition-colors rounded-md">
+                    <User className="h-4 w-4" />
+                    <span>{session.user.email}</span>
+                    <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
-                    className="w-56 bg-white shadow-lg" 
+                    className="w-56 bg-white shadow-lg z-50" 
                     align="end"
                   >
                     <DropdownMenuItem 

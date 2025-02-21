@@ -5,6 +5,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { Loader } from "lucide-react";
 
 interface Location {
   lng: number;
@@ -32,6 +33,23 @@ export const MapView = () => {
     lng: -74.006,
     lat: 40.7128,
   });
+  const [isMapLoading, setIsMapLoading] = useState(true);
+
+  // Fetch Mapbox token
+  const { data: mapboxToken, isLoading: isTokenLoading } = useQuery({
+    queryKey: ['mapbox-token'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('secrets')
+        .select('value')
+        .eq('name', 'MAPBOX_TOKEN')
+        .maybeSingle<Secret>();
+      
+      if (error) throw error;
+      if (!data) throw new Error('Mapbox token not found');
+      return data.value;
+    }
+  });
 
   // Fetch nearby malls
   const { data: malls } = useQuery({
@@ -43,85 +61,89 @@ export const MapView = () => {
       
       if (error) throw error;
       return data as ShoppingMall[];
-    }
+    },
+    enabled: !!mapboxToken, // Only fetch malls after we have the token
   });
 
   useEffect(() => {
-    const initializeMap = async () => {
-      if (!mapContainer.current) return;
+    if (!mapContainer.current || !mapboxToken || map.current) return;
 
-      try {
-        const { data, error } = await supabase
-          .from('secrets')
-          .select('value')
-          .eq('name', 'MAPBOX_TOKEN')
-          .maybeSingle<Secret>();
+    try {
+      mapboxgl.accessToken = mapboxToken;
+      
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/light-v11",
+        center: [userLocation.lng, userLocation.lat],
+        zoom: 12,
+      });
 
-        if (error) throw error;
-        if (!data) throw new Error('Mapbox token not found');
-        
-        mapboxgl.accessToken = data.value;
-        
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: "mapbox://styles/mapbox/light-v11",
-          center: [userLocation.lng, userLocation.lat],
-          zoom: 12,
-        });
+      map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-        map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-        // Get user location
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const newLocation = {
-              lng: position.coords.longitude,
-              lat: position.coords.latitude,
-            };
-            setUserLocation(newLocation);
-            map.current?.flyTo({
-              center: [newLocation.lng, newLocation.lat],
-              zoom: 12,
-            });
-          },
-          (error) => {
-            console.error("Error getting location:", error);
-            toast.error("Could not get your location. Using default location.");
-          }
-        );
-
-        // Add markers for malls when they're loaded
-        if (malls) {
-          malls.forEach((mall) => {
-            const marker = new mapboxgl.Marker()
-              .setLngLat([mall.longitude, mall.latitude])
-              .setPopup(
-                new mapboxgl.Popup({ offset: 25 })
-                  .setHTML(`
-                    <h3 class="text-lg font-semibold">${mall.name}</h3>
-                    <p class="text-sm text-gray-600">${mall.address}</p>
-                    ${mall.description ? `<p class="text-sm mt-2">${mall.description}</p>` : ''}
-                    <a href="/mall/${mall.id}" class="text-purple-600 hover:underline text-sm block mt-2">View Details →</a>
-                  `)
-              )
-              .addTo(map.current!);
+      // Get user location
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const newLocation = {
+            lng: position.coords.longitude,
+            lat: position.coords.latitude,
+          };
+          setUserLocation(newLocation);
+          map.current?.flyTo({
+            center: [newLocation.lng, newLocation.lat],
+            zoom: 12,
           });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          toast.error("Could not get your location. Using default location.");
         }
-      } catch (error) {
-        console.error("Error initializing map:", error);
-        toast.error("Could not initialize the map. Please try again later.");
-      }
-    };
+      );
 
-    initializeMap();
+      map.current.on('style.load', () => {
+        setIsMapLoading(false);
+      });
+
+      // Add markers for malls when they're loaded
+      if (malls) {
+        malls.forEach((mall) => {
+          const marker = new mapboxgl.Marker()
+            .setLngLat([mall.longitude, mall.latitude])
+            .setPopup(
+              new mapboxgl.Popup({ offset: 25 })
+                .setHTML(`
+                  <h3 class="text-lg font-semibold">${mall.name}</h3>
+                  <p class="text-sm text-gray-600">${mall.address}</p>
+                  ${mall.description ? `<p class="text-sm mt-2">${mall.description}</p>` : ''}
+                  <a href="/mall/${mall.id}" class="text-purple-600 hover:underline text-sm block mt-2">View Details →</a>
+                `)
+            )
+            .addTo(map.current!);
+        });
+      }
+    } catch (error) {
+      console.error("Error initializing map:", error);
+      toast.error("Could not initialize the map. Please try again later.");
+      setIsMapLoading(false);
+    }
 
     return () => {
       map.current?.remove();
     };
-  }, [malls]);
+  }, [mapboxToken, malls]);
+
+  if (isTokenLoading || isMapLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="flex items-center gap-2 text-gray-600">
+          <Loader className="h-5 w-5 animate-spin" />
+          <span>Loading map...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-[calc(100vh-4rem)] relative">
+    <div className="w-full h-full relative">
       <div ref={mapContainer} className="absolute inset-0 rounded-lg shadow-lg" />
       <div className="absolute inset-0 pointer-events-none rounded-lg bg-gradient-to-b from-transparent to-background/10" />
     </div>
