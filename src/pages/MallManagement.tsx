@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -8,9 +7,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
 import { StoresList } from "@/components/mall/StoresList";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { EditStoreDialog } from "@/components/store/EditStoreDialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +29,7 @@ export default function MallManagement() {
   const navigate = useNavigate();
   const { session } = useSession();
   const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
+  const [storeToEdit, setStoreToEdit] = useState<string | null>(null);
 
   // Fetch mall data
   const { data: mall, isLoading: isMallLoading } = useQuery({
@@ -158,50 +159,78 @@ export default function MallManagement() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stores?.map((store) => (
-              <div key={store.id} className="relative">
+              <div key={store.id} className="relative group">
                 <div onClick={() => handleStoreClick(store.id)} className="cursor-pointer">
                   <StoresList stores={[store]} onStoreClick={() => {}} />
                 </div>
-                <AlertDialog open={storeToDelete === store.id} onOpenChange={(open) => !open && setStoreToDelete(null)}>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 z-10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setStoreToDelete(store.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Store</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete the store and all its promotions. This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
+                <div className="absolute top-4 right-4 z-10 flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-gray-100"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStoreToEdit(store.id);
+                    }}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <AlertDialog open={storeToDelete === store.id} onOpenChange={(open) => !open && setStoreToDelete(null)}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteStore(store.id);
+                          setStoreToDelete(store.id);
                         }}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Store</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete the store and all its promotions. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteStore(store.id);
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </main>
+
+      {stores?.map((store) => (
+        storeToEdit === store.id && (
+          <EditStoreDialog
+            key={store.id}
+            store={store}
+            isOpen={true}
+            onClose={() => setStoreToEdit(null)}
+            onSuccess={() => {
+              refetchStores();
+              setStoreToEdit(null);
+            }}
+          />
+        )
+      ))}
 
       <Footer />
     </div>

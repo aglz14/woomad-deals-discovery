@@ -19,7 +19,7 @@ interface StoreCardProps {
 export const StoreCard = ({ store, onClick }: StoreCardProps) => {
   return (
     <Card 
-      className="hover:shadow-lg transition-shadow cursor-pointer"
+      className="hover:shadow-lg transition-shadow cursor-pointer relative"
       onClick={onClick}
     >
       <CardHeader>
@@ -33,7 +33,7 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
           ) : (
             <Store className="w-16 h-16 text-purple-500" />
           )}
-          <div>
+          <div className="flex-1">
             <CardTitle>{store.name}</CardTitle>
             <CardDescription className="flex items-center gap-2">
               <Tag className="h-4 w-4" />
@@ -61,4 +61,4 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
       </CardContent>
     </Card>
   );
-};
+}
