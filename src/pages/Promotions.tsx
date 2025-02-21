@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,17 @@ import { AddMallForm } from "@/components/mall/AddMallForm";
 import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 import { MallCard } from "@/components/mall/MallCard";
 import { useTranslation } from "react-i18next";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Promotions() {
   const { t } = useTranslation();
@@ -21,6 +32,7 @@ export default function Promotions() {
   const navigate = useNavigate();
   const [isAddingMall, setIsAddingMall] = useState(false);
   const [isAddingPromotion, setIsAddingPromotion] = useState(false);
+  const [mallToDelete, setMallToDelete] = useState<string | null>(null);
 
   const { data: malls, refetch: refetchMalls } = useQuery({
     queryKey: ["shopping-malls"],
@@ -48,6 +60,23 @@ export default function Promotions() {
 
   const handleMallClick = (mallId: string) => {
     navigate(`/mall/${mallId}/manage`);
+  };
+
+  const handleDeleteMall = async (mallId: string) => {
+    try {
+      const { error } = await supabase
+        .from('shopping_malls')
+        .delete()
+        .eq('id', mallId);
+
+      if (error) throw error;
+
+      toast.success(t("mallDeletedSuccess"));
+      refetchMalls();
+    } catch (error) {
+      toast.error(t("errorDeletingMall"));
+    }
+    setMallToDelete(null);
   };
 
   return (
@@ -104,11 +133,47 @@ export default function Promotions() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {malls?.map((mall) => (
-              <MallCard
-                key={mall.id}
-                mall={mall}
-                onClick={() => handleMallClick(mall.id)}
-              />
+              <div key={mall.id} className="relative">
+                <MallCard
+                  mall={mall}
+                  onClick={() => handleMallClick(mall.id)}
+                />
+                <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMallToDelete(mall.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t('deleteMallDescription')}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteMall(mall.id);
+                        }}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {t('delete')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             ))}
           </div>
         </div>

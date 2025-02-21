@@ -8,14 +8,27 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
 import { StoresList } from "@/components/mall/StoresList";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 export default function MallManagement() {
   const { mallId } = useParams();
   const navigate = useNavigate();
   const { session } = useSession();
+  const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
 
   // Fetch mall data
   const { data: mall, isLoading: isMallLoading } = useQuery({
@@ -30,7 +43,7 @@ export default function MallManagement() {
       if (error) throw error;
       return data;
     },
-    enabled: !!mallId, // Only run query if mallId exists
+    enabled: !!mallId,
   });
 
   // Fetch stores data
@@ -45,7 +58,7 @@ export default function MallManagement() {
       if (error) throw error;
       return data;
     },
-    enabled: !!mallId, // Only run query if mallId exists
+    enabled: !!mallId,
   });
 
   useEffect(() => {
@@ -62,6 +75,23 @@ export default function MallManagement() {
 
   const handleStoreClick = (storeId: string) => {
     navigate(`/store/${storeId}/promotions`);
+  };
+
+  const handleDeleteStore = async (storeId: string) => {
+    try {
+      const { error } = await supabase
+        .from('stores')
+        .delete()
+        .eq('id', storeId);
+
+      if (error) throw error;
+
+      toast.success("Store deleted successfully");
+      refetchStores();
+    } catch (error) {
+      toast.error("Error deleting store");
+    }
+    setStoreToDelete(null);
   };
 
   // Show loading state while data is being fetched
@@ -127,10 +157,48 @@ export default function MallManagement() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <StoresList 
-              stores={stores || []} 
-              onStoreClick={handleStoreClick} 
-            />
+            {stores?.map((store) => (
+              <div key={store.id} className="relative">
+                <div onClick={() => handleStoreClick(store.id)} className="cursor-pointer">
+                  <StoresList stores={[store]} onStoreClick={() => {}} />
+                </div>
+                <AlertDialog open={storeToDelete === store.id} onOpenChange={(open) => !open && setStoreToDelete(null)}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStoreToDelete(store.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Store</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete the store and all its promotions. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteStore(store.id);
+                        }}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            ))}
           </div>
         </div>
       </main>
