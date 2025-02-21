@@ -38,23 +38,23 @@ export const MapView = () => {
       console.log('Fetching Mapbox token...');
       const { data, error } = await supabase
         .from('secrets')
-        .select('*')
-        .eq('name', 'MAPBOX_TOKEN')
-        .single();
+        .select('value')
+        .eq('name', 'MAPBOX_TOKEN');
       
       if (error) {
         console.error('Error fetching token:', error);
         throw error;
       }
       
-      if (!data?.value) {
+      if (!data || data.length === 0) {
         console.error('No token found in secrets');
         throw new Error('Mapbox token not found');
       }
       
       console.log('Token retrieved successfully');
-      return data.value;
+      return data[0].value;
     },
+    retry: 1,
   });
 
   // Fetch nearby malls
