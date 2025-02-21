@@ -34,12 +34,15 @@ export const PromotionsList = ({
 
   if (!promotions?.length) {
     return (
-      <div className="text-center py-16 bg-gray-50 rounded-lg">
-        <div className="max-w-md mx-auto space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">No active promotions found</h2>
-          <p className="text-gray-500">
-            Check back later for new deals and promotions from your favorite stores.
-          </p>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
+        <div className="text-center py-16 bg-gray-50 rounded-lg">
+          <div className="max-w-md mx-auto space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900">No active promotions found</h2>
+            <p className="text-gray-500">
+              Check back later for new deals and promotions from your favorite stores.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -47,12 +50,15 @@ export const PromotionsList = ({
 
   if (currentItems.length === 0) {
     return (
-      <div className="text-center py-16 bg-gray-50 rounded-lg">
-        <div className="max-w-md mx-auto space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">No matches found</h2>
-          <p className="text-gray-500">
-            Try adjusting your search terms to find more promotions.
-          </p>
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
+        <div className="text-center py-16 bg-gray-50 rounded-lg">
+          <div className="max-w-md mx-auto space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900">No matches found</h2>
+            <p className="text-gray-500">
+              Try adjusting your search terms to find more promotions.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -60,6 +66,7 @@ export const PromotionsList = ({
 
   return (
     <div className="space-y-8 animate-fade-up">
+      <h2 className="text-2xl font-bold text-gray-900">Promociones Cercanas</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((promotion) => (
           <div key={promotion.id} className="transform transition-all duration-300 hover:scale-[1.02]">
