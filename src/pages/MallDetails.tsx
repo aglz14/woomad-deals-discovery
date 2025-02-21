@@ -41,9 +41,9 @@ export default function MallDetails() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow">
+        <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
-            <div className="animate-pulse space-y-4">
+            <div className="animate-pulse space-y-6">
               <div className="h-8 bg-gray-200 rounded w-1/4"></div>
               <div className="h-4 bg-gray-200 rounded w-1/2"></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
@@ -63,7 +63,7 @@ export default function MallDetails() {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow">
+        <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900">Shopping Mall Not Found</h1>
@@ -76,27 +76,39 @@ export default function MallDetails() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-3xl font-bold text-gray-900">{mall.name}</h1>
-              
-              <div className="flex items-start gap-2 text-gray-600">
-                <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                <p>{mall.address}</p>
+            <div className="bg-white rounded-lg p-6 shadow-sm space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-lg bg-purple-100">
+                  <Building2 className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="space-y-4">
+                  <h1 className="text-3xl font-bold text-gray-900">{mall.name}</h1>
+                  
+                  <div className="flex items-start gap-2 text-gray-600">
+                    <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                    <p className="text-lg">{mall.address}</p>
+                  </div>
+                  
+                  {mall.description && (
+                    <p className="text-gray-600 max-w-3xl text-lg leading-relaxed">
+                      {mall.description}
+                    </p>
+                  )}
+                </div>
               </div>
-              
-              {mall.description && (
-                <p className="text-gray-600 max-w-3xl">{mall.description}</p>
-              )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <StoresList stores={stores || []} onStoreClick={() => {}} />
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-gray-900">Available Stores</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StoresList stores={stores || []} onStoreClick={() => {}} />
+              </div>
             </div>
           </div>
         </div>
