@@ -44,14 +44,22 @@ export const Header = () => {
             <div className="flex items-center gap-4">
               <LanguageSwitcher />
               
-              {session ? (
+              {session?.user ? (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-2 text-white hover:text-white/90 transition-colors">
-                    <User className="h-4 w-4" />
-                    <span>{session.user.email}</span>
-                    <ChevronDown className="h-4 w-4" />
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      className="flex items-center gap-2 text-white hover:text-white/90 transition-colors"
+                    >
+                      <User className="h-4 w-4" />
+                      <span>{session.user.email}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent 
+                    className="w-56 bg-white" 
+                    align="end"
+                  >
                     <DropdownMenuItem onClick={() => navigate("/promotions")}>
                       <Star className="mr-2 h-4 w-4" />
                       <span>Promotions</span>
