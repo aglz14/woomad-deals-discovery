@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, SearchIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { AddMallForm } from "@/components/mall/AddMallForm";
 import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 import { MallCard } from "@/components/mall/MallCard";
 import { useTranslation } from "react-i18next";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +34,7 @@ export default function Promotions() {
   const [isAddingMall, setIsAddingMall] = useState(false);
   const [isAddingPromotion, setIsAddingPromotion] = useState(false);
   const [mallToDelete, setMallToDelete] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: malls, refetch: refetchMalls } = useQuery({
     queryKey: ["shopping-malls"],
@@ -79,102 +81,119 @@ export default function Promotions() {
     setMallToDelete(null);
   };
 
+  const filteredMalls = malls?.filter(mall => 
+    mall.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    mall.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    mall.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">{t('managePromotions')}</h1>
-            <div className="flex gap-4">
-              <Dialog open={isAddingPromotion} onOpenChange={setIsAddingPromotion}>
-                <DialogTrigger asChild>
-                  <Button variant="default">
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('addPromotion')}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>{t('addPromotion')}</DialogTitle>
-                  </DialogHeader>
-                  <AddPromotionForm
-                    onSuccess={() => {
-                      setIsAddingPromotion(false);
-                    }}
-                    onCancel={() => setIsAddingPromotion(false)}
-                  />
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={isAddingMall} onOpenChange={setIsAddingMall}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('addShoppingMall')}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>{t('addShoppingMall')}</DialogTitle>
-                  </DialogHeader>
-                  <AddMallForm
-                    onSuccess={() => {
-                      setIsAddingMall(false);
-                      refetchMalls();
-                    }}
-                    onCancel={() => setIsAddingMall(false)}
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {malls?.map((mall) => (
-              <div key={mall.id} className="relative">
-                <MallCard
-                  mall={mall}
-                  onClick={() => handleMallClick(mall.id)}
-                />
-                <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 z-10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMallToDelete(mall.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h1 className="text-2xl font-bold text-gray-900">{t('managePromotions')}</h1>
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <Dialog open={isAddingPromotion} onOpenChange={setIsAddingPromotion}>
+                  <DialogTrigger asChild>
+                    <Button variant="default" className="w-full sm:w-auto">
+                      <Plus className="h-4 w-4 mr-2" />
+                      {t('addPromotion')}
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        {t('deleteMallDescription')}
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                      <AlertDialogAction
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>{t('addPromotion')}</DialogTitle>
+                    </DialogHeader>
+                    <AddPromotionForm
+                      onSuccess={() => setIsAddingPromotion(false)}
+                      onCancel={() => setIsAddingPromotion(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={isAddingMall} onOpenChange={setIsAddingMall}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full sm:w-auto">
+                      <Plus className="h-4 w-4 mr-2" />
+                      {t('addShoppingMall')}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{t('addShoppingMall')}</DialogTitle>
+                    </DialogHeader>
+                    <AddMallForm
+                      onSuccess={() => {
+                        setIsAddingMall(false);
+                        refetchMalls();
+                      }}
+                      onCancel={() => setIsAddingMall(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+
+            <div className="relative">
+              <Input
+                type="text"
+                placeholder={t('searchMalls')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-md pl-10"
+              />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredMalls?.map((mall) => (
+                <div key={mall.id} className="relative group">
+                  <MallCard
+                    mall={mall}
+                    onClick={() => handleMallClick(mall.id)}
+                  />
+                  <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteMall(mall.id);
+                          setMallToDelete(mall.id);
                         }}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        {t('delete')}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            ))}
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t('deleteMallDescription')}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteMall(mall.id);
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {t('delete')}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </main>
