@@ -141,7 +141,7 @@ export default function MallManagement() {
               onClick={() => navigate('/promotions')}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Promotions
+              Volver a Promociones
             </Button>
           </div>
 
