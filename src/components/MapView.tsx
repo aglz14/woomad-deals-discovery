@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -39,20 +38,21 @@ export const MapView = () => {
       const { data, error } = await supabase
         .from('secrets')
         .select('value')
-        .eq('name', 'MAPBOX_TOKEN');
+        .eq('name', 'MAPBOX_TOKEN')
+        .maybeSingle();
       
       if (error) {
         console.error('Error fetching token:', error);
         throw error;
       }
       
-      if (!data || data.length === 0) {
+      if (!data) {
         console.error('No token found in secrets');
         throw new Error('Mapbox token not found');
       }
       
       console.log('Token retrieved successfully');
-      return data[0].value;
+      return data.value;
     },
     retry: 1,
   });
@@ -144,10 +144,12 @@ export const MapView = () => {
   }, [mapboxToken, malls]);
 
   if (tokenError) {
+    toast.error("Could not load map: Missing Mapbox token");
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <div className="text-red-500">
-          Error loading map: Could not retrieve Mapbox token
+        <div className="text-red-500 text-center">
+          <p className="font-semibold mb-2">Error loading map</p>
+          <p className="text-sm">Could not retrieve Mapbox token. Please check your configuration.</p>
         </div>
       </div>
     );
