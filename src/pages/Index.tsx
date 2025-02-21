@@ -1,7 +1,5 @@
 
 import { useState } from "react";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { HomeHero } from "@/components/home/HomeHero";
 import { PromotionsList } from "@/components/home/PromotionsList";
@@ -78,52 +76,46 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="min-h-screen">
+      <HomeHero 
+        userLocation={userLocation} 
+        onSearch={handleSearch}
+        onMallSelect={handleMallFilter}
+        malls={malls || []}
+        selectedMallId={selectedMallId}
+      />
 
-      <main className="flex-grow">
-        <HomeHero 
-          userLocation={userLocation} 
-          onSearch={handleSearch}
-          onMallSelect={handleMallFilter}
-          malls={malls || []}
-          selectedMallId={selectedMallId}
-        />
+      <div className="container mx-auto px-4 py-12 space-y-16">
+        <ErrorBoundary>
+          <div className="space-y-16">
+            <section>
+              <PromotionsList
+                isLoading={isLoading}
+                promotions={promotions}
+                currentItems={getCurrentPageItems()}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                setCurrentPage={setCurrentPage}
+                searchTerm={searchTerm}
+              />
+            </section>
 
-        <div className="container mx-auto px-4 py-12 space-y-16">
-          <ErrorBoundary>
-            <div className="space-y-16">
-              <section>
-                <PromotionsList
-                  isLoading={isLoading}
-                  promotions={promotions}
-                  currentItems={getCurrentPageItems()}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  setCurrentPage={setCurrentPage}
-                  searchTerm={searchTerm}
-                />
-              </section>
+            <section>
+              <StoresNearby 
+                searchTerm={searchTerm}
+                selectedMallId={selectedMallId}
+              />
+            </section>
 
-              <section>
-                <StoresNearby 
-                  searchTerm={searchTerm}
-                  selectedMallId={selectedMallId}
-                />
-              </section>
-
-              <section>
-                <MallsNearby 
-                  searchTerm={searchTerm}
-                  selectedMallId={selectedMallId}
-                />
-              </section>
-            </div>
-          </ErrorBoundary>
-        </div>
-      </main>
-
-      <Footer />
+            <section>
+              <MallsNearby 
+                searchTerm={searchTerm}
+                selectedMallId={selectedMallId}
+              />
+            </section>
+          </div>
+        </ErrorBoundary>
+      </div>
     </div>
   );
 }
