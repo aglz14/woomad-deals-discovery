@@ -1,7 +1,6 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 import { useSession } from "./providers/SessionProvider";
 import { AuthModal } from "./auth/AuthModal";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,9 +25,9 @@ export const Header = () => {
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      toast.error("Error signing out");
+      toast.error("Error al cerrar sesión");
     } else {
-      toast.success("Signed out successfully");
+      toast.success("Sesión cerrada con éxito");
     }
   };
 
@@ -50,8 +49,6 @@ export const Header = () => {
             </Link>
 
             <div className="flex items-center gap-4">
-              <LanguageSwitcher />
-              
               {session?.user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 text-white hover:text-white/90 transition-colors rounded-md">
@@ -68,7 +65,7 @@ export const Header = () => {
                       onClick={() => navigate("/promotions")}
                     >
                       <Star className="mr-2 h-4 w-4" />
-                      <span>Promotions</span>
+                      <span>Promociones</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
@@ -76,7 +73,7 @@ export const Header = () => {
                       onClick={handleLogout}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>Cerrar Sesión</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -87,7 +84,7 @@ export const Header = () => {
                     className="text-white hover:text-white/90"
                     onClick={() => setIsAuthModalOpen(true)}
                   >
-                    Login / Sign Up
+                    Iniciar Sesión / Registrarse
                   </Button>
                   <AuthModal 
                     isOpen={isAuthModalOpen}

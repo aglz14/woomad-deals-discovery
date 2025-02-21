@@ -4,20 +4,6 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 const resources = {
-  en: {
-    translation: {
-      "deals": "Find the best deals near you",
-      "nearMe": "Deals Near Me",
-      "searchPlaceholder": "Search for stores, malls, and deals",
-      "address": "Address",
-      "storeName": "Store Name",
-      "description": "Description",
-      "addShoppingMall": "Add Shopping Mall",
-      "cancel": "Cancel",
-      "selectMall": "Select Shopping Mall",
-      "allMalls": "All Shopping Malls",
-    }
-  },
   es: {
     translation: {
       "deals": "Encuentra las mejores ofertas cerca de ti",
@@ -30,6 +16,33 @@ const resources = {
       "cancel": "Cancelar",
       "selectMall": "Seleccionar Centro Comercial",
       "allMalls": "Todos los Centros Comerciales",
+      "managePromotions": "Gestionar Promociones",
+      "addPromotion": "Agregar Promoción",
+      "errorTitle": "Ha ocurrido un error",
+      "mallDeletedSuccess": "Centro comercial eliminado con éxito",
+      "errorDeletingMall": "Error al eliminar el centro comercial",
+      "deleteMallTitle": "Eliminar Centro Comercial",
+      "deleteMallDescription": "¿Estás seguro que deseas eliminar este centro comercial? Esta acción no se puede deshacer.",
+      "delete": "Eliminar",
+      "quickLinks": "Enlaces Rápidos",
+      "about": "Acerca de",
+      "contact": "Contacto",
+      "connect": "Conectar",
+      "rights": "Todos los derechos reservados",
+      "addStore": "Agregar Tienda",
+      "newStore": "Nueva Tienda",
+      "storeCategory": "Categoría",
+      "storeDescription": "Descripción de la Tienda",
+      "storeFloor": "Piso",
+      "storeLocation": "Ubicación en el Centro Comercial",
+      "storeContact": "Teléfono de Contacto",
+      "promotion": "Promoción",
+      "coupon": "Cupón",
+      "sale": "Oferta",
+      "selectType": "Seleccionar Tipo",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Fin",
+      "selectStore": "Seleccionar Tienda"
     }
   }
 };
@@ -39,7 +52,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: 'en',
+    lng: 'es', // Set Spanish as default
+    fallbackLng: 'es',
     interpolation: {
       escapeValue: false,
     },
