@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
-import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -16,6 +15,37 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { toast } from "sonner";
+
+// Define valid promotion types
+type ValidPromotionType = "promotion" | "coupon" | "sale";
+
+// Type guard to check if a string is a valid promotion type
+const isValidPromotionType = (type: string): type is ValidPromotionType => {
+  return ["promotion", "coupon", "sale"].includes(type);
+};
+
+// Interface for the promotion data from the database
+interface DatabasePromotion {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  discount_value?: string;
+  terms_conditions?: string;
+  image_url?: string;
+  store: {
+    id: string;
+    name: string;
+    mall: {
+      id: string;
+      name: string;
+      latitude: number;
+      longitude: number;
+    };
+  };
+}
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,7 +111,7 @@ export default function Index() {
       if (storesError) throw storesError;
 
       // Get all active promotions from these stores
-      const { data: promotions, error: promotionsError } = await supabase
+      const { data: rawPromotions, error: promotionsError } = await supabase
         .from("promotions")
         .select(`
           *,
@@ -99,7 +129,13 @@ export default function Index() {
 
       if (promotionsError) throw promotionsError;
 
-      return promotions;
+      // Filter and validate promotion types
+      return (rawPromotions as DatabasePromotion[])
+        .filter((promo) => isValidPromotionType(promo.type))
+        .map((promo) => ({
+          ...promo,
+          type: promo.type as ValidPromotionType
+        }));
     },
   });
 
