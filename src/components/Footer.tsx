@@ -1,10 +1,12 @@
+
 import { useTranslation } from "react-i18next";
+
 export const Footer = () => {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const year = new Date().getFullYear();
-  return <footer className="bg-white border-t border-gray-200">
+
+  return (
+    <footer className="bg-white border-t border-gray-200">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
@@ -15,28 +17,28 @@ export const Footer = () => {
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                  Home
+                  {t('deals')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                  About Us
+                  {t('about')}
                 </a>
               </li>
               <li>
                 <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                  Contact
+                  {t('contact')}
                 </a>
               </li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">Connect</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('connect')}</h3>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
@@ -59,9 +61,10 @@ export const Footer = () => {
         
         <div className="mt-8 pt-8 border-t border-gray-200">
           <p className="text-center text-gray-600 text-sm">
-            © {year} Woomad. All rights reserved.
+            © {year} Woomad. {t('rights')}
           </p>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 };
