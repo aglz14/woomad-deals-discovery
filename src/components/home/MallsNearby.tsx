@@ -33,6 +33,11 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
     );
   });
 
+  const handleMallClick = (mallId: string) => {
+    console.log("Navigating to mall:", mallId);
+    navigate(`/mall/${mallId}`);
+  };
+
   if (isLoading) {
     return (
       <div className="text-center py-12">
@@ -59,7 +64,7 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
           <MallCard
             key={mall.id}
             mall={mall}
-            onClick={() => navigate(`/mall/${mall.id}`)}
+            onClick={() => handleMallClick(mall.id)}
           />
         ))}
       </div>

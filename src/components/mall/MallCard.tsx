@@ -16,10 +16,16 @@ interface MallCardProps {
 }
 
 export function MallCard({ mall, onClick, onEdit }: MallCardProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  };
+
   return (
     <Card
       className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group bg-white"
-      onClick={onClick}
+      onClick={handleClick}
     >
       <CardHeader className="space-y-4">
         <div className="flex items-start gap-4">
