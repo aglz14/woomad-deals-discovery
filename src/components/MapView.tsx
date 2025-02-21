@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Location {
   lng: number;
@@ -17,37 +19,57 @@ export const MapView = () => {
   });
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    const initializeMap = async () => {
+      if (!mapContainer.current) return;
 
-    // Initialize map
-    mapboxgl.accessToken = "YOUR_MAPBOX_TOKEN"; // We'll handle this securely
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center: [userLocation.lng, userLocation.lat],
-      zoom: 12,
-    });
+      try {
+        // Get the Mapbox token from Supabase
+        const { data: config, error } = await supabase
+          .from('secrets')
+          .select('value')
+          .eq('name', 'MAPBOX_TOKEN')
+          .single();
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-    // Get user location
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const newLocation = {
-          lng: position.coords.longitude,
-          lat: position.coords.latitude,
-        };
-        setUserLocation(newLocation);
-        map.current?.flyTo({
-          center: [newLocation.lng, newLocation.lat],
+        if (error) throw error;
+        
+        // Initialize map with the token
+        mapboxgl.accessToken = config.value;
+        
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: "mapbox://styles/mapbox/light-v11",
+          center: [userLocation.lng, userLocation.lat],
           zoom: 12,
         });
-      },
-      (error) => {
-        console.error("Error getting location:", error);
+
+        // Add navigation controls
+        map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+        // Get user location
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const newLocation = {
+              lng: position.coords.longitude,
+              lat: position.coords.latitude,
+            };
+            setUserLocation(newLocation);
+            map.current?.flyTo({
+              center: [newLocation.lng, newLocation.lat],
+              zoom: 12,
+            });
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            toast.error("Could not get your location. Using default location.");
+          }
+        );
+      } catch (error) {
+        console.error("Error initializing map:", error);
+        toast.error("Could not initialize the map. Please try again later.");
       }
-    );
+    };
+
+    initializeMap();
 
     return () => {
       map.current?.remove();
