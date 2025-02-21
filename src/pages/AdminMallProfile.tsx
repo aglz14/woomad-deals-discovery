@@ -1,3 +1,4 @@
+
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +19,7 @@ export default function AdminMallProfile() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
 
-  const { data: mall, isLoading: isLoadingMall } = useQuery({
+  const { data: mall, isLoading: isLoadingMall, refetch: refetchMall } = useQuery({
     queryKey: ["mall", mallId],
     queryFn: async () => {
       console.log("Fetching mall with ID:", mallId);
@@ -42,7 +43,7 @@ export default function AdminMallProfile() {
     },
   });
 
-  const { data: stores, isLoading: isLoadingStores } = useQuery({
+  const { data: stores, isLoading: isLoadingStores, refetch: refetchStores } = useQuery({
     queryKey: ["mall-stores", mallId],
     enabled: !!mallId,
     queryFn: async () => {
@@ -101,11 +102,6 @@ export default function AdminMallProfile() {
 
   const handleStoreClick = (storeId: string) => {
     navigate(`/store/${storeId}/promotions`);
-  };
-
-  const refetchStores = () => {
-    // Manually refetch the stores query
-    console.log("Refetching stores...");
   };
 
   return (
@@ -172,7 +168,7 @@ export default function AdminMallProfile() {
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         onSuccess={() => {
-          refetchMalls();
+          refetchMall();
           setIsEditDialogOpen(false);
         }}
       />

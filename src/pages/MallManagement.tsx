@@ -30,6 +30,7 @@ export default function MallManagement() {
   const { session } = useSession();
   const [storeToDelete, setStoreToDelete] = useState<string | null>(null);
   const [storeToEdit, setStoreToEdit] = useState<string | null>(null);
+  const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
 
   // Fetch mall data
   const { data: mall, isLoading: isMallLoading } = useQuery({
@@ -151,9 +152,14 @@ export default function MallManagement() {
               <h1 className="text-2xl font-bold">{mall?.name}</h1>
               <p className="text-gray-600">{mall?.address}</p>
             </div>
-            <AddStoreDialog 
-              mallId={mallId!} 
-              onStoreAdded={refetchStores} 
+            <AddStoreDialog
+              mallId={mallId!}
+              isOpen={isAddStoreDialogOpen}
+              onClose={() => setIsAddStoreDialogOpen(false)}
+              onSuccess={() => {
+                refetchStores();
+                setIsAddStoreDialogOpen(false);
+              }}
             />
           </div>
 
