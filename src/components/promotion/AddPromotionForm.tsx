@@ -21,10 +21,8 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
     title: "",
     description: "",
     type: "",
-    discount_value: "",
     start_date: "",
     end_date: "",
-    terms_conditions: "",
   });
 
   const { data: malls } = useQuery({
@@ -58,10 +56,8 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
           title: newPromotion.title,
           description: newPromotion.description,
           type: newPromotion.type,
-          discount_value: newPromotion.discount_value,
           start_date: new Date(newPromotion.start_date).toISOString(),
           end_date: new Date(newPromotion.end_date).toISOString(),
-          terms_conditions: newPromotion.terms_conditions,
         },
       ]);
 
@@ -126,7 +122,7 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
       </div>
 
       <div>
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">Description & Conditions</Label>
         <Textarea
           id="description"
           value={newPromotion.description}
@@ -149,24 +145,11 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="discount">Discount</SelectItem>
-            <SelectItem value="bogo">Buy One Get One</SelectItem>
+            <SelectItem value="promotion">Promotion</SelectItem>
             <SelectItem value="coupon">Coupon</SelectItem>
+            <SelectItem value="sale">Sale</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-
-      <div>
-        <Label htmlFor="discount_value">Discount Value</Label>
-        <Input
-          id="discount_value"
-          value={newPromotion.discount_value}
-          onChange={(e) =>
-            setNewPromotion({ ...newPromotion, discount_value: e.target.value })
-          }
-          placeholder="e.g., 50% or BOGO"
-          required
-        />
       </div>
 
       <div>
@@ -192,17 +175,6 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
             setNewPromotion({ ...newPromotion, end_date: e.target.value })
           }
           required
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="terms">Terms & Conditions</Label>
-        <Textarea
-          id="terms"
-          value={newPromotion.terms_conditions}
-          onChange={(e) =>
-            setNewPromotion({ ...newPromotion, terms_conditions: e.target.value })
-          }
         />
       </div>
 
