@@ -8,6 +8,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
 import { StoresList } from "@/components/mall/StoresList";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function MallManagement() {
@@ -102,10 +104,21 @@ export default function MallManagement() {
       
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+              onClick={() => navigate('/promotions')}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Promotions
+            </Button>
+          </div>
+
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold">{mall.name}</h1>
-              <p className="text-gray-600">{mall.address}</p>
+              <h1 className="text-2xl font-bold">{mall?.name}</h1>
+              <p className="text-gray-600">{mall?.address}</p>
             </div>
             <AddStoreDialog 
               mallId={mallId!} 
