@@ -62,7 +62,7 @@ export default function StoreProfile() {
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
             <div className="flex justify-center items-center h-full">
-              <p className="text-gray-600">Loading...</p>
+              <p className="text-gray-600">Cargando...</p>
             </div>
           </div>
         </main>
@@ -78,7 +78,7 @@ export default function StoreProfile() {
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
             <div className="flex justify-center items-center h-full">
-              <p className="text-gray-600">Store not found</p>
+              <p className="text-gray-600">Tienda no encontrada</p>
             </div>
           </div>
         </main>
@@ -97,7 +97,7 @@ export default function StoreProfile() {
             onClick={() => navigate(-1)}
             className="mb-6 text-purple-600 hover:text-purple-700 flex items-center gap-2"
           >
-            ← Back
+            ← Volver
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -127,8 +127,7 @@ export default function StoreProfile() {
                   )}
                   {store.location_in_mall && (
                     <p className="text-sm text-gray-600">
-                      Location: {store.location_in_mall}
-                      {store.floor && ` - Floor ${store.floor}`}
+                      Ubicación: {store.location_in_mall}
                     </p>
                   )}
                 </div>
@@ -137,7 +136,7 @@ export default function StoreProfile() {
 
             {/* Promotions */}
             <div className="lg:col-span-2 space-y-6">
-              <h2 className="text-2xl font-bold">Current Promotions</h2>
+              <h2 className="text-2xl font-bold">Promociones Actuales</h2>
               {promotions && promotions.length > 0 ? (
                 promotions.map((promo) => (
                   <Card key={promo.id}>
@@ -167,12 +166,12 @@ export default function StoreProfile() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-center text-gray-500">
-                      No active promotions
+                      No hay promociones activas
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-center text-gray-500">
-                      Check back later for new promotions and deals!
+                      ¡Vuelve más tarde para ver nuevas promociones y ofertas!
                     </p>
                   </CardContent>
                 </Card>
