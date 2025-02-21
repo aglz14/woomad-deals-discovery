@@ -15,6 +15,7 @@ import {
 } from "./ui/dropdown-menu";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Button } from "./ui/button";
 
 export const Header = () => {
   const { t } = useTranslation();
@@ -62,11 +63,20 @@ export const Header = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <AuthModal 
-                  isOpen={isAuthModalOpen}
-                  onClose={() => setIsAuthModalOpen(false)}
-                  mode="login"
-                />
+                <>
+                  <Button 
+                    variant="ghost"
+                    className="text-white hover:text-white/90"
+                    onClick={() => setIsAuthModalOpen(true)}
+                  >
+                    Login / Sign Up
+                  </Button>
+                  <AuthModal 
+                    isOpen={isAuthModalOpen}
+                    onClose={() => setIsAuthModalOpen(false)}
+                    mode="login"
+                  />
+                </>
               )}
             </div>
           </div>
