@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Promotions from "./pages/Promotions";
 import MallManagement from "./pages/MallManagement";
+import StoreProfile from "./pages/StoreProfile";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/promotions" element={<Promotions />} />
             <Route path="/mall/:mallId/manage" element={<MallManagement />} />
+            <Route path="/store/:storeId" element={<StoreProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

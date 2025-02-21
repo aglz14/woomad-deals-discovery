@@ -2,13 +2,20 @@
 import { Store } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StoreCard } from "@/components/StoreCard";
+import { useNavigate } from "react-router-dom";
 
 interface StoresListProps {
   stores: any[];
   onStoreClick: (storeId: string) => void;
 }
 
-export function StoresList({ stores, onStoreClick }: StoresListProps) {
+export function StoresList({ stores }: StoresListProps) {
+  const navigate = useNavigate();
+
+  const handleStoreClick = (storeId: string) => {
+    navigate(`/store/${storeId}`);
+  };
+
   if (stores.length === 0) {
     return (
       <Card className="col-span-full">
@@ -33,7 +40,7 @@ export function StoresList({ stores, onStoreClick }: StoresListProps) {
         <StoreCard
           key={store.id}
           store={store}
-          onClick={() => onStoreClick(store.id)}
+          onClick={() => handleStoreClick(store.id)}
         />
       ))}
     </>

@@ -2,7 +2,6 @@
 import React from 'react';
 import { Store, Tag, Phone, Mail, Globe } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
 
 interface StoreCardProps {
   store: {
@@ -22,7 +21,10 @@ interface StoreCardProps {
 
 export const StoreCard = ({ store, onClick }: StoreCardProps) => {
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={onClick}
+    >
       <CardHeader>
         <div className="flex items-start gap-4">
           {store.logo_url ? (
@@ -72,15 +74,13 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-purple-600 hover:underline"
+                onClick={(e) => e.stopPropagation()}
               >
                 Visit Website
               </a>
             </p>
           )}
         </div>
-        <Button className="mt-4 w-full" onClick={onClick}>
-          View Promotions
-        </Button>
       </CardContent>
     </Card>
   );
