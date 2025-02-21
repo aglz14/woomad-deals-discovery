@@ -4,6 +4,7 @@ import Index from "@/pages/Index";
 import Promotions from "@/pages/Promotions";
 import MallManagement from "@/pages/MallManagement";
 import StoreProfile from "@/pages/StoreProfile";
+import PublicStoreProfile from "@/pages/PublicStoreProfile";
 import MallDetails from "@/pages/MallDetails";
 import NotFound from "@/pages/NotFound";
 import { SessionProvider } from "@/components/providers/SessionProvider";
@@ -23,7 +24,8 @@ export default function App() {
             <Route path="/promotions" element={<Promotions />} />
             <Route path="/mall/:mallId" element={<MallDetails />} />
             <Route path="/mall/:mallId/manage" element={<MallManagement />} />
-            <Route path="/store/:storeId" element={<StoreProfile />} />
+            <Route path="/store/:storeId" element={<PublicStoreProfile />} />
+            <Route path="/store/:storeId/promotions" element={<StoreProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
