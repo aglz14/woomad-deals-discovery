@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -14,6 +15,37 @@ export default function MallManagement() {
   const navigate = useNavigate();
   const { session } = useSession();
 
+  // Fetch mall data
+  const { data: mall, isLoading: isMallLoading } = useQuery({
+    queryKey: ["mall", mallId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("shopping_malls")
+        .select("*")
+        .eq("id", mallId)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!mallId, // Only run query if mallId exists
+  });
+
+  // Fetch stores data
+  const { data: stores, refetch: refetchStores, isLoading: isStoresLoading } = useQuery({
+    queryKey: ["stores", mallId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("stores")
+        .select("*")
+        .eq("mall_id", mallId);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!mallId, // Only run query if mallId exists
+  });
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -26,39 +58,42 @@ export default function MallManagement() {
     checkAuth();
   }, [navigate]);
 
-  const { data: mall } = useQuery({
-    queryKey: ["mall", mallId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("shopping_malls")
-        .select("*")
-        .eq("id", mallId)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: stores, refetch: refetchStores } = useQuery({
-    queryKey: ["stores", mallId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("stores")
-        .select("*")
-        .eq("mall_id", mallId);
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const handleStoreClick = (storeId: string) => {
     navigate(`/store/${storeId}/promotions`);
   };
 
+  // Show loading state while data is being fetched
+  if (isMallLoading || isStoresLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-center items-center h-full">
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Show error state if mall is not found
   if (!mall) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-center items-center h-full">
+              <p className="text-gray-600">Mall not found</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (
@@ -69,8 +104,8 @@ export default function MallManagement() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold">{mall?.name}</h1>
-              <p className="text-gray-600">{mall?.address}</p>
+              <h1 className="text-2xl font-bold">{mall.name}</h1>
+              <p className="text-gray-600">{mall.address}</p>
             </div>
             <AddStoreDialog 
               mallId={mallId!} 
