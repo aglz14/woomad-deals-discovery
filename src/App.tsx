@@ -41,17 +41,21 @@ function App() {
       <SessionProvider>
         <QueryClientProvider client={queryClient}>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <Header />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/promotions" element={<Promotions />} />
-              <Route path="/mall/:id" element={<MallDetails />} />
-              <Route path="/store/:id" element={<PublicStoreProfile />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Footer />
-            <Toaster />
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/promotions" element={<Promotions />} />
+                  <Route path="/mall/:id" element={<MallDetails />} />
+                  <Route path="/store/:id" element={<PublicStoreProfile />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+              <Toaster />
+            </div>
           </ErrorBoundary>
         </QueryClientProvider>
       </SessionProvider>
