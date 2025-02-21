@@ -9,6 +9,8 @@ import { useLocation } from "@/hooks/use-location";
 import { getPromotions } from "@/services/promotions";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,46 +78,52 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen">
-      <HomeHero 
-        userLocation={userLocation} 
-        onSearch={handleSearch}
-        onMallSelect={handleMallFilter}
-        malls={malls || []}
-        selectedMallId={selectedMallId}
-      />
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-grow pt-16">
+        <HomeHero 
+          userLocation={userLocation} 
+          onSearch={handleSearch}
+          onMallSelect={handleMallFilter}
+          malls={malls || []}
+          selectedMallId={selectedMallId}
+        />
 
-      <div className="container mx-auto px-4 py-12 space-y-16">
-        <ErrorBoundary>
-          <div className="space-y-16">
-            <section>
-              <PromotionsList
-                isLoading={isLoading}
-                promotions={promotions}
-                currentItems={getCurrentPageItems()}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-                searchTerm={searchTerm}
-              />
-            </section>
+        <div className="container mx-auto px-4 py-12 space-y-16">
+          <ErrorBoundary>
+            <div className="space-y-16">
+              <section>
+                <PromotionsList
+                  isLoading={isLoading}
+                  promotions={promotions}
+                  currentItems={getCurrentPageItems()}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  setCurrentPage={setCurrentPage}
+                  searchTerm={searchTerm}
+                />
+              </section>
 
-            <section>
-              <StoresNearby 
-                searchTerm={searchTerm}
-                selectedMallId={selectedMallId}
-              />
-            </section>
+              <section>
+                <StoresNearby 
+                  searchTerm={searchTerm}
+                  selectedMallId={selectedMallId}
+                />
+              </section>
 
-            <section>
-              <MallsNearby 
-                searchTerm={searchTerm}
-                selectedMallId={selectedMallId}
-              />
-            </section>
-          </div>
-        </ErrorBoundary>
-      </div>
+              <section>
+                <MallsNearby 
+                  searchTerm={searchTerm}
+                  selectedMallId={selectedMallId}
+                />
+              </section>
+            </div>
+          </ErrorBoundary>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
