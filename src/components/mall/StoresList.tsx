@@ -13,7 +13,7 @@ export function StoresList({ stores }: StoresListProps) {
   const navigate = useNavigate();
 
   const handleStoreClick = (storeId: string) => {
-    navigate(`/store/${storeId}`);
+    navigate(`/store/${storeId}/promotions`);
   };
 
   if (stores.length === 0) {
