@@ -14,10 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export const Header = () => {
   const { t } = useTranslation();
   const { session } = useSession();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -60,7 +62,11 @@ export const Header = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <AuthModal />
+                <AuthModal 
+                  isOpen={isAuthModalOpen}
+                  onClose={() => setIsAuthModalOpen(false)}
+                  mode="login"
+                />
               )}
             </div>
           </div>
