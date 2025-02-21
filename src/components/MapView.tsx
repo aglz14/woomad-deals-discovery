@@ -22,10 +22,6 @@ interface ShoppingMall {
   image_url?: string;
 }
 
-interface Secret {
-  value: string;
-}
-
 export const MapView = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -35,20 +31,30 @@ export const MapView = () => {
   });
   const [isMapLoading, setIsMapLoading] = useState(true);
 
-  // Fetch Mapbox token
-  const { data: mapboxToken, isLoading: isTokenLoading } = useQuery({
+  // Fetch Mapbox token with better error handling
+  const { data: mapboxToken, isLoading: isTokenLoading, error: tokenError } = useQuery({
     queryKey: ['mapbox-token'],
     queryFn: async () => {
+      console.log('Fetching Mapbox token...');
       const { data, error } = await supabase
         .from('secrets')
-        .select('value')
+        .select('*')
         .eq('name', 'MAPBOX_TOKEN')
-        .maybeSingle<Secret>();
+        .single();
       
-      if (error) throw error;
-      if (!data) throw new Error('Mapbox token not found');
+      if (error) {
+        console.error('Error fetching token:', error);
+        throw error;
+      }
+      
+      if (!data?.value) {
+        console.error('No token found in secrets');
+        throw new Error('Mapbox token not found');
+      }
+      
+      console.log('Token retrieved successfully');
       return data.value;
-    }
+    },
   });
 
   // Fetch nearby malls
@@ -62,12 +68,14 @@ export const MapView = () => {
       if (error) throw error;
       return data as ShoppingMall[];
     },
-    enabled: !!mapboxToken, // Only fetch malls after we have the token
+    enabled: !!mapboxToken,
   });
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken || map.current) return;
 
+    console.log('Initializing map with token:', mapboxToken.substring(0, 8) + '...');
+    
     try {
       mapboxgl.accessToken = mapboxToken;
       
@@ -100,6 +108,7 @@ export const MapView = () => {
       );
 
       map.current.on('style.load', () => {
+        console.log('Map style loaded successfully');
         setIsMapLoading(false);
       });
 
@@ -127,9 +136,22 @@ export const MapView = () => {
     }
 
     return () => {
-      map.current?.remove();
+      if (map.current) {
+        console.log('Cleaning up map instance');
+        map.current.remove();
+      }
     };
   }, [mapboxToken, malls]);
+
+  if (tokenError) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-red-500">
+          Error loading map: Could not retrieve Mapbox token
+        </div>
+      </div>
+    );
+  }
 
   if (isTokenLoading || isMapLoading) {
     return (
