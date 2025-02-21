@@ -46,7 +46,7 @@ export const HomeHero = ({ userLocation, onSearch, onMallSelect, malls, selected
                   <SelectValue placeholder={t("selectMall")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">
+                  <SelectItem value="all">
                     {t("allMalls")}
                   </SelectItem>
                   {malls.map((mall) => (

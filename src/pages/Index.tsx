@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMallId, setSelectedMallId] = useState<string>("");
+  const [selectedMallId, setSelectedMallId] = useState<string>("all");
   const ITEMS_PER_PAGE = 10;
 
   const { userLocation, calculateDistance } = useLocation();
@@ -47,7 +47,7 @@ export default function Index() {
       );
     }
 
-    if (selectedMallId) {
+    if (selectedMallId && selectedMallId !== 'all') {
       filtered = filtered.filter(promotion => 
         promotion.store.mall.id === selectedMallId
       );
