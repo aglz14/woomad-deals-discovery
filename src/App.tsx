@@ -8,6 +8,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Promotions from "./pages/Promotions";
+import MallManagement from "./pages/MallManagement";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/promotions" element={<Promotions />} />
+            <Route path="/mall/:mallId/manage" element={<MallManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
