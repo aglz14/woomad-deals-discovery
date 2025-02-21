@@ -1,4 +1,3 @@
-
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -42,7 +41,8 @@ const resources = {
       "selectType": "Seleccionar Tipo",
       "startDate": "Fecha de Inicio",
       "endDate": "Fecha de Fin",
-      "selectStore": "Seleccionar Tienda"
+      "selectStore": "Seleccionar Tienda",
+      "backToHome": "Volver al Inicio"
     }
   }
 };

@@ -7,8 +7,10 @@ import { Footer } from "@/components/Footer";
 import { StoresList } from "@/components/mall/StoresList";
 import { Building2, MapPin, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export default function MallDetails() {
+  const { t } = useTranslation();
   const { mallId } = useParams();
 
   const { data: mall, isLoading: isLoadingMall } = useQuery({
@@ -46,7 +48,7 @@ export default function MallDetails() {
           <div className="container mx-auto px-4 py-8">
             <Button variant="ghost" className="mb-6" disabled>
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Back to Home
+              {t('backToHome')}
             </Button>
             <div className="animate-pulse space-y-6">
               <div className="h-8 bg-gray-200 rounded w-1/4"></div>
@@ -73,7 +75,7 @@ export default function MallDetails() {
             <Button variant="ghost" className="mb-6" asChild>
               <Link to="/">
                 <ChevronLeft className="mr-2 h-4 w-4" />
-                Back to Home
+                {t('backToHome')}
               </Link>
             </Button>
             <div className="text-center">
@@ -95,7 +97,7 @@ export default function MallDetails() {
           <Button variant="ghost" className="mb-6" asChild>
             <Link to="/">
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Back to Home
+              {t('backToHome')}
             </Link>
           </Button>
           
