@@ -9,10 +9,12 @@ import { DatabasePromotion } from "@/types/promotion";
 import { useLocation } from "@/hooks/use-location";
 import { getPromotions } from "@/services/promotions";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMallId, setSelectedMallId] = useState<string>("");
   const ITEMS_PER_PAGE = 10;
 
   const { userLocation, calculateDistance } = useLocation();
@@ -22,16 +24,36 @@ export default function Index() {
     queryFn: () => getPromotions(userLocation, calculateDistance),
   });
 
+  const { data: malls } = useQuery({
+    queryKey: ["shopping-malls"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("shopping_malls").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const filterPromotions = (promotions: DatabasePromotion[]) => {
-    if (!searchTerm) return promotions;
+    if (!promotions) return [];
+    let filtered = promotions;
     
-    const searchLower = searchTerm.toLowerCase();
-    return promotions.filter(promotion => 
-      promotion.store.name.toLowerCase().includes(searchLower) ||
-      promotion.store.mall.name.toLowerCase().includes(searchLower) ||
-      promotion.title.toLowerCase().includes(searchLower) ||
-      promotion.description.toLowerCase().includes(searchLower)
-    );
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(promotion => 
+        promotion.store.name.toLowerCase().includes(searchLower) ||
+        promotion.store.mall.name.toLowerCase().includes(searchLower) ||
+        promotion.title.toLowerCase().includes(searchLower) ||
+        promotion.description.toLowerCase().includes(searchLower)
+      );
+    }
+
+    if (selectedMallId) {
+      filtered = filtered.filter(promotion => 
+        promotion.store.mall.id === selectedMallId
+      );
+    }
+
+    return filtered;
   };
 
   const getCurrentPageItems = () => {
@@ -42,10 +64,15 @@ export default function Index() {
     return filteredPromotions.slice(start, end);
   };
 
-  const totalPages = Math.ceil((promotions?.length || 0) / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil((filterPromotions(promotions || []).length) / ITEMS_PER_PAGE);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handleMallFilter = (mallId: string) => {
+    setSelectedMallId(mallId);
     setCurrentPage(1);
   };
 
@@ -54,7 +81,13 @@ export default function Index() {
       <Header />
 
       <main className="flex-grow">
-        <HomeHero userLocation={userLocation} onSearch={handleSearch} />
+        <HomeHero 
+          userLocation={userLocation} 
+          onSearch={handleSearch}
+          onMallSelect={handleMallFilter}
+          malls={malls || []}
+          selectedMallId={selectedMallId}
+        />
 
         <div className="container mx-auto px-4 py-12">
           <ErrorBoundary>
