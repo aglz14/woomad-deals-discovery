@@ -25,7 +25,7 @@ const isValidPromotionType = (type: string): type is ValidPromotionType => {
 
 interface DatabasePromotion {
   id: string;
-  type: string;
+  type: ValidPromotionType;  // Update this to use the ValidPromotionType
   title: string;
   description: string;
   start_date: string;
@@ -123,9 +123,10 @@ export default function Index() {
 
       if (promotionsError) throw promotionsError;
 
+      // Filter and validate promotion types
       return (rawPromotions as DatabasePromotion[])
-        .filter((promo) => isValidPromotionType(promo.type))
-        .map((promo) => ({
+        .filter(promo => isValidPromotionType(promo.type))
+        .map(promo => ({
           ...promo,
           type: promo.type as ValidPromotionType
         }));
