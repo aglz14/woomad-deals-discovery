@@ -22,12 +22,12 @@ export function StoresList({ stores }: StoresListProps) {
         <CardHeader>
           <CardTitle className="text-center flex items-center justify-center gap-2 text-gray-500">
             <Store className="h-6 w-6" />
-            No stores yet
+            No hay tiendas
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-center text-gray-500">
-            Click the "Add Store" button to add your first store to this mall.
+            Vuelve más tarde para ver las tiendas disponibles.
           </p>
         </CardContent>
       </Card>
