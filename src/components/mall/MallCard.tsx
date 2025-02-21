@@ -21,13 +21,13 @@ export function MallCard({ mall, onClick, onEdit }: MallCardProps) {
       className="cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group bg-white"
       onClick={onClick}
     >
-      <CardHeader className="space-y-2">
+      <CardHeader className="space-y-4">
         <div className="flex items-start gap-4">
           <div className="p-2 rounded-lg bg-purple-50 text-purple-600 group-hover:bg-purple-100 transition-colors">
             <Building2 className="h-5 w-5" />
           </div>
-          <div className="flex-1 pr-20"> {/* Added right padding to prevent title from going under icons */}
-            <CardTitle className="text-lg font-semibold line-clamp-2">{mall.name}</CardTitle>
+          <div className="flex-1">
+            <CardTitle className="text-lg font-semibold line-clamp-2 w-full">{mall.name}</CardTitle>
           </div>
         </div>
       </CardHeader>
