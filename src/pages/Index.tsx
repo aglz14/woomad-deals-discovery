@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader } from "lucide-react";
+import { Loader, MapPin } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
 import {
   Pagination,
@@ -170,72 +170,104 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">
-          {userLocation ? "Promotions Near You" : "All Active Promotions"}
-        </h1>
-
-        {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <Loader className="w-8 h-8 animate-spin" />
-          </div>
-        ) : promotions?.length === 0 ? (
-          <div className="text-center text-gray-500">
-            <p>No active promotions found.</p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {getCurrentPageItems().map((promotion) => (
-                <PromotionCard key={promotion.id} promotion={promotion} />
-              ))}
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center space-y-4 animate-fade-in">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+                {userLocation ? "Discover Deals Near You" : "Explore Amazing Deals"}
+              </h1>
+              <p className="text-lg md:text-xl text-white/90">
+                Find the best promotions, coupons, and sales from your favorite stores
+              </p>
+              {userLocation && (
+                <div className="flex items-center justify-center gap-2 text-sm text-white/80">
+                  <MapPin className="w-4 h-4" />
+                  <span>Location access enabled</span>
+                </div>
+              )}
             </div>
+          </div>
+        </div>
 
-            {totalPages > 1 && (
-              <Pagination className="mt-8">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentPage((prev) => Math.max(1, prev - 1));
-                      }}
-                    />
-                  </PaginationItem>
+        {/* Content Section */}
+        <div className="container mx-auto px-4 py-12">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-64 space-y-4">
+              <Loader className="w-8 h-8 animate-spin text-purple-500" />
+              <p className="text-gray-500">Finding the best deals for you...</p>
+            </div>
+          ) : promotions?.length === 0 ? (
+            <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="max-w-md mx-auto space-y-4">
+                <h2 className="text-xl font-semibold text-gray-900">No active promotions found</h2>
+                <p className="text-gray-500">
+                  Check back later for new deals and promotions from your favorite stores.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-8 animate-fade-up">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {getCurrentPageItems().map((promotion) => (
+                  <div key={promotion.id} className="transform transition-all duration-300 hover:scale-[1.02]">
+                    <PromotionCard promotion={promotion} />
+                  </div>
+                ))}
+              </div>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        href="#"
-                        isActive={page === currentPage}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(page);
-                        }}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-12">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage((prev) => Math.max(1, prev - 1));
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        />
+                      </PaginationItem>
 
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-                      }}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            )}
-          </>
-        )}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            href="#"
+                            isActive={page === currentPage}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setCurrentPage(page);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ))}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </main>
 
       <Footer />
