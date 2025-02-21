@@ -78,7 +78,7 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="latitude">Latitude</Label>
+        <Label htmlFor="latitude">Latitud</Label>
         <Input
           id="latitude"
           type="number"
@@ -89,7 +89,7 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="longitude">Longitude</Label>
+        <Label htmlFor="longitude">Longitud</Label>
         <Input
           id="longitude"
           type="number"
