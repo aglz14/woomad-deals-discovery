@@ -6,34 +6,54 @@ import { StoresList } from "@/components/mall/StoresList";
 import { Building2, MapPin, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function MallDetails() {
   const { t } = useTranslation();
   const { mallId } = useParams();
+  const { toast } = useToast();
 
   const { data: mall, isLoading: isLoadingMall } = useQuery({
     queryKey: ["mall", mallId],
     queryFn: async () => {
+      console.log("Fetching mall with ID:", mallId);
       const { data, error } = await supabase
         .from("shopping_malls")
         .select("*")
         .eq("id", mallId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching mall:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se pudo cargar el centro comercial"
+        });
+        throw error;
+      }
+      
+      console.log("Fetched mall data:", data);
       return data;
     },
   });
 
   const { data: stores, isLoading: isLoadingStores } = useQuery({
     queryKey: ["mall-stores", mallId],
+    enabled: !!mallId,
     queryFn: async () => {
+      console.log("Fetching stores for mall:", mallId);
       const { data, error } = await supabase
         .from("stores")
         .select("*")
         .eq("mall_id", mallId);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching stores:", error);
+        throw error;
+      }
+
+      console.log("Fetched stores data:", data);
       return data;
     },
   });
@@ -67,8 +87,10 @@ export default function MallDetails() {
             {t('backToHome')}
           </Link>
         </Button>
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Shopping Mall Not Found</h1>
+        <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <Building2 className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-4 text-lg font-semibold text-gray-900">Centro Comercial No Encontrado</h3>
+          <p className="mt-2 text-gray-500">El centro comercial que buscas no existe o ha sido eliminado</p>
         </div>
       </div>
     );
