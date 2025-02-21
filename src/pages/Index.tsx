@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import "../i18n/config";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { MapView } from "@/components/MapView";
 
@@ -16,14 +16,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-woomad-50">
-      <LanguageSwitcher />
+      <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 mt-16">
         <div className="space-y-8 animate-fade-up">
-          <h1 className="text-4xl font-bold text-center text-woomad-900">
-            Woomad
-          </h1>
-          
           <div className="relative z-10">
             <SearchBar onSearch={handleSearch} />
           </div>
