@@ -1,20 +1,18 @@
-
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { StoresList } from "@/components/mall/StoresList";
-import { Building2, MapPin, ChevronLeft, Plus, PencilLine, InfoIcon } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { MallHeader } from "@/components/mall/MallHeader";
+import { MallStoresSection } from "@/components/mall/MallStoresSection";
 
 export default function AdminMallProfile() {
-  const { t } = useTranslation();
   const { mallId } = useParams();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -132,56 +130,23 @@ export default function AdminMallProfile() {
             </Button>
             
             <div className="space-y-8">
-              <div className="bg-white rounded-xl p-8 shadow-md space-y-6 transition-all hover:shadow-lg">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-6">
-                    <div className="p-4 rounded-xl bg-purple-100 ring-1 ring-purple-200">
-                      <Building2 className="h-8 w-8 text-purple-600" />
-                    </div>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <h1 className="text-3xl font-bold text-gray-900 leading-tight">{mall.name}</h1>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <MapPin className="h-5 w-5 flex-shrink-0 text-gray-500" />
-                          <p className="text-lg leading-relaxed">{mall.address}</p>
-                        </div>
-                      </div>
-                      
-                      {mall.description && (
-                        <div className="flex items-start gap-2 max-w-3xl">
-                          <InfoIcon className="h-5 w-5 mt-1 flex-shrink-0 text-gray-400" />
-                          <p className="text-gray-600 text-lg leading-relaxed">
-                            {mall.description}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditDialogOpen(true)}
-                    className="hover:bg-purple-50"
-                  >
-                    <PencilLine className="h-4 w-4 mr-2" />
-                    Editar
-                  </Button>
-                </div>
-              </div>
+              <MallHeader
+                name={mall.name}
+                address={mall.address}
+                description={mall.description}
+                onEdit={() => setIsEditDialogOpen(true)}
+              />
 
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold text-gray-900">Tiendas Disponibles</h2>
-                  <Button onClick={() => setIsAddStoreDialogOpen(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Agregar Tienda
-                  </Button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <StoresList stores={stores || []} onStoreClick={handleStoreClick} />
-                </div>
-              </div>
+              <MallStoresSection
+                stores={stores || []}
+                onStoreClick={handleStoreClick}
+                onAddStore={() => setIsAddStoreDialogOpen(true)}
+                onEditStore={(storeId) => navigate(`/store/${storeId}/edit`)}
+                onDeleteStore={(storeId) => {
+                  // Handle delete store
+                  console.log("Delete store:", storeId);
+                }}
+              />
             </div>
           </div>
         </div>
