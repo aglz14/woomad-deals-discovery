@@ -1,4 +1,3 @@
-
 import { Loader } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -41,9 +40,9 @@ export const PromotionsList = ({
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
         <div className="text-center py-16 bg-gray-50 rounded-lg">
           <div className="max-w-md mx-auto space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900">No active promotions found</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t('noActivePromotions')}</h2>
             <p className="text-gray-500">
-              Check back later for new deals and promotions from your favorite stores.
+              {t('checkBackLater')}
             </p>
           </div>
         </div>

@@ -52,7 +52,9 @@ const resources = {
       "mallUpdatedSuccess": "Centro comercial actualizado con éxito",
       "searchMalls": "Buscar centros comerciales",
       "noMatchesFound": "No se encontraron resultados",
-      "tryAdjustingSearch": "Intenta ajustar los términos de búsqueda para encontrar más promociones"
+      "tryAdjustingSearch": "Intenta ajustar los términos de búsqueda para encontrar más promociones",
+      "noActivePromotions": "No hay promociones activas",
+      "checkBackLater": "¡Vuelve más tarde para ver nuevas promociones y ofertas de tus tiendas favoritas!"
     }
   }
 };
