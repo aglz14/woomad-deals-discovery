@@ -116,42 +116,36 @@ export type Database = {
           contact_number: string | null
           created_at: string
           description: string | null
-          email: string | null
           floor: string | null
           id: string
           location_in_mall: string | null
           logo_url: string | null
           mall_id: string | null
           name: string
-          website: string | null
         }
         Insert: {
           category: string
           contact_number?: string | null
           created_at?: string
           description?: string | null
-          email?: string | null
           floor?: string | null
           id?: string
           location_in_mall?: string | null
           logo_url?: string | null
           mall_id?: string | null
           name: string
-          website?: string | null
         }
         Update: {
           category?: string
           contact_number?: string | null
           created_at?: string
           description?: string | null
-          email?: string | null
           floor?: string | null
           id?: string
           location_in_mall?: string | null
           logo_url?: string | null
           mall_id?: string | null
           name?: string
-          website?: string | null
         }
         Relationships: [
           {

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { DatabasePromotion } from "@/types/promotion";
+import { DatabasePromotion, ValidPromotionType } from "@/types/promotion";
 import { toast } from "sonner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -87,7 +87,6 @@ export function EditPromotionDialog({
             >
               <option value="promotion">Promoción</option>
               <option value="coupon">Cupón</option>
-              <option value="sale">Oferta</option>
             </select>
           </div>
           <div>
