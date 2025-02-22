@@ -1,28 +1,47 @@
 
 import React from 'react';
 import { PublicStoreCard } from './PublicStoreCard';
+import { AdminStoreCard } from './AdminStoreCard';
 import { Store } from '@/types/store';
 import { useNavigate } from 'react-router-dom';
 
 interface StoresListProps {
   stores: Store[];
+  onStoreClick?: (storeId: string) => void;
+  onEdit?: (storeId: string) => void;
+  onDelete?: (storeId: string) => void;
 }
 
-export const StoresList = ({ stores }: StoresListProps) => {
+export const StoresList = ({ stores, onStoreClick, onEdit, onDelete }: StoresListProps) => {
   const navigate = useNavigate();
+  const isAdminView = !!onEdit && !!onDelete;
 
   const handleStoreClick = (storeId: string) => {
-    navigate(`/store/${storeId}`);
+    if (onStoreClick) {
+      onStoreClick(storeId);
+    } else {
+      navigate(`/store/${storeId}`);
+    }
   };
 
   return (
     <>
       {stores.map((store) => (
-        <PublicStoreCard
-          key={store.id}
-          store={store}
-          onClick={() => handleStoreClick(store.id)}
-        />
+        isAdminView ? (
+          <AdminStoreCard 
+            key={store.id} 
+            store={store} 
+            onClick={() => handleStoreClick(store.id)}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ) : (
+          <PublicStoreCard 
+            key={store.id} 
+            store={store} 
+            onClick={() => handleStoreClick(store.id)}
+          />
+        )
       ))}
     </>
   );
