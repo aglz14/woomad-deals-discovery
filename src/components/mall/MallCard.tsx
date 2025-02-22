@@ -37,13 +37,17 @@ export function MallCard({ mall, onClick, onEdit }: MallCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3 text-left">
-        <div className="flex items-start gap-2 text-sm text-gray-600">
-          <MapPin className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
-          <p className="line-clamp-2">{mall.address}</p>
+      <CardContent className="space-y-4">
+        <div className="flex items-start gap-3">
+          <MapPin className="h-4 w-4 text-purple-500 mt-1 flex-shrink-0" />
+          <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{mall.address}</p>
         </div>
         {mall.description && (
-          <p className="text-sm text-gray-500 line-clamp-2 mt-2">{mall.description}</p>
+          <div className="pt-1">
+            <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 italic">
+              {mall.description}
+            </p>
+          </div>
         )}
       </CardContent>
     </Card>
