@@ -37,7 +37,7 @@ export default function StoreProfile() {
   const { data: promotions, isLoading: isPromotionsLoading, refetch: refetchPromotions } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: rawData, error } = await supabase
         .from("promotions")
         .select(`
           *,
@@ -61,11 +61,13 @@ export default function StoreProfile() {
         throw error;
       }
 
-      // Ensure the type is ValidPromotionType
-      return data.map(promotion => ({
+      // Type cast the raw data to ensure it matches DatabasePromotion
+      const promotions = rawData.map(promotion => ({
         ...promotion,
-        type: promotion.type as ValidPromotionType
+        type: promotion.type as ValidPromotionType, // Ensure type is ValidPromotionType
       })) as DatabasePromotion[];
+
+      return promotions;
     }
   });
 
