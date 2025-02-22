@@ -10,6 +10,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function AdminMallProfile() {
   const { t } = useTranslation();
@@ -64,104 +66,118 @@ export default function AdminMallProfile() {
 
   if (isLoadingMall || isLoadingStores) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" className="mb-6" disabled>
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Volver a Promociones
-        </Button>
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="h-48 bg-gray-200 rounded"></div>
-            ))}
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <Button variant="ghost" className="mb-6" disabled>
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Volver a Promociones
+            </Button>
+            <div className="animate-pulse space-y-6">
+              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="h-48 bg-gray-200 rounded"></div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   if (!mall) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" className="mb-6" asChild>
-          <Link to="/promotions">
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Volver a Promociones
-          </Link>
-        </Button>
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <Building2 className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-semibold text-gray-900">Centro Comercial No Encontrado</h3>
-          <p className="mt-2 text-gray-500">El centro comercial que buscas no existe o ha sido eliminado</p>
-        </div>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <Button variant="ghost" className="mb-6" asChild>
+              <Link to="/promotions">
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Volver a Promociones
+              </Link>
+            </Button>
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <Building2 className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-4 text-lg font-semibold text-gray-900">Centro Comercial No Encontrado</h3>
+              <p className="mt-2 text-gray-500">El centro comercial que buscas no existe o ha sido eliminado</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
-  const handleStoreClick = (storeId: string) => {
-    navigate(`/store/${storeId}/promotions`);
-  };
-
   return (
-    <div className="bg-gradient-to-b from-purple-50 to-white min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <Button variant="ghost" className="mb-6" asChild>
-          <Link to="/promotions">
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Volver a Promociones
-          </Link>
-        </Button>
-        
-        <div className="space-y-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-purple-100">
-                  <Building2 className="h-6 w-6 text-purple-600" />
-                </div>
-                <div className="space-y-4">
-                  <h1 className="text-3xl font-bold text-gray-900">{mall.name}</h1>
-                  
-                  <div className="flex items-start gap-2 text-gray-600">
-                    <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                    <p className="text-lg">{mall.address}</p>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow pt-16">
+        <div className="bg-gradient-to-b from-purple-50 to-white">
+          <div className="container mx-auto px-4 py-8">
+            <Button variant="ghost" className="mb-6" asChild>
+              <Link to="/promotions">
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Volver a Promociones
+              </Link>
+            </Button>
+            
+            <div className="space-y-8">
+              <div className="bg-white rounded-lg p-6 shadow-sm space-y-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-lg bg-purple-100">
+                      <Building2 className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div className="space-y-4">
+                      <h1 className="text-3xl font-bold text-gray-900">{mall.name}</h1>
+                      
+                      <div className="flex items-start gap-2 text-gray-600">
+                        <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                        <p className="text-lg">{mall.address}</p>
+                      </div>
+                      
+                      {mall.description && (
+                        <p className="text-gray-600 max-w-3xl text-lg leading-relaxed">
+                          {mall.description}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   
-                  {mall.description && (
-                    <p className="text-gray-600 max-w-3xl text-lg leading-relaxed">
-                      {mall.description}
-                    </p>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditDialogOpen(true)}
+                  >
+                    <PencilLine className="h-4 w-4 mr-2" />
+                    Editar
+                  </Button>
                 </div>
               </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditDialogOpen(true)}
-              >
-                <PencilLine className="h-4 w-4 mr-2" />
-                Editar
-              </Button>
-            </div>
-          </div>
 
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-gray-900">Tiendas Disponibles</h2>
-              <Button onClick={() => setIsAddStoreDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Agregar Tienda
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <StoresList stores={stores || []} onStoreClick={handleStoreClick} />
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-semibold text-gray-900">Tiendas Disponibles</h2>
+                  <Button onClick={() => setIsAddStoreDialogOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Agregar Tienda
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <StoresList stores={stores || []} onStoreClick={handleStoreClick} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+      <Footer />
 
       <EditMallDialog
         mall={mall}
