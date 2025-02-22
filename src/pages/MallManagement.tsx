@@ -32,7 +32,6 @@ export default function MallManagement() {
   const [storeToEdit, setStoreToEdit] = useState<string | null>(null);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
 
-  // Fetch mall data
   const { data: mall, isLoading: isMallLoading } = useQuery({
     queryKey: ["mall", mallId],
     queryFn: async () => {
@@ -48,7 +47,6 @@ export default function MallManagement() {
     enabled: !!mallId,
   });
 
-  // Fetch stores data
   const { data: stores, refetch: refetchStores, isLoading: isStoresLoading } = useQuery({
     queryKey: ["stores", mallId],
     queryFn: async () => {
@@ -96,7 +94,6 @@ export default function MallManagement() {
     setStoreToDelete(null);
   };
 
-  // Show loading state while data is being fetched
   if (isMallLoading || isStoresLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
@@ -113,7 +110,6 @@ export default function MallManagement() {
     );
   }
 
-  // Show error state if mall is not found
   if (!mall) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
