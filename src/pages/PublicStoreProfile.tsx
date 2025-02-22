@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
 export default function PublicStoreProfile() {
   const {
     storeId
@@ -125,10 +126,11 @@ export default function PublicStoreProfile() {
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-2xl font-bold mb-4">Promociones Actuales</h2>
                 {promotions && promotions.length > 0 ? <div className="space-y-4">
-                    {promotions.map(promo => <Card key={promo.id}>
+                    {promotions.map((promo) => (
+                      <Card key={promo.id}>
                         <CardHeader>
                           <div className="flex items-start justify-between">
-                            <div className="space-y-2">
+                            <div className="space-y-2 text-left w-full">
                               <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
                                 {promo.type}
                               </Badge>
@@ -146,7 +148,8 @@ export default function PublicStoreProfile() {
                             </span>
                           </div>
                         </CardContent>
-                      </Card>)}
+                      </Card>
+                    ))}
                   </div> : <Card>
                     <CardHeader>
                       <CardTitle className="text-center text-gray-500">
