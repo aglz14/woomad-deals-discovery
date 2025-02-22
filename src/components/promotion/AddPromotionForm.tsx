@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -112,7 +113,7 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
 
       <div>
         <Label>
-          {newPromotion.type === "coupon" ? t('coupon') : t('promotion')}
+          {t('type')}
         </Label>
         <Input
           value={newPromotion.title}
@@ -148,6 +149,7 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
           <SelectContent>
             <SelectItem value="promotion">{t('promotion')}</SelectItem>
             <SelectItem value="coupon">{t('coupon')}</SelectItem>
+            <SelectItem value="sale">{t('sale')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
