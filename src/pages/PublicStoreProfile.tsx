@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,7 +30,7 @@ export default function PublicStoreProfile() {
         throw error;
       }
       
-      console.log("Store data:", data); // Add this for debugging
+      console.log("Store data:", data);
       return data;
     },
     enabled: !!storeId,
@@ -115,44 +116,7 @@ export default function PublicStoreProfile() {
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <div className="flex items-start gap-4">
-                  {store.logo_url ? (
-                    <img
-                      src={store.logo_url}
-                      alt={store.name}
-                      className="w-16 h-16 object-contain rounded-lg"
-                    />
-                  ) : (
-                    <Store className="w-16 h-16 text-purple-500" />
-                  )}
-                  <div>
-                    <CardTitle className="text-left">{store.name}</CardTitle>
-                    <CardDescription className="text-left">{store.category}</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {store.description && (
-                    <p className="text-gray-600 text-left">{store.description}</p>
-                  )}
-                  {store.location_in_mall && (
-                    <p className="text-sm text-gray-600 text-left">
-                      Ubicación: {store.location_in_mall}
-                    </p>
-                  )}
-                  {store.mall && (
-                    <p className="text-sm text-gray-600 text-left">
-                      Centro Comercial: {store.mall.name}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-2xl font-bold mb-4">Información de la Tienda</h2>
                 <div className="space-y-4">
