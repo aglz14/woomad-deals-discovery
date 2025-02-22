@@ -1,5 +1,5 @@
 
-export type ValidPromotionType = "promotion" | "coupon";
+export type ValidPromotionType = "promotion" | "coupon" | "sale";
 
 export interface DatabasePromotion {
   id: string;

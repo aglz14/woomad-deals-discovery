@@ -15,7 +15,7 @@ import { PromotionsList } from "@/components/store/PromotionsList";
 
 // Helper function to validate promotion type
 const isValidPromotionType = (type: string): type is ValidPromotionType => {
-  return ["promotion", "coupon"].includes(type);
+  return ["promotion", "coupon", "sale"].includes(type);
 };
 
 export default function StoreProfile() {

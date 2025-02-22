@@ -16,7 +16,14 @@ interface PromotionsListProps {
 export function PromotionsList({ promotions, onEdit, onDelete }: PromotionsListProps) {
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
-    promotion: 'bg-purple-100 text-purple-800'
+    promotion: 'bg-purple-100 text-purple-800',
+    sale: 'bg-green-100 text-green-800'
+  };
+
+  const typeLabels = {
+    promotion: 'Promoción',
+    coupon: 'Cupón',
+    sale: 'Oferta'
   };
 
   if (!promotions?.length) {
@@ -42,7 +49,7 @@ export function PromotionsList({ promotions, onEdit, onDelete }: PromotionsListP
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <Badge className={`${typeColors[promo.type]} capitalize`}>
-                  {promo.type === 'promotion' ? 'Promoción' : 'Cupón'}
+                  {typeLabels[promo.type]}
                 </Badge>
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button
