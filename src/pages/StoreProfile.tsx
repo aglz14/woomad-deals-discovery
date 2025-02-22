@@ -13,12 +13,14 @@ import { EditPromotionDialog } from "@/components/promotion/EditPromotionDialog"
 import { useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { DatabasePromotion } from "@/types/promotion";
+
 export default function StoreProfile() {
   const {
     storeId
   } = useParams();
   const navigate = useNavigate();
   const [promotionToEdit, setPromotionToEdit] = useState<DatabasePromotion | null>(null);
+
   const {
     data: store,
     isLoading: isStoreLoading
@@ -36,6 +38,7 @@ export default function StoreProfile() {
       return data;
     }
   });
+
   const {
     data: promotions,
     isLoading: isPromotionsLoading,
@@ -43,19 +46,20 @@ export default function StoreProfile() {
   } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from("promotions").select("*").eq("store_id", storeId).gte("end_date", new Date().toISOString()).order("start_date", {
-        ascending: true
-      });
+      const { data, error } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("store_id", storeId)
+        .gte("end_date", new Date().toISOString())
+        .order("start_date", { ascending: true });
       if (error) {
         toast.error("Failed to fetch promotions");
         throw error;
       }
-      return data as DatabasePromotion[];
+      return data;
     }
   });
+
   const handleDeletePromotion = async (promotionId: string) => {
     try {
       const {
@@ -69,11 +73,13 @@ export default function StoreProfile() {
       toast.error("Error al eliminar la promoción");
     }
   };
+
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
     promotion: 'bg-purple-100 text-purple-800',
     sale: 'bg-red-100 text-red-800'
   };
+
   if (isStoreLoading || isPromotionsLoading) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -91,6 +97,7 @@ export default function StoreProfile() {
         <Footer />
       </div>;
   }
+
   if (!store) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -106,6 +113,7 @@ export default function StoreProfile() {
         <Footer />
       </div>;
   }
+
   return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       

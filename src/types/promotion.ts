@@ -11,14 +11,6 @@ export interface DatabasePromotion {
   discount_value?: string;
   terms_conditions?: string;
   image_url?: string;
-  store: {
-    id: string;
-    name: string;
-    mall: {
-      id: string;
-      name: string;
-      latitude: number;
-      longitude: number;
-    };
-  };
+  store_id?: string;
+  created_at: string;
 }
