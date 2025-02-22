@@ -7,9 +7,9 @@ export default function Nosotros() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-grow pt-16">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white py-20">
+        <div className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white py-20 mt-16">
           <div className="container mx-auto px-4">
             <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">
               Sobre Nosotros
