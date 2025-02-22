@@ -153,46 +153,84 @@ export default function PublicStoreProfile() {
             </Card>
 
             <div className="lg:col-span-2 space-y-6">
-              <h2 className="text-2xl font-bold">Promociones Actuales</h2>
-              {promotions && promotions.length > 0 ? (
-                promotions.map((promo) => (
-                  <Card key={promo.id}>
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h2 className="text-2xl font-bold mb-4">Información de la Tienda</h2>
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
+                    {store.logo_url ? (
+                      <img
+                        src={store.logo_url}
+                        alt={store.name}
+                        className="w-16 h-16 object-contain rounded-lg"
+                      />
+                    ) : (
+                      <Store className="w-16 h-16 text-purple-500" />
+                    )}
+                    <div>
+                      <h3 className="text-xl font-semibold">{store.name}</h3>
+                      <p className="text-gray-600">{store.category}</p>
+                    </div>
+                  </div>
+                  {store.description && (
+                    <p className="text-gray-600 text-left">{store.description}</p>
+                  )}
+                  {store.location_in_mall && (
+                    <p className="text-sm text-gray-600 text-left">
+                      Ubicación: {store.location_in_mall}
+                    </p>
+                  )}
+                  {store.mall && (
+                    <p className="text-sm text-gray-600 text-left">
+                      Centro Comercial: {store.mall.name}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h2 className="text-2xl font-bold mb-4">Promociones Actuales</h2>
+                {promotions && promotions.length > 0 ? (
+                  <div className="space-y-4">
+                    {promotions.map((promo) => (
+                      <Card key={promo.id}>
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-2">
+                              <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
+                                {promo.type}
+                              </Badge>
+                              <CardTitle>{promo.title}</CardTitle>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <p className="text-gray-600 whitespace-pre-wrap text-left">{promo.description}</p>
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Calendar className="h-4 w-4" />
+                            <span>
+                              {format(new Date(promo.start_date), 'MMM d')} -{' '}
+                              {format(new Date(promo.end_date), 'MMM d, yyyy')}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card>
                     <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2">
-                          <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
-                            {promo.type}
-                          </Badge>
-                          <CardTitle>{promo.title}</CardTitle>
-                        </div>
-                      </div>
+                      <CardTitle className="text-center text-gray-500">
+                        No hay promociones activas
+                      </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-gray-600 whitespace-pre-wrap text-left">{promo.description}</p>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                          {format(new Date(promo.start_date), 'MMM d')} -{' '}
-                          {format(new Date(promo.end_date), 'MMM d, yyyy')}
-                        </span>
-                      </div>
+                    <CardContent>
+                      <p className="text-center text-gray-500">
+                        ¡Vuelve más tarde para ver nuevas promociones y ofertas!
+                      </p>
                     </CardContent>
                   </Card>
-                ))
-              ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-center text-gray-500">
-                      No hay promociones activas
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-center text-gray-500">
-                      ¡Vuelve más tarde para ver nuevas promociones y ofertas!
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
