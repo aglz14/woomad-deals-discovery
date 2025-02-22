@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, Calendar } from "lucide-react";
+import { Store, Calendar, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -61,8 +61,12 @@ export default function StoreProfile() {
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-center items-center h-full">
-              <p className="text-gray-600">Cargando...</p>
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-pulse space-y-4 w-full max-w-2xl">
+                <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-32 bg-gray-200 rounded"></div>
+              </div>
             </div>
           </div>
         </main>
@@ -77,8 +81,10 @@ export default function StoreProfile() {
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-center items-center h-full">
-              <p className="text-gray-600">Tienda no encontrada</p>
+            <div className="flex flex-col items-center justify-center h-48 text-center">
+              <Store className="h-12 w-12 text-gray-400 mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Tienda no encontrada</h2>
+              <p className="text-gray-600">La tienda que buscas no existe o ha sido eliminada</p>
             </div>
           </div>
         </main>
@@ -95,73 +101,76 @@ export default function StoreProfile() {
         <div className="container mx-auto px-4 py-8">
           <button
             onClick={() => navigate(-1)}
-            className="mb-6 text-purple-600 hover:text-purple-700 flex items-center gap-2"
+            className="mb-8 text-purple-600 hover:text-purple-700 flex items-center gap-2 transition-colors"
           >
             ← Volver
           </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Store Information */}
-            <Card className="lg:col-span-1">
-              <CardHeader>
-                <div className="flex items-start gap-4">
+            <Card className="lg:col-span-1 h-fit">
+              <CardHeader className="space-y-6">
+                <div className="flex flex-col items-center text-center">
                   {store.logo_url ? (
                     <img
                       src={store.logo_url}
                       alt={store.name}
-                      className="w-16 h-16 object-contain rounded-lg"
+                      className="w-24 h-24 object-contain rounded-xl shadow-sm mb-4"
                     />
                   ) : (
-                    <Store className="w-16 h-16 text-purple-500" />
+                    <div className="w-24 h-24 flex items-center justify-center bg-purple-100 rounded-xl mb-4">
+                      <Store className="w-12 h-12 text-purple-500" />
+                    </div>
                   )}
-                  <div>
-                    <CardTitle>{store.name}</CardTitle>
-                    <CardDescription>{store.category}</CardDescription>
+                  <div className="space-y-2">
+                    <CardTitle className="text-2xl">{store.name}</CardTitle>
+                    <Badge variant="outline" className="capitalize">
+                      {store.category}
+                    </Badge>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {store.description && (
-                    <p className="text-gray-600">{store.description}</p>
-                  )}
-                  {store.location_in_mall && (
-                    <p className="text-sm text-gray-600">
-                      Ubicación: {store.location_in_mall}
-                    </p>
-                  )}
-                </div>
+              <CardContent className="space-y-6">
+                {store.description && (
+                  <p className="text-gray-600 text-center">{store.description}</p>
+                )}
+                {store.location_in_mall && (
+                  <div className="flex items-center justify-center gap-2 text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{store.location_in_mall}</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Promotions */}
             <div className="lg:col-span-2 space-y-6">
-              <h2 className="text-2xl font-bold">Promociones Actuales</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Promociones Actuales</h2>
               {promotions && promotions.length > 0 ? (
-                promotions.map((promo) => (
-                  <Card key={promo.id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2">
+                <div className="space-y-6">
+                  {promotions.map((promo) => (
+                    <Card key={promo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <div className="space-y-4">
                           <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
                             {promo.type}
                           </Badge>
-                          <CardTitle>{promo.title}</CardTitle>
+                          <CardTitle className="text-xl">{promo.title}</CardTitle>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-gray-600 whitespace-pre-wrap">{promo.description}</p>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                          {format(new Date(promo.start_date), 'MMM d')} -{' '}
-                          {format(new Date(promo.end_date), 'MMM d, yyyy')}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <p className="text-gray-600 whitespace-pre-wrap">{promo.description}</p>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <Calendar className="h-4 w-4" />
+                          <span>
+                            {format(new Date(promo.start_date), 'd MMM')} -{' '}
+                            {format(new Date(promo.end_date), 'd MMM, yyyy')}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               ) : (
                 <Card>
                   <CardHeader>
