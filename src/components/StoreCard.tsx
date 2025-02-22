@@ -22,7 +22,7 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
       className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white relative overflow-hidden"
       onClick={onClick}
     >
-      <CardHeader>
+      <CardHeader className="text-left">
         <div className="flex items-start gap-4">
           {store.logo_url ? (
             <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-purple-50">
@@ -38,7 +38,7 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold line-clamp-1">{store.name}</CardTitle>
+            <CardTitle className="text-lg font-semibold line-clamp-1 text-left">{store.name}</CardTitle>
             <CardDescription className="flex items-center gap-2 mt-1">
               <Tag className="h-4 w-4 text-purple-500" />
               <span className="line-clamp-1">{store.category}</span>
@@ -46,7 +46,7 @@ export const StoreCard = ({ store, onClick }: StoreCardProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="text-left">
         <div className="space-y-2 text-sm text-gray-600">
           {store.description && (
             <p className="line-clamp-2 mb-3">{store.description}</p>

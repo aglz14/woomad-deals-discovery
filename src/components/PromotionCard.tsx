@@ -44,7 +44,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
         </div>
       )}
       
-      <CardHeader className="space-y-2">
+      <CardHeader className="space-y-2 text-left">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1 flex-1">
             <Badge 
@@ -53,7 +53,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
             >
               {promotion.type}
             </Badge>
-            <CardTitle className="leading-tight line-clamp-2">{promotion.title}</CardTitle>
+            <CardTitle className="leading-tight line-clamp-2 text-left">{promotion.title}</CardTitle>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
       </CardHeader>
 
       <CardContent>
-        <p className="text-gray-600 text-sm line-clamp-3">{promotion.description}</p>
+        <p className="text-gray-600 text-sm line-clamp-3 text-left">{promotion.description}</p>
       </CardContent>
     </Card>
   );
