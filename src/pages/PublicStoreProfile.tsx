@@ -100,8 +100,8 @@ export default function PublicStoreProfile() {
                 <div className="flex items-start gap-4">
                   {store.logo_url ? <img src={store.logo_url} alt={store.name} className="w-16 h-16 object-contain rounded-lg" /> : <Store className="w-16 h-16 text-purple-500" />}
                   <div>
-                    <CardTitle>{store.name}</CardTitle>
-                    <CardDescription>{store.category}</CardDescription>
+                    <CardTitle className="text-left">{store.name}</CardTitle>
+                    <CardDescription className="text-left">{store.category}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
