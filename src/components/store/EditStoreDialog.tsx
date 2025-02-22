@@ -1,36 +1,30 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Store } from "@/types/store";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EditStoreDialogProps {
-  store: {
-    id: string;
-    name: string;
-    description?: string;
-    category: string;
-    location_in_mall?: string;
-    contact_number?: string;
-  };
+  store: Store;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
 export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStoreDialogProps) {
-  const { t } = useTranslation();
-  const [editedStore, setEditedStore] = useState({
+  const [formData, setFormData] = useState({
     name: store.name,
-    description: store.description || "",
     category: store.category,
+    description: store.description || "",
     location_in_mall: store.location_in_mall || "",
     contact_number: store.contact_number || "",
+    email: store.email || "",
+    website: store.website || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,20 +32,13 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
     try {
       const { error } = await supabase
         .from("stores")
-        .update({
-          name: editedStore.name,
-          description: editedStore.description,
-          category: editedStore.category,
-          location_in_mall: editedStore.location_in_mall,
-          contact_number: editedStore.contact_number,
-        })
+        .update(formData)
         .eq("id", store.id);
 
       if (error) throw error;
 
       toast.success("Tienda actualizada exitosamente");
       onSuccess();
-      onClose();
     } catch (error) {
       console.error("Error updating store:", error);
       toast.error("Error al actualizar la tienda");
@@ -69,8 +56,8 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             <Label htmlFor="name">Nombre de la tienda</Label>
             <Input
               id="name"
-              value={editedStore.name}
-              onChange={(e) => setEditedStore({ ...editedStore, name: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
           </div>
@@ -78,8 +65,8 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             <Label htmlFor="category">Categoría</Label>
             <Input
               id="category"
-              value={editedStore.category}
-              onChange={(e) => setEditedStore({ ...editedStore, category: e.target.value })}
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               required
             />
           </div>
@@ -87,31 +74,49 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
-              value={editedStore.description}
-              onChange={(e) => setEditedStore({ ...editedStore, description: e.target.value })}
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
           </div>
           <div>
-            <Label htmlFor="location">Ubicación</Label>
+            <Label htmlFor="location">Ubicación en el centro comercial</Label>
             <Input
               id="location"
-              value={editedStore.location_in_mall}
-              onChange={(e) => setEditedStore({ ...editedStore, location_in_mall: e.target.value })}
+              value={formData.location_in_mall}
+              onChange={(e) => setFormData({ ...formData, location_in_mall: e.target.value })}
             />
           </div>
           <div>
-            <Label htmlFor="contact">Contacto</Label>
+            <Label htmlFor="contact">Número de contacto</Label>
             <Input
               id="contact"
-              value={editedStore.contact_number}
-              onChange={(e) => setEditedStore({ ...editedStore, contact_number: e.target.value })}
+              value={formData.contact_number}
+              onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Correo electrónico</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="website">Sitio web</Label>
+            <Input
+              id="website"
+              type="url"
+              value={formData.website}
+              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
             />
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">Actualizar</Button>
+            <Button type="submit">Guardar</Button>
           </div>
         </form>
       </DialogContent>

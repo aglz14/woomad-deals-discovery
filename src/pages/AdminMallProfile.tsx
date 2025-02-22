@@ -1,4 +1,3 @@
-
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,10 +7,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
+import { EditStoreDialog } from "@/components/store/EditStoreDialog";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MallHeader } from "@/components/mall/MallHeader";
 import { MallStoresSection } from "@/components/mall/MallStoresSection";
+import { toast } from "sonner";
 
 export default function AdminMallProfile() {
   const { mallId } = useParams();
@@ -19,6 +20,7 @@ export default function AdminMallProfile() {
   const navigate = useNavigate();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
+  const [storeToEdit, setStoreToEdit] = useState<string | null>(null);
 
   const handleStoreClick = (storeId: string) => {
     navigate(`/store/${storeId}/promotions`);
@@ -66,6 +68,23 @@ export default function AdminMallProfile() {
       return data;
     },
   });
+
+  const handleDeleteStore = async (storeId: string) => {
+    try {
+      const { error } = await supabase
+        .from("stores")
+        .delete()
+        .eq("id", storeId);
+
+      if (error) throw error;
+
+      toast.success("Tienda eliminada exitosamente");
+      refetchStores();
+    } catch (error) {
+      console.error("Error deleting store:", error);
+      toast.error("Error al eliminar la tienda");
+    }
+  };
 
   if (isLoadingMall || isLoadingStores) {
     return (
@@ -142,11 +161,8 @@ export default function AdminMallProfile() {
                 stores={stores || []}
                 onStoreClick={handleStoreClick}
                 onAddStore={() => setIsAddStoreDialogOpen(true)}
-                onEditStore={(storeId) => navigate(`/store/${storeId}/edit`)}
-                onDeleteStore={(storeId) => {
-                  // Handle delete store
-                  console.log("Delete store:", storeId);
-                }}
+                onEditStore={(storeId) => setStoreToEdit(storeId)}
+                onDeleteStore={handleDeleteStore}
               />
             </div>
           </div>
@@ -173,6 +189,18 @@ export default function AdminMallProfile() {
           setIsAddStoreDialogOpen(false);
         }}
       />
+
+      {storeToEdit && stores?.find(s => s.id === storeToEdit) && (
+        <EditStoreDialog
+          store={stores.find(s => s.id === storeToEdit)!}
+          isOpen={true}
+          onClose={() => setStoreToEdit(null)}
+          onSuccess={() => {
+            refetchStores();
+            setStoreToEdit(null);
+          }}
+        />
+      )}
     </div>
   );
 }
