@@ -42,7 +42,7 @@ export function PromotionsList({ promotions, onEdit, onDelete }: PromotionsListP
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <Badge className={`${typeColors[promo.type]} capitalize`}>
-                  {promo.type}
+                  {promo.type === 'promotion' ? 'Promoción' : 'Cupón'}
                 </Badge>
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button

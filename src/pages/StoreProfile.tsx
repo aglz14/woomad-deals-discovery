@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
 import { useState } from "react";
 import { EditPromotionDialog } from "@/components/promotion/EditPromotionDialog";
-import { DatabasePromotion } from "@/types/promotion";
+import { DatabasePromotion, ValidPromotionType } from "@/types/promotion";
 import { StoreLoadingState } from "@/components/store/StoreLoadingState";
 import { StoreNotFound } from "@/components/store/StoreNotFound";
 import { StoreInfo } from "@/components/store/StoreInfo";
@@ -39,15 +39,33 @@ export default function StoreProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("promotions")
-        .select("*")
+        .select(`
+          *,
+          store:stores (
+            id,
+            name,
+            mall:shopping_malls (
+              id,
+              name,
+              latitude,
+              longitude
+            )
+          )
+        `)
         .eq("store_id", storeId)
         .gte("end_date", new Date().toISOString())
         .order("start_date", { ascending: true });
+      
       if (error) {
         toast.error("Failed to fetch promotions");
         throw error;
       }
-      return data;
+
+      // Ensure the type is ValidPromotionType
+      return data.map(promotion => ({
+        ...promotion,
+        type: promotion.type as ValidPromotionType
+      })) as DatabasePromotion[];
     }
   });
 
