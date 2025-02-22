@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Plus, Trash2, SearchIcon, Pencil } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -63,7 +62,7 @@ export default function Promotions() {
   }, [navigate, t]);
 
   const handleMallClick = (mallId: string) => {
-    navigate(`/mall/${mallId}/manage`);
+    navigate(`/admin/mall/${mallId}`);
   };
 
   const handleDeleteMall = async (mallId: string) => {
