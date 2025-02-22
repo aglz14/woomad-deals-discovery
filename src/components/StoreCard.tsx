@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Store, Tag, Phone, MapPin } from 'lucide-react';
+import { Store, Tag, Phone, MapPin, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
 
 interface StoreCardProps {
   store: {
@@ -14,14 +15,50 @@ interface StoreCardProps {
     contact_number?: string;
   };
   onClick: () => void;
+  onEdit?: (storeId: string) => void;
+  onDelete?: (storeId: string) => void;
 }
 
-export const StoreCard = ({ store, onClick }: StoreCardProps) => {
+export const StoreCard = ({ store, onClick, onEdit, onDelete }: StoreCardProps) => {
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onEdit?.(store.id);
+  };
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete?.(store.id);
+  };
+
   return (
     <Card 
       className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white relative overflow-hidden"
       onClick={onClick}
     >
+      {(onEdit || onDelete) && (
+        <div className="absolute top-4 right-4 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="bg-white hover:bg-gray-100"
+              onClick={handleEdit}
+            >
+              <Pencil className="h-4 w-4 text-purple-500" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="bg-white hover:bg-red-100"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-4 w-4 text-red-500" />
+            </Button>
+          )}
+        </div>
+      )}
       <CardHeader className="text-left">
         <div className="flex items-start gap-4">
           {store.logo_url ? (

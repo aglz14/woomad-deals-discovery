@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -136,15 +135,11 @@ export default function MallManagement() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stores?.map((store) => (
               <div key={store.id} className="relative group">
-                <div onClick={() => handleStoreClick(store.id)} className="cursor-pointer">
-                  <StoresList stores={[store]} onStoreClick={() => {}} />
-                </div>
-                <StoreActions
-                  storeId={store.id}
+                <StoresList 
+                  stores={[store]} 
+                  onStoreClick={() => handleStoreClick(store.id)}
                   onEdit={setStoreToEdit}
-                  onDelete={handleDeleteStore}
-                  isDeleteDialogOpen={storeToDelete === store.id}
-                  setDeleteDialogOpen={(open) => !open && setStoreToDelete(null)}
+                  onDelete={(storeId) => setStoreToDelete(storeId)}
                 />
               </div>
             ))}
