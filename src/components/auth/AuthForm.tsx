@@ -29,13 +29,13 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
           password,
         });
         if (error) throw error;
-        toast.success("Check your email to confirm your account!");
+        toast.success("¡Revisa tu correo para confirmar tu cuenta!");
       } else if (mode === "reset") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin,
         });
         if (error) throw error;
-        toast.success("Check your email for the password reset link!");
+        toast.success("¡Revisa tu correo para restablecer tu contraseña!");
         onModeChange("login");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -43,7 +43,7 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
           password,
         });
         if (error) throw error;
-        toast.success("Successfully logged in!");
+        toast.success("¡Has iniciado sesión exitosamente!");
       }
       onClose();
     } catch (error: any) {
@@ -59,13 +59,13 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             type="email"
-            placeholder="Email"
+            placeholder="Correo electrónico"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Loading..." : "Send Reset Link"}
+            {loading ? "Cargando..." : "Enviar enlace de recuperación"}
           </Button>
         </form>
         <div className="text-center">
@@ -74,7 +74,7 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
             className="text-sm"
             onClick={() => onModeChange("login")}
           >
-            Back to Login
+            Volver al inicio de sesión
           </Button>
         </div>
       </div>
@@ -86,20 +86,20 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           type="email"
-          placeholder="Email"
+          placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <Input
           type="password"
-          placeholder="Password"
+          placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Loading..." : mode === "login" ? "Log In" : "Sign Up"}
+          {loading ? "Cargando..." : mode === "login" ? "Iniciar Sesión" : "Registrarse"}
         </Button>
       </form>
 
@@ -111,7 +111,7 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
               className="text-sm"
               onClick={() => onModeChange("reset")}
             >
-              Forgot your password?
+              ¿Olvidaste tu contraseña?
             </Button>
             <div>
               <Button
@@ -119,7 +119,7 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
                 className="text-sm"
                 onClick={() => onModeChange("signup")}
               >
-                Need an account? Sign up
+                ¿No tienes una cuenta? Regístrate
               </Button>
             </div>
           </>
@@ -129,7 +129,7 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
             className="text-sm"
             onClick={() => onModeChange("login")}
           >
-            Already have an account? Log in
+            ¿Ya tienes una cuenta? Inicia sesión
           </Button>
         )}
       </div>

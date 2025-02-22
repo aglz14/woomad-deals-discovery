@@ -23,10 +23,10 @@ export const AuthModal = ({ isOpen, onClose, mode: initialMode }: AuthModalProps
         <DialogHeader>
           <DialogTitle>
             {mode === "login" 
-              ? "Log In" 
+              ? "Iniciar Sesión" 
               : mode === "signup" 
-              ? "Create Account"
-              : "Reset Password"}
+              ? "Crear Cuenta"
+              : "Restablecer Contraseña"}
           </DialogTitle>
         </DialogHeader>
         <AuthForm 

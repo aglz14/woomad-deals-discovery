@@ -50,6 +50,7 @@ const resources = {
       "longitude": "Longitud",
       "update": "Actualizar",
       "mallUpdatedSuccess": "Centro comercial actualizado con éxito",
+      "mallUpdatedError": "Error al actualizar el centro comercial",
       "searchMalls": "Buscar centros comerciales",
       "noMatchesFound": "No se encontraron resultados",
       "tryAdjustingSearch": "Intenta ajustar los términos de búsqueda para encontrar más promociones",
