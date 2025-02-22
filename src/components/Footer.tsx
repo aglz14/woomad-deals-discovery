@@ -1,3 +1,4 @@
+
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 export const Footer = () => {
@@ -17,8 +18,8 @@ export const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('quickLinks')}</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/about" className="text-gray-600 hover:text-purple-600 transition-colors">
-                  {t('about')}
+                <Link to="/nosotros" className="text-gray-600 hover:text-purple-600 transition-colors">
+                  Nosotros
                 </Link>
               </li>
               <li>
