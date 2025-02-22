@@ -13,6 +13,11 @@ import { StoreNotFound } from "@/components/store/StoreNotFound";
 import { StoreInfo } from "@/components/store/StoreInfo";
 import { PromotionsList } from "@/components/store/PromotionsList";
 
+// Helper function to validate promotion type
+const isValidPromotionType = (type: string): type is ValidPromotionType => {
+  return ["promotion", "coupon"].includes(type);
+};
+
 export default function StoreProfile() {
   const { storeId } = useParams();
   const navigate = useNavigate();
@@ -61,13 +66,15 @@ export default function StoreProfile() {
         throw error;
       }
 
-      // Type cast the raw data to ensure it matches DatabasePromotion
-      const promotions = rawData.map(promotion => ({
-        ...promotion,
-        type: promotion.type as ValidPromotionType, // Ensure type is ValidPromotionType
-      })) as DatabasePromotion[];
+      // Filter and validate the promotion types
+      const validPromotions = rawData
+        .filter((promotion) => isValidPromotionType(promotion.type))
+        .map((promotion) => ({
+          ...promotion,
+          type: promotion.type as ValidPromotionType,
+        })) as DatabasePromotion[];
 
-      return promotions;
+      return validPromotions;
     }
   });
 
