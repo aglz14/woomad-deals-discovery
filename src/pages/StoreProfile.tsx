@@ -4,25 +4,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, Calendar, MapPin } from "lucide-react";
+import { Store, Calendar, MapPin, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { EditPromotionDialog } from "@/components/promotion/EditPromotionDialog";
+import { useState } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { DatabasePromotion } from "@/types/promotion";
+
 export default function StoreProfile() {
-  const {
-    storeId
-  } = useParams();
+  const { storeId } = useParams();
   const navigate = useNavigate();
+  const [promotionToEdit, setPromotionToEdit] = useState<DatabasePromotion | null>(null);
+
   const {
     data: store,
     isLoading: isStoreLoading
   } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from("stores").select("*").eq("id", storeId).single();
+      const { data, error } = await supabase.from("stores").select("*").eq("id", storeId).single();
       if (error) {
         toast.error("Failed to fetch store details");
         throw error;
@@ -30,30 +33,51 @@ export default function StoreProfile() {
       return data;
     }
   });
+
   const {
     data: promotions,
-    isLoading: isPromotionsLoading
+    isLoading: isPromotionsLoading,
+    refetch: refetchPromotions
   } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
-      const {
-        data,
-        error
-      } = await supabase.from("promotions").select("*").eq("store_id", storeId).gte("end_date", new Date().toISOString()).order("start_date", {
-        ascending: true
-      });
+      const { data, error } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("store_id", storeId)
+        .gte("end_date", new Date().toISOString())
+        .order("start_date", { ascending: true });
       if (error) {
         toast.error("Failed to fetch promotions");
         throw error;
       }
-      return data;
+      return data as DatabasePromotion[];
     }
   });
+
+  const handleDeletePromotion = async (promotionId: string) => {
+    try {
+      const { error } = await supabase
+        .from("promotions")
+        .delete()
+        .eq("id", promotionId);
+
+      if (error) throw error;
+
+      toast.success("Promoción eliminada exitosamente");
+      refetchPromotions();
+    } catch (error) {
+      console.error("Error deleting promotion:", error);
+      toast.error("Error al eliminar la promoción");
+    }
+  };
+
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
     promotion: 'bg-purple-100 text-purple-800',
     sale: 'bg-red-100 text-red-800'
   };
+
   if (isStoreLoading || isPromotionsLoading) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -71,6 +95,7 @@ export default function StoreProfile() {
         <Footer />
       </div>;
   }
+
   if (!store) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -86,6 +111,7 @@ export default function StoreProfile() {
         <Footer />
       </div>;
   }
+
   return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       
@@ -101,9 +127,13 @@ export default function StoreProfile() {
               <CardHeader className="space-y-6">
                 <div className="flex flex-col items-start">
                   <div className="flex items-center gap-4 w-full">
-                    {store.logo_url ? <img src={store.logo_url} alt={store.name} className="w-24 h-24 object-contain rounded-xl shadow-sm" /> : <div className="w-24 h-24 flex items-center justify-center bg-purple-100 rounded-xl">
+                    {store.logo_url ? (
+                      <img src={store.logo_url} alt={store.name} className="w-24 h-24 object-contain rounded-xl shadow-sm" />
+                    ) : (
+                      <div className="w-24 h-24 flex items-center justify-center bg-purple-100 rounded-xl">
                         <Store className="w-12 h-12 text-purple-500" />
-                      </div>}
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <CardTitle className="text-2xl">{store.name}</CardTitle>
                       <Badge variant="outline" className="capitalize">
@@ -115,23 +145,67 @@ export default function StoreProfile() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {store.description && <p className="text-gray-600 text-left">{store.description}</p>}
-                {store.location_in_mall && <div className="flex items-center gap-2 text-gray-600">
+                {store.location_in_mall && (
+                  <div className="flex items-center gap-2 text-gray-600">
                     <MapPin className="h-4 w-4 flex-shrink-0" />
                     <span>{store.location_in_mall}</span>
-                  </div>}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Promotions */}
             <div className="lg:col-span-2 space-y-6">
               <h2 className="text-2xl font-bold text-gray-900">Promociones Actuales</h2>
-              {promotions && promotions.length > 0 ? <div className="space-y-6">
-                  {promotions.map(promo => <Card key={promo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              {promotions && promotions.length > 0 ? (
+                <div className="space-y-6">
+                  {promotions.map(promo => (
+                    <Card key={promo.id} className="overflow-hidden hover:shadow-lg transition-shadow relative group">
                       <CardHeader>
                         <div className="space-y-4">
-                          <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
-                            {promo.type}
-                          </Badge>
+                          <div className="flex items-start justify-between">
+                            <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
+                              {promo.type}
+                            </Badge>
+                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 bg-white hover:bg-gray-100"
+                                onClick={() => setPromotionToEdit(promo)}
+                              >
+                                <Pencil className="h-3.5 w-3.5 text-purple-500" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 bg-white hover:bg-red-100"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>¿Eliminar promoción?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Esta acción eliminará permanentemente la promoción. Esta acción no se puede deshacer.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDeletePromotion(promo.id)}
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                    >
+                                      Eliminar
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
                           <CardTitle className="text-xl">{promo.title}</CardTitle>
                         </div>
                       </CardHeader>
@@ -145,8 +219,11 @@ export default function StoreProfile() {
                           </span>
                         </div>
                       </CardContent>
-                    </Card>)}
-                </div> : <Card>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card>
                   <CardHeader>
                     <CardTitle>No hay promociones activas</CardTitle>
                   </CardHeader>
@@ -155,12 +232,25 @@ export default function StoreProfile() {
                       ¡Vuelve más tarde para ver nuevas promociones y ofertas!
                     </p>
                   </CardContent>
-                </Card>}
+                </Card>
+              )}
             </div>
           </div>
         </div>
       </main>
 
       <Footer />
+
+      {promotionToEdit && (
+        <EditPromotionDialog
+          promotion={promotionToEdit}
+          isOpen={true}
+          onClose={() => setPromotionToEdit(null)}
+          onSuccess={() => {
+            refetchPromotions();
+            setPromotionToEdit(null);
+          }}
+        />
+      )}
     </div>;
 }
