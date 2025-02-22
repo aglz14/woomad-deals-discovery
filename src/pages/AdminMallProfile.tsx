@@ -1,4 +1,3 @@
-
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +19,10 @@ export default function AdminMallProfile() {
   const navigate = useNavigate();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
+
+  const handleStoreClick = (storeId: string) => {
+    navigate(`/store/${storeId}/promotions`);
+  };
 
   const { data: mall, isLoading: isLoadingMall, refetch: refetchMall } = useQuery({
     queryKey: ["mall", mallId],
