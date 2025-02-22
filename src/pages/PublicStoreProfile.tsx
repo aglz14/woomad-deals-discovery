@@ -7,19 +7,23 @@ import { Store, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function PublicStoreProfile() {
-  const { id: storeId } = useParams();
+  const { id: storeId } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const { data: store, isLoading: isStoreLoading } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
+      if (!storeId) throw new Error("No store ID provided");
+      
       const { data, error } = await supabase
         .from("stores")
         .select("*, mall:shopping_malls(*)")
         .eq("id", storeId)
-        .single();
+        .maybeSingle();
       
       if (error) {
         toast.error("Error al cargar la tienda");
@@ -27,11 +31,14 @@ export default function PublicStoreProfile() {
       }
       return data;
     },
+    enabled: !!storeId,
   });
 
   const { data: promotions, isLoading: isPromotionsLoading } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
+      if (!storeId) throw new Error("No store ID provided");
+
       const { data, error } = await supabase
         .from("promotions")
         .select("*")
@@ -45,6 +52,7 @@ export default function PublicStoreProfile() {
       }
       return data;
     },
+    enabled: !!storeId,
   });
 
   const typeColors = {
@@ -55,112 +63,130 @@ export default function PublicStoreProfile() {
 
   if (isStoreLoading || isPromotionsLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-full">
-          <p className="text-gray-600">Cargando...</p>
-        </div>
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-center items-center h-full">
+              <p className="text-gray-600">Cargando...</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   if (!store) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center items-center h-full">
-          <p className="text-gray-600">Tienda no encontrada</p>
-        </div>
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex justify-center items-center h-full">
+              <p className="text-gray-600">Tienda no encontrada</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <button
-        onClick={() => navigate('/')}
-        className="mb-6 text-purple-600 hover:text-purple-700 flex items-center gap-2"
-      >
-        ← Volver
-      </button>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+      <Header />
+      <main className="flex-grow pt-16">
+        <div className="container mx-auto px-4 py-8">
+          <button
+            onClick={() => navigate('/')}
+            className="mb-6 text-purple-600 hover:text-purple-700 flex items-center gap-2"
+          >
+            ← Volver
+          </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <div className="flex items-start gap-4">
-              {store.logo_url ? (
-                <img
-                  src={store.logo_url}
-                  alt={store.name}
-                  className="w-16 h-16 object-contain rounded-lg"
-                />
-              ) : (
-                <Store className="w-16 h-16 text-purple-500" />
-              )}
-              <div>
-                <CardTitle>{store.name}</CardTitle>
-                <CardDescription>{store.category}</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {store.description && (
-                <p className="text-gray-600">{store.description}</p>
-              )}
-              {store.location_in_mall && (
-                <p className="text-sm text-gray-600">
-                  Ubicación: {store.location_in_mall}
-                </p>
-              )}
-              <p className="text-sm text-gray-600">
-                Centro Comercial: {store.mall.name}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="lg:col-span-2 space-y-6">
-          <h2 className="text-2xl font-bold">Promociones Actuales</h2>
-          {promotions && promotions.length > 0 ? (
-            promotions.map((promo) => (
-              <Card key={promo.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2">
-                      <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
-                        {promo.type}
-                      </Badge>
-                      <CardTitle>{promo.title}</CardTitle>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-gray-600 whitespace-pre-wrap">{promo.description}</p>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="h-4 w-4" />
-                    <span>
-                      {format(new Date(promo.start_date), 'MMM d')} -{' '}
-                      {format(new Date(promo.end_date), 'MMM d, yyyy')}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-1">
               <CardHeader>
-                <CardTitle className="text-center text-gray-500">
-                  No hay promociones activas
-                </CardTitle>
+                <div className="flex items-start gap-4">
+                  {store.logo_url ? (
+                    <img
+                      src={store.logo_url}
+                      alt={store.name}
+                      className="w-16 h-16 object-contain rounded-lg"
+                    />
+                  ) : (
+                    <Store className="w-16 h-16 text-purple-500" />
+                  )}
+                  <div>
+                    <CardTitle>{store.name}</CardTitle>
+                    <CardDescription>{store.category}</CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <p className="text-center text-gray-500">
-                  ¡Vuelve más tarde para ver nuevas promociones y ofertas!
-                </p>
+                <div className="space-y-4">
+                  {store.description && (
+                    <p className="text-gray-600">{store.description}</p>
+                  )}
+                  {store.location_in_mall && (
+                    <p className="text-sm text-gray-600">
+                      Ubicación: {store.location_in_mall}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-600">
+                    Centro Comercial: {store.mall.name}
+                  </p>
+                </div>
               </CardContent>
             </Card>
-          )}
+
+            <div className="lg:col-span-2 space-y-6">
+              <h2 className="text-2xl font-bold">Promociones Actuales</h2>
+              {promotions && promotions.length > 0 ? (
+                promotions.map((promo) => (
+                  <Card key={promo.id}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2">
+                          <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
+                            {promo.type}
+                          </Badge>
+                          <CardTitle>{promo.title}</CardTitle>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-gray-600 whitespace-pre-wrap">{promo.description}</p>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                          {format(new Date(promo.start_date), 'MMM d')} -{' '}
+                          {format(new Date(promo.end_date), 'MMM d, yyyy')}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-center text-gray-500">
+                      No hay promociones activas
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-center text-gray-500">
+                      ¡Vuelve más tarde para ver nuevas promociones y ofertas!
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
