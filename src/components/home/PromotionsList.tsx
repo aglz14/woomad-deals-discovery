@@ -3,6 +3,7 @@ import { Loader } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { DatabasePromotion } from "@/types/promotion";
+import { useTranslation } from "react-i18next";
 
 interface PromotionsListProps {
   isLoading: boolean;
@@ -23,6 +24,8 @@ export const PromotionsList = ({
   setCurrentPage,
   searchTerm 
 }: PromotionsListProps) => {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
@@ -54,9 +57,9 @@ export const PromotionsList = ({
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
         <div className="text-center py-16 bg-gray-50 rounded-lg">
           <div className="max-w-md mx-auto space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900">No matches found</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{t('noMatchesFound')}</h2>
             <p className="text-gray-500">
-              Try adjusting your search terms to find more promotions.
+              {t('tryAdjustingSearch')}
             </p>
           </div>
         </div>
