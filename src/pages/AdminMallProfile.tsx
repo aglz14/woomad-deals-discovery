@@ -1,9 +1,9 @@
+
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
@@ -16,7 +16,6 @@ import { toast } from "sonner";
 
 export default function AdminMallProfile() {
   const { mallId } = useParams();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
@@ -38,9 +37,7 @@ export default function AdminMallProfile() {
 
       if (error) {
         console.error("Error fetching mall:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
+        toast("Error", {
           description: "No se pudo cargar el centro comercial"
         });
         throw error;
@@ -78,11 +75,15 @@ export default function AdminMallProfile() {
 
       if (error) throw error;
 
-      toast.success("Tienda eliminada exitosamente");
+      toast("Éxito", {
+        description: "Tienda eliminada exitosamente"
+      });
       refetchStores();
     } catch (error) {
       console.error("Error deleting store:", error);
-      toast.error("Error al eliminar la tienda");
+      toast("Error", {
+        description: "Error al eliminar la tienda"
+      });
     }
   };
 
