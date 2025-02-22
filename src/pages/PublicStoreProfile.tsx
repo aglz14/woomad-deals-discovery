@@ -62,6 +62,13 @@ export default function PublicStoreProfile() {
     promotion: 'bg-purple-100 text-purple-800',
     sale: 'bg-red-100 text-red-800'
   };
+
+  const typeLabels = {
+    coupon: 'Cupón',
+    promotion: 'Promoción',
+    sale: 'Oferta'
+  };
+
   if (isStoreLoading || isPromotionsLoading) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -132,7 +139,7 @@ export default function PublicStoreProfile() {
                           <div className="flex items-start justify-between">
                             <div className="space-y-2 text-left w-full">
                               <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
-                                {promo.type}
+                                {typeLabels[promo.type as keyof typeof typeLabels]}
                               </Badge>
                               <CardTitle className="text-left">{promo.title}</CardTitle>
                             </div>
