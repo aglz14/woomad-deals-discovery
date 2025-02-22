@@ -20,27 +20,15 @@ export default function Nosotros() {
           </div>
         </div>
 
-        {/* Mission & Vision Section */}
+        {/* Description Section */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-gray-900">Nuestra Misión</h2>
-                <p className="text-lg text-gray-600">
-                  Conectar a comerciantes y consumidores a través de una plataforma
-                  innovadora que simplifica la gestión de promociones y mejora la
-                  experiencia de compra en centros comerciales.
-                </p>
-              </div>
-              <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-gray-900">Nuestra Visión</h2>
-                <p className="text-lg text-gray-600">
-                  Ser la plataforma líder en la transformación digital del comercio
-                  minorista, creando experiencias de compra más inteligentes y
-                  personalizadas.
-                </p>
-              </div>
-            </div>
+            <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto leading-relaxed">
+              En Woomad, nos dedicamos a revolucionar la forma en que las personas interactúan con los centros comerciales. 
+              Nuestra plataforma conecta a comerciantes y consumidores, creando una experiencia de compra más inteligente, 
+              personalizada y eficiente. A través de la innovación digital y un profundo entendimiento de las necesidades 
+              del mercado retail, estamos construyendo el futuro del comercio minorista.
+            </p>
           </div>
         </section>
 
