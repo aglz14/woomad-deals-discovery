@@ -42,6 +42,7 @@ export default function StoreProfile() {
   const { data: promotions, isLoading: isPromotionsLoading, refetch: refetchPromotions } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
+      const currentDate = new Date().toISOString();
       const { data: rawData, error } = await supabase
         .from("promotions")
         .select(`
@@ -58,7 +59,8 @@ export default function StoreProfile() {
           )
         `)
         .eq("store_id", storeId)
-        .gte("end_date", new Date().toISOString())
+        .lte("start_date", currentDate)  // Start date is before or equal to now
+        .gte("end_date", currentDate)    // End date is after or equal to now
         .order("start_date", { ascending: true });
       
       if (error) {
