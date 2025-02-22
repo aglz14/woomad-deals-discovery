@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -5,24 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/components/providers/SessionProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
 import { StoresList } from "@/components/mall/StoresList";
-import { ArrowLeft, Trash2, Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { EditStoreDialog } from "@/components/store/EditStoreDialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { MallHeader } from "@/components/mall/MallHeader";
+import { StoreActions } from "@/components/mall/StoreActions";
 
 export default function MallManagement() {
   const { mallId } = useParams();
@@ -132,32 +121,17 @@ export default function MallManagement() {
       
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-              onClick={() => navigate('/promotions')}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver a Promociones
-            </Button>
-          </div>
-
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-2xl font-bold">{mall?.name}</h1>
-              <p className="text-gray-600">{mall?.address}</p>
-            </div>
-            <AddStoreDialog
-              mallId={mallId!}
-              isOpen={isAddStoreDialogOpen}
-              onClose={() => setIsAddStoreDialogOpen(false)}
-              onSuccess={() => {
-                refetchStores();
-                setIsAddStoreDialogOpen(false);
-              }}
-            />
-          </div>
+          <MallHeader
+            mallName={mall.name}
+            mallAddress={mall.address}
+            mallId={mallId!}
+            isAddStoreDialogOpen={isAddStoreDialogOpen}
+            onAddStoreDialogClose={() => setIsAddStoreDialogOpen(false)}
+            onAddStoreSuccess={() => {
+              refetchStores();
+              setIsAddStoreDialogOpen(false);
+            }}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {stores?.map((store) => (
@@ -165,54 +139,13 @@ export default function MallManagement() {
                 <div onClick={() => handleStoreClick(store.id)} className="cursor-pointer">
                   <StoresList stores={[store]} onStoreClick={() => {}} />
                 </div>
-                <div className="absolute top-4 right-4 z-10 flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-gray-100"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setStoreToEdit(store.id);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <AlertDialog open={storeToDelete === store.id} onOpenChange={(open) => !open && setStoreToDelete(null)}>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setStoreToDelete(store.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Store</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will permanently delete the store and all its promotions. This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteStore(store.id);
-                          }}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+                <StoreActions
+                  storeId={store.id}
+                  onEdit={setStoreToEdit}
+                  onDelete={handleDeleteStore}
+                  isDeleteDialogOpen={storeToDelete === store.id}
+                  setDeleteDialogOpen={(open) => !open && setStoreToDelete(null)}
+                />
               </div>
             ))}
           </div>
