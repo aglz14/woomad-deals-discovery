@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,8 +84,16 @@ export default function PublicStoreProfile() {
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-center items-center h-full">
-              <p className="text-gray-600">Tienda no encontrada</p>
+            <div className="flex flex-col items-center justify-center gap-4 p-8 bg-white rounded-lg shadow-sm border border-gray-100">
+              <Store className="w-12 h-12 text-gray-400" />
+              <p className="text-xl font-semibold text-gray-800">Tienda no encontrada</p>
+              <p className="text-gray-600">Lo sentimos, no pudimos encontrar la tienda que buscas</p>
+              <button
+                onClick={() => navigate('/')}
+                className="mt-4 px-4 py-2 text-purple-600 hover:text-purple-700 flex items-center gap-2"
+              >
+                ← Volver al inicio
+              </button>
             </div>
           </div>
         </main>
