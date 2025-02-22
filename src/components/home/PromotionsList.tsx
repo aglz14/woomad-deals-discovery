@@ -1,3 +1,4 @@
+
 import { Loader } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -29,7 +30,7 @@ export const PromotionsList = ({
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <Loader className="w-8 h-8 animate-spin text-purple-500" />
-        <p className="text-gray-500">Finding the best deals for you...</p>
+        <p className="text-gray-500">Buscando las mejores ofertas para ti...</p>
       </div>
     );
   }
@@ -38,7 +39,7 @@ export const PromotionsList = ({
     return (
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
-        <div className="text-center py-16 bg-gray-50 rounded-lg">
+        <div className="text-center py-16 bg-gradient-to-b from-purple-50 to-white rounded-lg border border-purple-100 shadow-sm">
           <div className="max-w-md mx-auto space-y-4">
             <h2 className="text-xl font-semibold text-gray-900">{t('noActivePromotions')}</h2>
             <p className="text-gray-500">
@@ -54,7 +55,7 @@ export const PromotionsList = ({
     return (
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
-        <div className="text-center py-16 bg-gray-50 rounded-lg">
+        <div className="text-center py-16 bg-gradient-to-b from-purple-50 to-white rounded-lg border border-purple-100 shadow-sm">
           <div className="max-w-md mx-auto space-y-4">
             <h2 className="text-xl font-semibold text-gray-900">{t('noMatchesFound')}</h2>
             <p className="text-gray-500">
