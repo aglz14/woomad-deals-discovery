@@ -153,15 +153,11 @@ export default function Promotions() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMalls?.map((mall) => (
                 <div key={mall.id} className="relative group">
-                  <MallCard
-                    mall={mall}
-                    onClick={() => handleMallClick(mall.id)}
-                  />
-                  <div className="absolute top-2 right-2 z-10 flex gap-2">
+                  <div className="absolute top-4 right-4 z-10 flex gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm hover:bg-white"
                       onClick={(e) => {
                         e.stopPropagation();
                         setMallToEdit(mall.id);
@@ -205,6 +201,10 @@ export default function Promotions() {
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
+                  <MallCard
+                    mall={mall}
+                    onClick={() => handleMallClick(mall.id)}
+                  />
                 </div>
               ))}
             </div>
