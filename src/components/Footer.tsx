@@ -23,9 +23,9 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
+                <Link to="/contacto" className="text-gray-600 hover:text-purple-600 transition-colors">
                   {t('contact')}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
