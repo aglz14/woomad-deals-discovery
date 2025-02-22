@@ -13,39 +13,33 @@ export type Database = {
         Row: {
           created_at: string
           description: string
-          discount_value: string | null
           end_date: string
           id: string
           image_url: string | null
           start_date: string
           store_id: string | null
-          terms_conditions: string | null
           title: string
           type: string
         }
         Insert: {
           created_at?: string
           description: string
-          discount_value?: string | null
           end_date: string
           id?: string
           image_url?: string | null
           start_date: string
           store_id?: string | null
-          terms_conditions?: string | null
           title: string
           type: string
         }
         Update: {
           created_at?: string
           description?: string
-          discount_value?: string | null
           end_date?: string
           id?: string
           image_url?: string | null
           start_date?: string
           store_id?: string | null
-          terms_conditions?: string | null
           title?: string
           type?: string
         }

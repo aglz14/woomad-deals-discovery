@@ -34,7 +34,6 @@ export function EditPromotionDialog({
     start_date: new Date(promotion.start_date),
     end_date: new Date(promotion.end_date),
     terms_conditions: promotion.terms_conditions || "",
-    discount_value: promotion.discount_value || "",
   });
 
   const [startDate, setStartDate] = useState<Date>(new Date(promotion.start_date));
@@ -149,14 +148,6 @@ export function EditPromotionDialog({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
-            />
-          </div>
-          <div>
-            <Label htmlFor="discount">Valor del descuento</Label>
-            <Input
-              id="discount"
-              value={formData.discount_value}
-              onChange={(e) => setFormData({ ...formData, discount_value: e.target.value })}
             />
           </div>
           <div>
