@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 
 export default function AdminMallProfile() {
   const { mallId } = useParams();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
