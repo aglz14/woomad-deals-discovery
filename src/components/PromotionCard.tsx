@@ -13,7 +13,14 @@ interface PromotionCardProps {
 export const PromotionCard = ({ promotion }: PromotionCardProps) => {
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800 border-blue-200',
-    promotion: 'bg-purple-100 text-purple-800 border-purple-200'
+    promotion: 'bg-purple-100 text-purple-800 border-purple-200',
+    sale: 'bg-green-100 text-green-800 border-green-200'
+  };
+
+  const typeLabels = {
+    promotion: 'Promoción',
+    coupon: 'Cupón',
+    sale: 'Oferta'
   };
 
   const hasImage = !!promotion.image_url;
@@ -37,7 +44,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
               variant="outline" 
               className={`${typeColors[promotion.type]} capitalize mb-2`}
             >
-              {promotion.type === 'promotion' ? 'Promoción' : 'Cupón'}
+              {typeLabels[promotion.type]}
             </Badge>
             <CardTitle className="leading-tight line-clamp-2 text-left">{promotion.title}</CardTitle>
           </div>
