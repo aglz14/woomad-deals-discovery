@@ -13,4 +13,14 @@ export interface DatabasePromotion {
   image_url?: string;
   store_id?: string;
   created_at: string;
+  store?: {
+    id: string;
+    name: string;
+    mall: {
+      id: string;
+      name: string;
+      latitude: number;
+      longitude: number;
+    };
+  };
 }

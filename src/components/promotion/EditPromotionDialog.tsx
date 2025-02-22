@@ -33,7 +33,6 @@ export function EditPromotionDialog({
     type: promotion.type,
     start_date: new Date(promotion.start_date),
     end_date: new Date(promotion.end_date),
-    terms_conditions: promotion.terms_conditions || "",
   });
 
   const [startDate, setStartDate] = useState<Date>(new Date(promotion.start_date));
@@ -83,7 +82,7 @@ export function EditPromotionDialog({
               id="type"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
+              onChange={(e) => setFormData({ ...formData, type: e.target.value as ValidPromotionType })}
               required
             >
               <option value="promotion">Promoción</option>
@@ -148,14 +147,6 @@ export function EditPromotionDialog({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
-            />
-          </div>
-          <div>
-            <Label htmlFor="terms">Términos y condiciones</Label>
-            <Textarea
-              id="terms"
-              value={formData.terms_conditions}
-              onChange={(e) => setFormData({ ...formData, terms_conditions: e.target.value })}
             />
           </div>
           <div className="flex justify-end gap-2">
