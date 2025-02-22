@@ -6,6 +6,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import Index from "@/pages/Index";
 import About from "@/pages/About";
 import Nosotros from "@/pages/Nosotros";
+import Contacto from "@/pages/Contacto";
 import Promotions from "@/pages/Promotions";
 import NotFound from "@/pages/NotFound";
 import PublicMallProfile from "@/pages/PublicMallProfile";
@@ -26,6 +27,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<About />} />
             <Route path="/nosotros" element={<Nosotros />} />
+            <Route path="/contacto" element={<Contacto />} />
             <Route path="/promotions" element={<Promotions />} />
             <Route path="/mall/:mallId" element={<PublicMallProfile />} />
             <Route path="/admin/mall/:mallId" element={<AdminMallProfile />} />
