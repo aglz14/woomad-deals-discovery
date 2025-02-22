@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,55 +8,54 @@ import { Store, Calendar, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-
 export default function StoreProfile() {
-  const { storeId } = useParams();
+  const {
+    storeId
+  } = useParams();
   const navigate = useNavigate();
-
-  const { data: store, isLoading: isStoreLoading } = useQuery({
+  const {
+    data: store,
+    isLoading: isStoreLoading
+  } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("stores")
-        .select("*")
-        .eq("id", storeId)
-        .single();
-      
+      const {
+        data,
+        error
+      } = await supabase.from("stores").select("*").eq("id", storeId).single();
       if (error) {
         toast.error("Failed to fetch store details");
         throw error;
       }
       return data;
-    },
+    }
   });
-
-  const { data: promotions, isLoading: isPromotionsLoading } = useQuery({
+  const {
+    data: promotions,
+    isLoading: isPromotionsLoading
+  } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("promotions")
-        .select("*")
-        .eq("store_id", storeId)
-        .gte("end_date", new Date().toISOString())
-        .order("start_date", { ascending: true });
-      
+      const {
+        data,
+        error
+      } = await supabase.from("promotions").select("*").eq("store_id", storeId).gte("end_date", new Date().toISOString()).order("start_date", {
+        ascending: true
+      });
       if (error) {
         toast.error("Failed to fetch promotions");
         throw error;
       }
       return data;
-    },
+    }
   });
-
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
     promotion: 'bg-purple-100 text-purple-800',
-    sale: 'bg-red-100 text-red-800',
+    sale: 'bg-red-100 text-red-800'
   };
-
   if (isStoreLoading || isPromotionsLoading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+    return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
@@ -71,13 +69,10 @@ export default function StoreProfile() {
           </div>
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
   if (!store) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+    return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
@@ -89,20 +84,14 @@ export default function StoreProfile() {
           </div>
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+  return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="mb-8 text-purple-600 hover:text-purple-700 flex items-center gap-2 transition-colors"
-          >
+          <button onClick={() => navigate(-1)} className="mb-8 text-purple-600 hover:text-purple-700 flex items-center gap-2 transition-colors">
             ← Volver
           </button>
 
@@ -112,17 +101,9 @@ export default function StoreProfile() {
               <CardHeader className="space-y-6">
                 <div className="flex flex-col items-start">
                   <div className="flex items-center gap-4 w-full">
-                    {store.logo_url ? (
-                      <img
-                        src={store.logo_url}
-                        alt={store.name}
-                        className="w-24 h-24 object-contain rounded-xl shadow-sm"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 flex items-center justify-center bg-purple-100 rounded-xl">
+                    {store.logo_url ? <img src={store.logo_url} alt={store.name} className="w-24 h-24 object-contain rounded-xl shadow-sm" /> : <div className="w-24 h-24 flex items-center justify-center bg-purple-100 rounded-xl">
                         <Store className="w-12 h-12 text-purple-500" />
-                      </div>
-                    )}
+                      </div>}
                     <div className="space-y-2">
                       <CardTitle className="text-2xl">{store.name}</CardTitle>
                       <Badge variant="outline" className="capitalize">
@@ -133,25 +114,19 @@ export default function StoreProfile() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {store.description && (
-                  <p className="text-gray-600">{store.description}</p>
-                )}
-                {store.location_in_mall && (
-                  <div className="flex items-center gap-2 text-gray-600">
+                {store.description && <p className="text-gray-600 text-left">{store.description}</p>}
+                {store.location_in_mall && <div className="flex items-center gap-2 text-gray-600">
                     <MapPin className="h-4 w-4 flex-shrink-0" />
                     <span>{store.location_in_mall}</span>
-                  </div>
-                )}
+                  </div>}
               </CardContent>
             </Card>
 
             {/* Promotions */}
             <div className="lg:col-span-2 space-y-6">
               <h2 className="text-2xl font-bold text-gray-900">Promociones Actuales</h2>
-              {promotions && promotions.length > 0 ? (
-                <div className="space-y-6">
-                  {promotions.map((promo) => (
-                    <Card key={promo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              {promotions && promotions.length > 0 ? <div className="space-y-6">
+                  {promotions.map(promo => <Card key={promo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                       <CardHeader>
                         <div className="space-y-4">
                           <Badge className={`${typeColors[promo.type as keyof typeof typeColors]} capitalize`}>
@@ -170,11 +145,8 @@ export default function StoreProfile() {
                           </span>
                         </div>
                       </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                <Card>
+                    </Card>)}
+                </div> : <Card>
                   <CardHeader>
                     <CardTitle>No hay promociones activas</CardTitle>
                   </CardHeader>
@@ -183,14 +155,12 @@ export default function StoreProfile() {
                       ¡Vuelve más tarde para ver nuevas promociones y ofertas!
                     </p>
                   </CardContent>
-                </Card>
-              )}
+                </Card>}
             </div>
           </div>
         </div>
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 }
