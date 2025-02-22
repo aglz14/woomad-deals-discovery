@@ -23,8 +23,6 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
     description: store.description || "",
     location_in_mall: store.location_in_mall || "",
     contact_number: store.contact_number || "",
-    email: store.email || "",
-    website: store.website || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,24 +90,6 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
               id="contact"
               value={formData.contact_number}
               onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label htmlFor="email">Correo electrónico</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label htmlFor="website">Sitio web</Label>
-            <Input
-              id="website"
-              type="url"
-              value={formData.website}
-              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
             />
           </div>
           <div className="flex justify-end gap-2">
