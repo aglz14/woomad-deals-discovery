@@ -11,7 +11,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export default function PublicStoreProfile() {
-  const { id: storeId } = useParams<{ id: string }>();
+  const { storeId } = useParams<{ storeId: string }>();
   const navigate = useNavigate();
 
   const { data: store, isLoading: isStoreLoading } = useQuery({
