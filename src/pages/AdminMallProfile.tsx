@@ -1,8 +1,9 @@
+
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StoresList } from "@/components/mall/StoresList";
-import { Building2, MapPin, ChevronLeft, Plus, PencilLine } from "lucide-react";
+import { Building2, MapPin, ChevronLeft, Plus, PencilLine, InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/use-toast";
@@ -131,24 +132,28 @@ export default function AdminMallProfile() {
             </Button>
             
             <div className="space-y-8">
-              <div className="bg-white rounded-lg p-6 shadow-sm space-y-4">
+              <div className="bg-white rounded-xl p-8 shadow-md space-y-6 transition-all hover:shadow-lg">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-purple-100">
-                      <Building2 className="h-6 w-6 text-purple-600" />
+                  <div className="flex items-start gap-6">
+                    <div className="p-4 rounded-xl bg-purple-100 ring-1 ring-purple-200">
+                      <Building2 className="h-8 w-8 text-purple-600" />
                     </div>
                     <div className="space-y-4">
-                      <h1 className="text-3xl font-bold text-gray-900">{mall.name}</h1>
-                      
-                      <div className="flex items-start gap-2 text-gray-600">
-                        <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                        <p className="text-lg">{mall.address}</p>
+                      <div className="space-y-2">
+                        <h1 className="text-3xl font-bold text-gray-900 leading-tight">{mall.name}</h1>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <MapPin className="h-5 w-5 flex-shrink-0 text-gray-500" />
+                          <p className="text-lg leading-relaxed">{mall.address}</p>
+                        </div>
                       </div>
                       
                       {mall.description && (
-                        <p className="text-gray-600 max-w-3xl text-lg leading-relaxed">
-                          {mall.description}
-                        </p>
+                        <div className="flex items-start gap-2 max-w-3xl">
+                          <InfoIcon className="h-5 w-5 mt-1 flex-shrink-0 text-gray-400" />
+                          <p className="text-gray-600 text-lg leading-relaxed">
+                            {mall.description}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -157,6 +162,7 @@ export default function AdminMallProfile() {
                     variant="outline"
                     size="sm"
                     onClick={() => setIsEditDialogOpen(true)}
+                    className="hover:bg-purple-50"
                   >
                     <PencilLine className="h-4 w-4 mr-2" />
                     Editar
