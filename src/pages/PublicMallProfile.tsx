@@ -117,21 +117,23 @@ export default function PublicMallProfile() {
           </Button>
           
           <div className="space-y-8">
-            <div className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-purple-100">
-                  <Building2 className="h-6 w-6 text-purple-600" />
+            <div className="bg-white rounded-xl p-8 shadow-md space-y-6 hover:shadow-lg transition-all duration-300 border border-purple-100/50">
+              <div className="flex items-start gap-6">
+                <div className="p-4 rounded-xl bg-purple-100/50 hover:bg-purple-100 transition-colors duration-300">
+                  <Building2 className="h-8 w-8 text-purple-600" />
                 </div>
-                <div className="space-y-4">
-                  <h1 className="text-3xl font-bold text-gray-900">{mall.name}</h1>
+                <div className="space-y-5 flex-1">
+                  <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{mall.name}</h1>
                   
-                  <div className="flex items-start gap-2 text-gray-600">
-                    <MapPin className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                    <p className="text-lg">{mall.address}</p>
+                  <div className="flex items-start gap-3 group">
+                    <MapPin className="h-5 w-5 mt-1 flex-shrink-0 text-purple-500 group-hover:text-purple-600 transition-colors" />
+                    <p className="text-lg text-gray-600 leading-relaxed group-hover:text-gray-900 transition-colors">
+                      {mall.address}
+                    </p>
                   </div>
                   
                   {mall.description && (
-                    <p className="text-gray-600 max-w-3xl text-lg leading-relaxed">
+                    <p className="text-gray-600 max-w-3xl text-lg leading-relaxed pl-8 border-l-2 border-purple-100">
                       {mall.description}
                     </p>
                   )}
