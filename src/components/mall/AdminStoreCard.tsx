@@ -1,33 +1,26 @@
 
 import React from 'react';
 import { Store, Tag, Phone, MapPin, Pencil, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Store as StoreType } from '@/types/store';
 
-interface StoreCardProps {
-  store: {
-    id: string;
-    name: string;
-    description?: string;
-    logo_url?: string;
-    location_in_mall?: string;
-    category: string;
-    contact_number?: string;
-  };
+interface AdminStoreCardProps {
+  store: StoreType;
   onClick: () => void;
-  onEdit?: (storeId: string) => void;
-  onDelete?: (storeId: string) => void;
+  onEdit: (storeId: string) => void;
+  onDelete: (storeId: string) => void;
 }
 
-export const StoreCard = ({ store, onClick, onEdit, onDelete }: StoreCardProps) => {
+export const AdminStoreCard = ({ store, onClick, onEdit, onDelete }: AdminStoreCardProps) => {
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onEdit?.(store.id);
+    onEdit(store.id);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDelete?.(store.id);
+    onDelete(store.id);
   };
 
   return (
@@ -36,30 +29,24 @@ export const StoreCard = ({ store, onClick, onEdit, onDelete }: StoreCardProps) 
       onClick={onClick}
     >
       <CardHeader className="text-left pt-14">
-        {(onEdit || onDelete) && (
-          <div className="absolute top-3 right-3 z-10 flex gap-2">
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 bg-white hover:bg-gray-100"
-                onClick={handleEdit}
-              >
-                <Pencil className="h-3.5 w-3.5 text-purple-500" />
-              </Button>
-            )}
-            {onDelete && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 bg-white hover:bg-red-100"
-                onClick={handleDelete}
-              >
-                <Trash2 className="h-3.5 w-3.5 text-red-500" />
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="absolute top-3 right-3 z-10 flex gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-white hover:bg-gray-100"
+            onClick={handleEdit}
+          >
+            <Pencil className="h-3.5 w-3.5 text-purple-500" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 bg-white hover:bg-red-100"
+            onClick={handleDelete}
+          >
+            <Trash2 className="h-3.5 w-3.5 text-red-500" />
+          </Button>
+        </div>
         <div className="flex items-start gap-4">
           {store.logo_url ? (
             <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-purple-50">
