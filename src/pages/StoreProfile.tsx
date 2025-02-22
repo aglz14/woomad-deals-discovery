@@ -61,7 +61,7 @@ export default function StoreProfile() {
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
-            <div className="flex justify-center items-center h-48">
+            <div className="flex justify-start items-center h-48">
               <div className="animate-pulse space-y-4 w-full max-w-2xl">
                 <div className="h-8 bg-gray-200 rounded w-1/3"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -81,7 +81,7 @@ export default function StoreProfile() {
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col items-center justify-center h-48 text-center">
+            <div className="flex flex-col items-start h-48">
               <Store className="h-12 w-12 text-gray-400 mb-4" />
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Tienda no encontrada</h2>
               <p className="text-gray-600">La tienda que buscas no existe o ha sido eliminada</p>
@@ -110,33 +110,35 @@ export default function StoreProfile() {
             {/* Store Information */}
             <Card className="lg:col-span-1 h-fit">
               <CardHeader className="space-y-6">
-                <div className="flex flex-col items-center text-center">
-                  {store.logo_url ? (
-                    <img
-                      src={store.logo_url}
-                      alt={store.name}
-                      className="w-24 h-24 object-contain rounded-xl shadow-sm mb-4"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 flex items-center justify-center bg-purple-100 rounded-xl mb-4">
-                      <Store className="w-12 h-12 text-purple-500" />
+                <div className="flex flex-col items-start">
+                  <div className="flex items-center gap-4 w-full">
+                    {store.logo_url ? (
+                      <img
+                        src={store.logo_url}
+                        alt={store.name}
+                        className="w-24 h-24 object-contain rounded-xl shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 flex items-center justify-center bg-purple-100 rounded-xl">
+                        <Store className="w-12 h-12 text-purple-500" />
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <CardTitle className="text-2xl">{store.name}</CardTitle>
+                      <Badge variant="outline" className="capitalize">
+                        {store.category}
+                      </Badge>
                     </div>
-                  )}
-                  <div className="space-y-2">
-                    <CardTitle className="text-2xl">{store.name}</CardTitle>
-                    <Badge variant="outline" className="capitalize">
-                      {store.category}
-                    </Badge>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
                 {store.description && (
-                  <p className="text-gray-600 text-center">{store.description}</p>
+                  <p className="text-gray-600">{store.description}</p>
                 )}
                 {store.location_in_mall && (
-                  <div className="flex items-center justify-center gap-2 text-gray-600">
-                    <MapPin className="h-4 w-4" />
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <MapPin className="h-4 w-4 flex-shrink-0" />
                     <span>{store.location_in_mall}</span>
                   </div>
                 )}
@@ -161,7 +163,7 @@ export default function StoreProfile() {
                       <CardContent className="space-y-4">
                         <p className="text-gray-600 whitespace-pre-wrap">{promo.description}</p>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <Calendar className="h-4 w-4" />
+                          <Calendar className="h-4 w-4 flex-shrink-0" />
                           <span>
                             {format(new Date(promo.start_date), 'd MMM')} -{' '}
                             {format(new Date(promo.end_date), 'd MMM, yyyy')}
@@ -174,12 +176,10 @@ export default function StoreProfile() {
               ) : (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-center text-gray-500">
-                      No hay promociones activas
-                    </CardTitle>
+                    <CardTitle>No hay promociones activas</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-center text-gray-500">
+                    <p className="text-gray-500">
                       ¡Vuelve más tarde para ver nuevas promociones y ofertas!
                     </p>
                   </CardContent>
