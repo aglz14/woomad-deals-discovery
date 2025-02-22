@@ -35,31 +35,31 @@ export const StoreCard = ({ store, onClick, onEdit, onDelete }: StoreCardProps) 
       className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white relative overflow-hidden"
       onClick={onClick}
     >
-      {(onEdit || onDelete) && (
-        <div className="absolute top-4 right-4 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          {onEdit && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="bg-white hover:bg-gray-100"
-              onClick={handleEdit}
-            >
-              <Pencil className="h-4 w-4 text-purple-500" />
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="bg-white hover:bg-red-100"
-              onClick={handleDelete}
-            >
-              <Trash2 className="h-4 w-4 text-red-500" />
-            </Button>
-          )}
-        </div>
-      )}
-      <CardHeader className="text-left">
+      <CardHeader className="text-left pt-14">
+        {(onEdit || onDelete) && (
+          <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 bg-white hover:bg-gray-100"
+                onClick={handleEdit}
+              >
+                <Pencil className="h-3.5 w-3.5 text-purple-500" />
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 bg-white hover:bg-red-100"
+                onClick={handleDelete}
+              >
+                <Trash2 className="h-3.5 w-3.5 text-red-500" />
+              </Button>
+            )}
+          </div>
+        )}
         <div className="flex items-start gap-4">
           {store.logo_url ? (
             <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-purple-50">
