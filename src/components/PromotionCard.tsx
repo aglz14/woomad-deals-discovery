@@ -33,13 +33,13 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 bg-white">
       {promotion.image_url && (
         <div className="relative h-48 w-full overflow-hidden">
           <img
             src={promotion.image_url}
             alt={promotion.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
       )}
@@ -53,22 +53,22 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
             >
               {promotion.type}
             </Badge>
-            <CardTitle className="leading-tight">{promotion.title}</CardTitle>
+            <CardTitle className="leading-tight line-clamp-2">{promotion.title}</CardTitle>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Store className="h-4 w-4" />
-          <span>{promotion.store.name}</span>
+          <Store className="h-4 w-4 text-purple-500" />
+          <span className="font-medium">{promotion.store.name}</span>
         </div>
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MapPin className="h-4 w-4" />
+          <MapPin className="h-4 w-4 text-purple-500" />
           <span>{promotion.store.mall.name}</span>
         </div>
 
         <CardDescription className="flex items-center gap-2">
-          <Calendar className="h-4 w-4" />
+          <Calendar className="h-4 w-4 text-purple-500" />
           <span>
             {format(new Date(promotion.start_date), 'MMM d')} -{' '}
             {format(new Date(promotion.end_date), 'MMM d, yyyy')}
@@ -77,7 +77,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
       </CardHeader>
 
       <CardContent>
-        <p className="text-gray-600 text-sm whitespace-pre-wrap">{promotion.description}</p>
+        <p className="text-gray-600 text-sm line-clamp-3">{promotion.description}</p>
       </CardContent>
     </Card>
   );
