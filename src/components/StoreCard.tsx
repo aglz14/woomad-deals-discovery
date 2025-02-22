@@ -37,7 +37,7 @@ export const StoreCard = ({ store, onClick, onEdit, onDelete }: StoreCardProps) 
     >
       <CardHeader className="text-left pt-14">
         {(onEdit || onDelete) && (
-          <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute top-3 right-3 z-10 flex gap-2">
             {onEdit && (
               <Button
                 variant="ghost"
