@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Plus, Trash2, SearchIcon, Pencil } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -88,6 +89,10 @@ export default function Promotions() {
     mall.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const isOwner = (mallUserId: string) => {
+    return session?.user?.id === mallUserId;
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
@@ -153,54 +158,56 @@ export default function Promotions() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMalls?.map((mall) => (
                 <div key={mall.id} className="relative group">
-                  <div className="absolute top-4 right-4 z-10 flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm hover:bg-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMallToEdit(mall.id);
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMallToDelete(mall.id);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            {t('deleteMallDescription')}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                          <AlertDialogAction
+                  {isOwner(mall.user_id) && (
+                    <div className="absolute top-4 right-4 z-10 flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 backdrop-blur-sm hover:bg-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMallToEdit(mall.id);
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteMall(mall.id);
+                              setMallToDelete(mall.id);
                             }}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            {t('delete')}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t('deleteMallDescription')}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteMall(mall.id);
+                              }}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {t('delete')}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  )}
                   <MallCard
                     mall={mall}
                     onClick={() => handleMallClick(mall.id)}
@@ -213,7 +220,7 @@ export default function Promotions() {
       </main>
 
       {malls?.map((mall) => (
-        mallToEdit === mall.id && (
+        mallToEdit === mall.id && isOwner(mall.user_id) && (
           <EditMallDialog
             key={mall.id}
             mall={mall}
