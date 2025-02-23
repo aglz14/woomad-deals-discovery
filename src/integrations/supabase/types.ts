@@ -20,6 +20,7 @@ export type Database = {
           store_id: string | null
           title: string
           type: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -31,6 +32,7 @@ export type Database = {
           store_id?: string | null
           title: string
           type: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -42,6 +44,7 @@ export type Database = {
           store_id?: string | null
           title?: string
           type?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -122,6 +125,7 @@ export type Database = {
           logo_url: string | null
           mall_id: string | null
           name: string
+          user_id: string | null
         }
         Insert: {
           category: string
@@ -134,6 +138,7 @@ export type Database = {
           logo_url?: string | null
           mall_id?: string | null
           name: string
+          user_id?: string | null
         }
         Update: {
           category?: string
@@ -146,6 +151,7 @@ export type Database = {
           logo_url?: string | null
           mall_id?: string | null
           name?: string
+          user_id?: string | null
         }
         Relationships: [
           {

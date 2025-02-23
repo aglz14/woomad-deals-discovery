@@ -6,8 +6,7 @@ import { useSession } from "@/components/providers/SessionProvider";
 
 interface StoreActionsProps {
   storeId: string;
-  mallId: string;
-  mallUserId: string;
+  storeUserId: string; // Changed from mallUserId to storeUserId
   onEdit: (storeId: string) => void;
   onDelete: (storeId: string) => void;
   isDeleteDialogOpen: boolean;
@@ -16,15 +15,14 @@ interface StoreActionsProps {
 
 export function StoreActions({ 
   storeId, 
-  mallId,
-  mallUserId,
+  storeUserId, // Changed from mallUserId to storeUserId
   onEdit, 
   onDelete, 
   isDeleteDialogOpen,
   setDeleteDialogOpen 
 }: StoreActionsProps) {
   const { session } = useSession();
-  const isOwner = session?.user?.id === mallUserId;
+  const isOwner = session?.user?.id === storeUserId;
 
   if (!isOwner) return null;
 

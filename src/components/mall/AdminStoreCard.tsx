@@ -1,14 +1,12 @@
 
 import React from 'react';
-import { Store, Tag, Phone, MapPin, Pencil } from 'lucide-react';
+import { Store, Tag, Phone, MapPin } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Store as StoreType } from '@/types/store';
 import { StoreActions } from './StoreActions';
 
 interface AdminStoreCardProps {
   store: StoreType;
-  mallId: string;
-  mallUserId: string;
   onClick: () => void;
   onEdit: (storeId: string) => void;
   onDelete: (storeId: string) => void;
@@ -16,8 +14,6 @@ interface AdminStoreCardProps {
 
 export const AdminStoreCard = ({ 
   store, 
-  mallId,
-  mallUserId,
   onClick, 
   onEdit, 
   onDelete 
@@ -31,8 +27,7 @@ export const AdminStoreCard = ({
     >
       <StoreActions
         storeId={store.id}
-        mallId={mallId}
-        mallUserId={mallUserId}
+        storeUserId={store.user_id}
         onEdit={onEdit}
         onDelete={onDelete}
         isDeleteDialogOpen={isDeleteDialogOpen}
