@@ -5,6 +5,7 @@ import { Loader } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { useNavigate } from "react-router-dom";
 
 interface StoresNearbyProps {
   searchTerm: string;
@@ -12,6 +13,7 @@ interface StoresNearbyProps {
 }
 
 export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
 
@@ -63,6 +65,10 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
   const totalPages = Math.ceil((filterStores(stores || []).length) / ITEMS_PER_PAGE);
 
+  const handleStoreClick = (storeId: string) => {
+    navigate(`/stores/${storeId}`);
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
@@ -101,7 +107,11 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
       <h2 className="text-2xl font-bold text-gray-900">Tiendas Cercanas</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((store) => (
-          <PublicStoreCard key={store.id} store={store} />
+          <PublicStoreCard 
+            key={store.id} 
+            store={store} 
+            onClick={() => handleStoreClick(store.id)}
+          />
         ))}
       </div>
 
