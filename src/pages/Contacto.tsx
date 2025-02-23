@@ -1,4 +1,3 @@
-
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -8,10 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-
 export default function Contacto() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -26,17 +23,16 @@ export default function Contacto() {
       setIsSubmitting(false);
     }
   };
-
   return <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow pt-16">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white py-20 mt-16">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-left">
+            <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">
               Contáctanos
             </h1>
-            <p className="text-xl max-w-2xl text-left">
+            <p className="text-xl text-center max-w-2xl mx-auto">
               Estamos aquí para ayudarte. Ponte en contacto con nosotros
             </p>
           </div>
@@ -88,20 +84,20 @@ export default function Contacto() {
 
               {/* Contact Form */}
               <div className="bg-white p-8 rounded-lg shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-left">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   Envíanos un Mensaje
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-left block">Nombre</Label>
+                    <Label htmlFor="name">Nombre</Label>
                     <Input id="name" type="text" required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-left block">Email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="message" className="text-left block">Mensaje</Label>
+                    <Label htmlFor="message">Mensaje</Label>
                     <Textarea id="message" required className="min-h-[120px]" />
                   </div>
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
