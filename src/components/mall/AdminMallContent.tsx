@@ -32,7 +32,7 @@ export function AdminMallContent({
   onStoreClick,
 }: AdminMallContentProps) {
   return (
-    <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full py-4 sm:py-6 lg:py-8">
+    <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full py-4 sm:py-6 lg:py-8 mt-16">
       <Button variant="ghost" className="mb-4 sm:mb-6" asChild>
         <Link to="/promotions" className="inline-flex items-center">
           <ChevronLeft className="mr-2 h-4 w-4" />
