@@ -55,8 +55,7 @@ export default function Contacto() {
                     <div>
                       <p className="font-medium text-gray-900 text-left">Dirección</p>
                       <p className="text-gray-600 text-left">
-                        Calle Principal 123<br />
-                        28001 Madrid, España
+                        Monterrey, Nuevo León
                       </p>
                     </div>
                   </div>
