@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useSession } from "@/components/providers/SessionProvider";
 
 interface AddStoreDialogProps {
   mallId: string;
@@ -16,6 +17,7 @@ interface AddStoreDialogProps {
 }
 
 export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreDialogProps) {
+  const { session } = useSession();
   const [store, setStore] = useState({
     name: "",
     category: "",
@@ -27,18 +29,24 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!session?.user?.id) {
+        toast.error("You must be logged in to add a store");
+        return;
+      }
+
       const { error } = await supabase
         .from("stores")
         .insert([
           {
             ...store,
             mall_id: mallId,
+            user_id: session.user.id,
           },
         ]);
 
       if (error) throw error;
 
-      toast.success("Tienda agregada exitosamente");
+      toast.success("Store added successfully");
       onSuccess();
       onClose();
       setStore({
@@ -50,7 +58,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
       });
     } catch (error) {
       console.error("Error adding store:", error);
-      toast.error("Error al agregar la tienda");
+      toast.error("Error adding store");
     }
   };
 
@@ -58,11 +66,11 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Agregar Nueva Tienda</DialogTitle>
+          <DialogTitle>Add New Store</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name">Nombre de la tienda</Label>
+            <Label htmlFor="name">Store Name</Label>
             <Input
               id="name"
               value={store.name}
@@ -71,7 +79,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="category">Categoría</Label>
+            <Label htmlFor="category">Category</Label>
             <Input
               id="category"
               value={store.category}
@@ -80,7 +88,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={store.description}
@@ -88,7 +96,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="location">Ubicación en el centro comercial</Label>
+            <Label htmlFor="location">Location in Mall</Label>
             <Input
               id="location"
               value={store.location_in_mall}
@@ -96,7 +104,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="contact">Número de contacto</Label>
+            <Label htmlFor="contact">Contact Number</Label>
             <Input
               id="contact"
               value={store.contact_number}
@@ -105,9 +113,9 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
+              Cancel
             </Button>
-            <Button type="submit">Agregar</Button>
+            <Button type="submit">Add</Button>
           </div>
         </form>
       </DialogContent>
