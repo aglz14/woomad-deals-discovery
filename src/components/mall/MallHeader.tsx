@@ -2,15 +2,26 @@
 import React from 'react';
 import { Building2, MapPin, InfoIcon, PencilLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useSession } from '@/components/providers/SessionProvider';
 
 interface MallHeaderProps {
   name: string;
   address: string;
   description?: string;
+  mallUserId: string;
   onEdit: () => void;
 }
 
-export const MallHeader = ({ name, address, description, onEdit }: MallHeaderProps) => {
+export const MallHeader = ({ 
+  name, 
+  address, 
+  description, 
+  mallUserId,
+  onEdit 
+}: MallHeaderProps) => {
+  const { session } = useSession();
+  const isOwner = session?.user?.id === mallUserId;
+
   return (
     <div className="bg-white rounded-xl p-8 shadow-md space-y-6 transition-all hover:shadow-lg">
       <div className="flex items-start justify-between">
@@ -38,15 +49,17 @@ export const MallHeader = ({ name, address, description, onEdit }: MallHeaderPro
           </div>
         </div>
         
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onEdit}
-          className="hover:bg-purple-50"
-        >
-          <PencilLine className="h-4 w-4 mr-2" />
-          Editar
-        </Button>
+        {isOwner && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onEdit}
+            className="hover:bg-purple-50"
+          >
+            <PencilLine className="h-4 w-4 mr-2" />
+            Editar
+          </Button>
+        )}
       </div>
     </div>
   );
