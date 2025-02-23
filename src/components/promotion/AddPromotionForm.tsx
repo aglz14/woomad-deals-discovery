@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useSession } from "@/components/providers/SessionProvider";
 
 interface AddPromotionFormProps {
   onSuccess: () => void;
@@ -17,6 +18,7 @@ interface AddPromotionFormProps {
 
 export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps) {
   const { t } = useTranslation();
+  const { session } = useSession();
   const [selectedMall, setSelectedMall] = useState<string>("");
   const [selectedStore, setSelectedStore] = useState<string>("");
   const [newPromotion, setNewPromotion] = useState({
@@ -52,6 +54,11 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!session?.user?.id) {
+        toast.error("You must be logged in to add a promotion");
+        return;
+      }
+
       const { error } = await supabase.from("promotions").insert([
         {
           store_id: selectedStore,
@@ -60,6 +67,7 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
           type: newPromotion.type,
           start_date: new Date(newPromotion.start_date).toISOString(),
           end_date: new Date(newPromotion.end_date).toISOString(),
+          user_id: session.user.id,
         },
       ]);
 
