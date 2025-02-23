@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Building2 } from "lucide-react";
+import { useState } from "react";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 interface MallsNearbyProps {
   searchTerm: string;
@@ -12,6 +14,8 @@ interface MallsNearbyProps {
 
 export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) => {
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 9;
 
   const { data: malls, isLoading } = useQuery({
     queryKey: ["shopping-malls"],
@@ -32,6 +36,15 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
       mall.description?.toLowerCase().includes(searchLower)
     );
   });
+
+  const getCurrentPageItems = () => {
+    if (!filteredMalls) return [];
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    return filteredMalls.slice(start, end);
+  };
+
+  const totalPages = Math.ceil((filteredMalls?.length || 0) / ITEMS_PER_PAGE);
 
   const handleMallClick = (mallId: string) => {
     console.log("Navigating to mall:", mallId);
@@ -56,11 +69,13 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
     );
   }
 
+  const currentItems = getCurrentPageItems();
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Centros Comerciales Cercanos</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMalls.map((mall) => (
+        {currentItems.map((mall) => (
           <MallCard
             key={mall.id}
             mall={mall}
@@ -68,6 +83,52 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
           />
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage(Math.max(1, currentPage - 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    href="#"
+                    isActive={page === currentPage}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentPage(Math.min(totalPages, currentPage + 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </div>
   );
 };
