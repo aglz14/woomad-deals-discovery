@@ -30,7 +30,24 @@ export const useLocation = () => {
     }
   }, []);
 
+  const isValidCoordinates = (lat: number, lng: number) => {
+    return (
+      !isNaN(lat) &&
+      !isNaN(lng) &&
+      lat >= -90 && 
+      lat <= 90 && 
+      lng >= -180 && 
+      lng <= 180
+    );
+  };
+
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    // Validate coordinates before calculation
+    if (!isValidCoordinates(lat1, lon1) || !isValidCoordinates(lat2, lon2)) {
+      console.error("Invalid coordinates detected:", { lat1, lon1, lat2, lon2 });
+      return Infinity; // Return Infinity for invalid coordinates
+    }
+
     const R = 6371; // Earth's radius in km
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
@@ -49,14 +66,15 @@ export const useLocation = () => {
   };
 
   const isWithinDistance = (lat: number, lng: number) => {
-    if (!userLocation) return true; // If no location, show all
+    if (!userLocation || !isValidCoordinates(lat, lng)) return true; // Show all if no location or invalid coordinates
     const distance = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
     return distance <= maxDistance;
   };
 
   const formatDistance = (lat: number, lng: number): string => {
-    if (!userLocation) return '';
+    if (!userLocation || !isValidCoordinates(lat, lng)) return '';
     const distance = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
+    if (distance === Infinity) return '';
     return distance < 1 ? 
       `${Math.round(distance * 1000)}m` : 
       `${Math.round(distance)}km`;
@@ -68,6 +86,7 @@ export const useLocation = () => {
     isWithinDistance, 
     formatDistance,
     maxDistance,
-    setMaxDistance 
+    setMaxDistance,
+    isValidCoordinates
   };
 };

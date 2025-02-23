@@ -18,18 +18,27 @@ export default function Index() {
   const [selectedMallId, setSelectedMallId] = useState<string>("all");
   const ITEMS_PER_PAGE = 9;
 
-  const { userLocation, calculateDistance } = useLocation();
+  const { userLocation, calculateDistance, maxDistance } = useLocation();
 
-  const { data: promotions, isLoading } = useQuery({
-    queryKey: ["promotions", userLocation],
-    queryFn: () => getPromotions(userLocation, calculateDistance),
+  const { data: promotions, isLoading: isLoadingPromotions } = useQuery({
+    queryKey: ["promotions", userLocation, maxDistance],
+    queryFn: () => getPromotions(userLocation, calculateDistance, maxDistance),
   });
 
-  const { data: malls } = useQuery({
+  const { data: malls, isLoading: isLoadingMalls } = useQuery({
     queryKey: ["shopping-malls"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("shopping_malls").select("*");
-      if (error) throw error;
+      const { data, error } = await supabase
+        .from("shopping_malls")
+        .select("*")
+        .order('name');
+      
+      if (error) {
+        console.error("Error fetching malls:", error);
+        throw error;
+      }
+      
+      console.log("Fetched malls:", data); // Debug log
       return data;
     },
   });
@@ -95,7 +104,7 @@ export default function Index() {
             <div className="space-y-16">
               <section>
                 <PromotionsList
-                  isLoading={isLoading}
+                  isLoading={isLoadingPromotions}
                   promotions={promotions}
                   currentItems={getCurrentPageItems()}
                   currentPage={currentPage}
