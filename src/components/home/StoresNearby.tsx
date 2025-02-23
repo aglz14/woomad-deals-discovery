@@ -27,7 +27,9 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
           mall:shopping_malls (
             id,
             name,
-            location
+            latitude,
+            longitude,
+            address
           )
         `);
       if (error) throw error;
@@ -44,7 +46,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
       filtered = filtered.filter(
         (store) =>
           store.name.toLowerCase().includes(searchLower) ||
-          store.mall.name.toLowerCase().includes(searchLower)
+          store.mall?.name.toLowerCase().includes(searchLower)
       );
     }
 
