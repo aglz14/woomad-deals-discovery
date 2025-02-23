@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { PublicStoreCard } from "@/components/mall/PublicStoreCard";
 import { Loader } from "lucide-react";
@@ -5,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "@/hooks/use-location";
+import { Badge } from "@/components/ui/badge";
 
 interface StoresNearbyProps {
   searchTerm: string;
@@ -15,20 +18,53 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
+  const { userLocation, calculateDistance, formatDistance, isWithinDistance } = useLocation();
 
   const { data: stores, isLoading } = useQuery({
-    queryKey: ["stores"],
+    queryKey: ["stores", userLocation],
     queryFn: async () => {
+      const { data: malls } = await supabase
+        .from("shopping_malls")
+        .select("*");
+
       const { data, error } = await supabase
         .from("stores")
         .select(`
           *,
           mall:shopping_malls (
-            id,
-            name
+            *
           )
         `);
+
       if (error) throw error;
+
+      if (userLocation && malls) {
+        return data
+          .filter(store => {
+            const mall = malls.find(m => m.id === store.mall_id);
+            return mall ? isWithinDistance(mall.latitude, mall.longitude) : true;
+          })
+          .sort((a, b) => {
+            const mallA = malls.find(m => m.id === a.mall_id);
+            const mallB = malls.find(m => m.id === b.mall_id);
+            if (!mallA || !mallB) return 0;
+            
+            const distA = calculateDistance(
+              userLocation.lat,
+              userLocation.lng,
+              mallA.latitude,
+              mallA.longitude
+            );
+            const distB = calculateDistance(
+              userLocation.lat,
+              userLocation.lng,
+              mallB.latitude,
+              mallB.longitude
+            );
+            return distA - distB;
+          });
+      }
+
       return data;
     },
   });
@@ -105,11 +141,19 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
       <h2 className="text-2xl font-bold text-gray-900">Tiendas Cercanas</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((store) => (
-          <PublicStoreCard 
-            key={store.id} 
-            store={store} 
-            onClick={() => handleStoreClick(store.id)}
-          />
+          <div key={store.id} className="relative">
+            <PublicStoreCard 
+              store={store} 
+              onClick={() => handleStoreClick(store.id)}
+            />
+            {userLocation && store.mall && (
+              <Badge 
+                className="absolute top-4 right-4 bg-purple-100 text-purple-800 border-purple-200"
+              >
+                {formatDistance(store.mall.latitude, store.mall.longitude)}
+              </Badge>
+            )}
+          </div>
         ))}
       </div>
 

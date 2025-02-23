@@ -7,8 +7,11 @@ export interface Location {
   lng: number;
 }
 
+export const MAX_DISTANCE_KM = 50; // Default max distance in kilometers
+
 export const useLocation = () => {
   const [userLocation, setUserLocation] = useState<Location | null>(null);
+  const [maxDistance, setMaxDistance] = useState(MAX_DISTANCE_KM);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -21,14 +24,14 @@ export const useLocation = () => {
         },
         (error) => {
           console.error("Error getting location:", error);
-          toast.error("Could not get your location. Showing all promotions instead.");
+          toast.error("No pudimos obtener tu ubicación. Mostrando todas las ubicaciones.");
         }
       );
     }
   }, []);
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371;
+    const R = 6371; // Earth's radius in km
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a =
@@ -45,5 +48,26 @@ export const useLocation = () => {
     return deg * (Math.PI / 180);
   };
 
-  return { userLocation, calculateDistance };
+  const isWithinDistance = (lat: number, lng: number) => {
+    if (!userLocation) return true; // If no location, show all
+    const distance = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
+    return distance <= maxDistance;
+  };
+
+  const formatDistance = (lat: number, lng: number): string => {
+    if (!userLocation) return '';
+    const distance = calculateDistance(userLocation.lat, userLocation.lng, lat, lng);
+    return distance < 1 ? 
+      `${Math.round(distance * 1000)}m` : 
+      `${Math.round(distance)}km`;
+  };
+
+  return { 
+    userLocation, 
+    calculateDistance, 
+    isWithinDistance, 
+    formatDistance,
+    maxDistance,
+    setMaxDistance 
+  };
 };
