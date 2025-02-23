@@ -7,12 +7,21 @@ import { useNavigate } from 'react-router-dom';
 
 interface StoresListProps {
   stores: Store[];
+  mallId?: string;
+  mallUserId?: string;
   onStoreClick?: (storeId: string) => void;
   onEdit?: (storeId: string) => void;
   onDelete?: (storeId: string) => void;
 }
 
-export const StoresList = ({ stores, onStoreClick, onEdit, onDelete }: StoresListProps) => {
+export const StoresList = ({ 
+  stores, 
+  mallId, 
+  mallUserId,
+  onStoreClick, 
+  onEdit, 
+  onDelete 
+}: StoresListProps) => {
   const navigate = useNavigate();
   const isAdminView = !!onEdit && !!onDelete;
 
@@ -30,10 +39,12 @@ export const StoresList = ({ stores, onStoreClick, onEdit, onDelete }: StoresLis
         isAdminView ? (
           <AdminStoreCard 
             key={store.id} 
-            store={store} 
+            store={store}
+            mallId={mallId || ''}
+            mallUserId={mallUserId || ''}
             onClick={() => handleStoreClick(store.id)}
-            onEdit={onEdit}
-            onDelete={onDelete}
+            onEdit={onEdit!}
+            onDelete={onDelete!}
           />
         ) : (
           <PublicStoreCard 

@@ -2,9 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { DeleteStoreDialog } from "./DeleteStoreDialog";
+import { useSession } from "@/components/providers/SessionProvider";
 
 interface StoreActionsProps {
   storeId: string;
+  mallId: string;
+  mallUserId: string;
   onEdit: (storeId: string) => void;
   onDelete: (storeId: string) => void;
   isDeleteDialogOpen: boolean;
@@ -13,11 +16,18 @@ interface StoreActionsProps {
 
 export function StoreActions({ 
   storeId, 
+  mallId,
+  mallUserId,
   onEdit, 
   onDelete, 
   isDeleteDialogOpen,
   setDeleteDialogOpen 
 }: StoreActionsProps) {
+  const { session } = useSession();
+  const isOwner = session?.user?.id === mallUserId;
+
+  if (!isOwner) return null;
+
   return (
     <div className="absolute top-4 right-4 z-10 flex gap-2">
       <Button

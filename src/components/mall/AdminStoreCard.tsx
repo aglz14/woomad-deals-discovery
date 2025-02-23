@@ -2,51 +2,43 @@
 import React from 'react';
 import { Store, Tag, Phone, MapPin, Pencil } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
 import { Store as StoreType } from '@/types/store';
-import { DeleteStoreDialog } from './DeleteStoreDialog';
+import { StoreActions } from './StoreActions';
 
 interface AdminStoreCardProps {
   store: StoreType;
+  mallId: string;
+  mallUserId: string;
   onClick: () => void;
   onEdit: (storeId: string) => void;
   onDelete: (storeId: string) => void;
 }
 
-export const AdminStoreCard = ({ store, onClick, onEdit, onDelete }: AdminStoreCardProps) => {
+export const AdminStoreCard = ({ 
+  store, 
+  mallId,
+  mallUserId,
+  onClick, 
+  onEdit, 
+  onDelete 
+}: AdminStoreCardProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onEdit(store.id);
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete(store.id);
-  };
 
   return (
     <Card 
       className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white relative overflow-hidden"
       onClick={onClick}
     >
+      <StoreActions
+        storeId={store.id}
+        mallId={mallId}
+        mallUserId={mallUserId}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setDeleteDialogOpen={setIsDeleteDialogOpen}
+      />
       <CardHeader className="text-left pt-14">
-        <div className="absolute top-3 right-3 z-10 flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-white hover:bg-gray-100"
-            onClick={handleEdit}
-          >
-            <Pencil className="h-3.5 w-3.5 text-purple-500" />
-          </Button>
-          <DeleteStoreDialog
-            isOpen={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-            onConfirm={handleDelete}
-          />
-        </div>
         <div className="flex items-start gap-4">
           {store.logo_url ? (
             <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-purple-50">
