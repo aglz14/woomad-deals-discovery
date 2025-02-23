@@ -112,6 +112,25 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
       </div>
 
       <div>
+        <Label>Tipo</Label>
+        <Select
+          value={newPromotion.type}
+          onValueChange={(value) =>
+            setNewPromotion({ ...newPromotion, type: value })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={t('selectType')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="promotion">{t('promotion')}</SelectItem>
+            <SelectItem value="coupon">{t('coupon')}</SelectItem>
+            <SelectItem value="sale">{t('sale')}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
         <Label>
           {newPromotion.type === "coupon" ? "Cupón" : "Título"}
         </Label>
@@ -133,25 +152,6 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
           }
           required
         />
-      </div>
-
-      <div>
-        <Label>{t('type')}</Label>
-        <Select
-          value={newPromotion.type}
-          onValueChange={(value) =>
-            setNewPromotion({ ...newPromotion, type: value })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={t('selectType')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="promotion">{t('promotion')}</SelectItem>
-            <SelectItem value="coupon">{t('coupon')}</SelectItem>
-            <SelectItem value="sale">{t('sale')}</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       <div>
