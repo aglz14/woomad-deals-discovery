@@ -43,7 +43,7 @@ export default function Contacto() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               {/* Contact Information */}
               <div className="space-y-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6 text-left">
                   Información de Contacto
                 </h2>
                 <div className="space-y-6">
