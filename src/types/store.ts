@@ -8,4 +8,5 @@ export interface Store {
   category: string;
   contact_number?: string;
   mall_id: string;
+  user_id: string;
 }

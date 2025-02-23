@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +11,6 @@ import { toast } from "sonner";
 import { EditStoreDialog } from "@/components/store/EditStoreDialog";
 import { useState } from "react";
 import { MallHeader } from "@/components/mall/MallHeader";
-import { StoreActions } from "@/components/mall/StoreActions";
 
 export default function MallManagement() {
   const { mallId } = useParams();
@@ -136,8 +136,6 @@ export default function MallManagement() {
                   onStoreClick={() => handleStoreClick(store.id)}
                   onEdit={setStoreToEdit}
                   onDelete={(storeId) => setStoreToDelete(storeId)}
-                  mallId={mall.id}
-                  mallUserId={mall.user_id}
                 />
               </div>
             ))}
