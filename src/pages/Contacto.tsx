@@ -1,28 +1,9 @@
+
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { toast } from "sonner";
+
 export default function Contacto() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      // Here you would typically send the form data to your backend
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
-      toast.success("¡Mensaje enviado! Nos pondremos en contacto contigo pronto.");
-      (e.target as HTMLFormElement).reset();
-    } catch (error) {
-      toast.error("Error al enviar el mensaje. Por favor, intenta nuevamente.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
   return <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow pt-16">
@@ -82,28 +63,13 @@ export default function Contacto() {
                 </div>
               </div>
 
-              {/* Contact Form */}
+              {/* Contact Image */}
               <div className="bg-white p-8 rounded-lg shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Envíanos un Mensaje
-                </h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nombre</Label>
-                    <Input id="name" type="text" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Mensaje</Label>
-                    <Textarea id="message" required className="min-h-[120px]" />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Enviando..." : "Enviar Mensaje"}
-                  </Button>
-                </form>
+                <img 
+                  src="https://images.unsplash.com/photo-1483058712412-4245e9b90334" 
+                  alt="Contact us" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
               </div>
             </div>
           </div>
