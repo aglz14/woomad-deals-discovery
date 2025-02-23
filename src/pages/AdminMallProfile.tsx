@@ -155,6 +155,7 @@ export default function AdminMallProfile() {
                 name={mall.name}
                 address={mall.address}
                 description={mall.description}
+                mallUserId={mall.user_id}
                 onEdit={() => setIsEditDialogOpen(true)}
               />
 

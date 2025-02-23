@@ -35,7 +35,7 @@ export default function MallManagement() {
     enabled: !!mallId,
   });
 
-  const { data: stores, refetch: refetchStores, isLoading: isStoresLoading } = useQuery({
+  const { data: stores, refetch: refetchStores, isLoading: isLoadingStores } = useQuery({
     queryKey: ["stores", mallId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -82,7 +82,7 @@ export default function MallManagement() {
     setStoreToDelete(null);
   };
 
-  if (isMallLoading || isStoresLoading) {
+  if (isMallLoading || isLoadingStores) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -124,6 +124,7 @@ export default function MallManagement() {
             name={mall.name}
             address={mall.address}
             description={mall.description}
+            mallUserId={mall.user_id}
             onEdit={() => setIsAddStoreDialogOpen(false)}
           />
 
@@ -135,6 +136,8 @@ export default function MallManagement() {
                   onStoreClick={() => handleStoreClick(store.id)}
                   onEdit={setStoreToEdit}
                   onDelete={(storeId) => setStoreToDelete(storeId)}
+                  mallId={mall.id}
+                  mallUserId={mall.user_id}
                 />
               </div>
             ))}
