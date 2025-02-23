@@ -30,7 +30,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
     e.preventDefault();
     try {
       if (!session?.user?.id) {
-        toast.error("You must be logged in to add a store");
+        toast.error("Debes iniciar sesión para agregar una tienda");
         return;
       }
 
@@ -46,7 +46,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
 
       if (error) throw error;
 
-      toast.success("Store added successfully");
+      toast.success("Tienda agregada exitosamente");
       onSuccess();
       onClose();
       setStore({
@@ -57,8 +57,8 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
         contact_number: "",
       });
     } catch (error) {
-      console.error("Error adding store:", error);
-      toast.error("Error adding store");
+      console.error("Error al agregar tienda:", error);
+      toast.error("Error al agregar tienda");
     }
   };
 
@@ -66,11 +66,11 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Store</DialogTitle>
+          <DialogTitle>Agregar Nueva Tienda</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name">Store Name</Label>
+            <Label htmlFor="name">Nombre de la Tienda</Label>
             <Input
               id="name"
               value={store.name}
@@ -79,7 +79,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">Categoría</Label>
             <Input
               id="category"
               value={store.category}
@@ -88,7 +88,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
               value={store.description}
@@ -96,7 +96,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="location">Location in Mall</Label>
+            <Label htmlFor="location">Ubicación en el Centro Comercial</Label>
             <Input
               id="location"
               value={store.location_in_mall}
@@ -104,7 +104,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="contact">Contact Number</Label>
+            <Label htmlFor="contact">Número de Contacto</Label>
             <Input
               id="contact"
               value={store.contact_number}
@@ -113,9 +113,9 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              Cancelar
             </Button>
-            <Button type="submit">Add</Button>
+            <Button type="submit">Agregar</Button>
           </div>
         </form>
       </DialogContent>
