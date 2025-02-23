@@ -9,8 +9,8 @@ export function AdminMallNotFound() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
-      <main className="flex-grow px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full py-8">
-        <Button variant="ghost" className="mb-6" asChild>
+      <main className="flex-grow mt-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full py-4 sm:py-6 lg:py-8">
+        <Button variant="ghost" className="mb-4 sm:mb-6" asChild>
           <Link to="/promotions">
             <ChevronLeft className="mr-2 h-4 w-4" />
             Volver a Promociones

@@ -28,7 +28,7 @@ export default function AdminMallProfile() {
         .from("shopping_malls")
         .select("*")
         .eq("id", mallId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching mall:", error);
@@ -91,9 +91,9 @@ export default function AdminMallProfile() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
-      <main className="flex-grow bg-gradient-to-b from-purple-50 to-white">
+      <main className="flex-grow mt-16">
         <AdminMallContent
           mall={mall}
           stores={stores || []}
