@@ -40,6 +40,20 @@ export function EditPromotionDialog({
   const [startTime, setStartTime] = useState(format(new Date(promotion.start_date), "HH:mm"));
   const [endTime, setEndTime] = useState(format(new Date(promotion.end_date), "HH:mm"));
 
+  const handleStartDateChange = (date: Date | undefined) => {
+    if (date) {
+      setStartDate(date);
+      setFormData(prev => ({ ...prev, start_date: date }));
+    }
+  };
+
+  const handleEndDateChange = (date: Date | undefined) => {
+    if (date) {
+      setEndDate(date);
+      setFormData(prev => ({ ...prev, end_date: date }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -121,7 +135,7 @@ export function EditPromotionDialog({
                   <Calendar
                     mode="single"
                     selected={startDate}
-                    onSelect={(date) => date && setStartDate(date)}
+                    onSelect={handleStartDateChange}
                     initialFocus
                   />
                 </PopoverContent>
@@ -154,7 +168,7 @@ export function EditPromotionDialog({
                   <Calendar
                     mode="single"
                     selected={endDate}
-                    onSelect={(date) => date && setEndDate(date)}
+                    onSelect={handleEndDateChange}
                     initialFocus
                   />
                 </PopoverContent>
