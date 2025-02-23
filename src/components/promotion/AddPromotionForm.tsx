@@ -113,7 +113,7 @@ export function AddPromotionForm({ onSuccess, onCancel }: AddPromotionFormProps)
 
       <div>
         <Label>
-          {t('type')}
+          {newPromotion.type === "coupon" ? "Cupón" : "Título"}
         </Label>
         <Input
           value={newPromotion.title}
