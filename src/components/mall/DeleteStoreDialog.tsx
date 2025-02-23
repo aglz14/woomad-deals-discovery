@@ -26,7 +26,7 @@ export function DeleteStoreDialog({ isOpen, onOpenChange, onConfirm }: DeleteSto
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 bg-white hover:bg-red-100"
+          className="opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-red-100 h-8 w-8"
           onClick={(e) => {
             e.stopPropagation();
             onOpenChange(true);
@@ -35,21 +35,21 @@ export function DeleteStoreDialog({ isOpen, onOpenChange, onConfirm }: DeleteSto
           <Trash2 className="h-3.5 w-3.5 text-red-500" />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle>¿Eliminar tienda?</AlertDialogTitle>
           <AlertDialogDescription>
             Esta acción eliminará permanentemente la tienda y todas sus promociones. Esta acción no se puede deshacer.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+        <AlertDialogFooter className="sm:flex-row-reverse">
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Eliminar
           </AlertDialogAction>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

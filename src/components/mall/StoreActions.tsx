@@ -6,7 +6,7 @@ import { useSession } from "@/components/providers/SessionProvider";
 
 interface StoreActionsProps {
   storeId: string;
-  storeUserId: string; // Changed from mallUserId to storeUserId
+  storeUserId: string;
   onEdit: (storeId: string) => void;
   onDelete: (storeId: string) => void;
   isDeleteDialogOpen: boolean;
@@ -15,7 +15,7 @@ interface StoreActionsProps {
 
 export function StoreActions({ 
   storeId, 
-  storeUserId, // Changed from mallUserId to storeUserId
+  storeUserId,
   onEdit, 
   onDelete, 
   isDeleteDialogOpen,
@@ -27,17 +27,17 @@ export function StoreActions({
   if (!isOwner) return null;
 
   return (
-    <div className="absolute top-4 right-4 z-10 flex gap-2">
+    <div className="absolute top-2 right-2 z-10 flex gap-2 p-2">
       <Button
         variant="ghost"
         size="icon"
-        className="opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-gray-100"
+        className="opacity-0 group-hover:opacity-100 transition-opacity bg-white hover:bg-gray-100 h-8 w-8"
         onClick={(e) => {
           e.stopPropagation();
           onEdit(storeId);
         }}
       >
-        <Pencil className="h-4 w-4" />
+        <Pencil className="h-3.5 w-3.5 text-purple-500" />
       </Button>
       <DeleteStoreDialog
         isOpen={isDeleteDialogOpen}

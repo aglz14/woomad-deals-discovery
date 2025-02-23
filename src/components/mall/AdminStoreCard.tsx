@@ -64,14 +64,14 @@ export const AdminStoreCard = ({
           )}
           {store.location_in_mall && (
             <p className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-purple-500" />
+              <MapPin className="h-4 w-4 text-purple-500 flex-shrink-0" />
               <span className="line-clamp-1">{store.location_in_mall}</span>
             </p>
           )}
           {store.contact_number && (
             <p className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-purple-500" />
-              <span>{store.contact_number}</span>
+              <Phone className="h-4 w-4 text-purple-500 flex-shrink-0" />
+              <span className="line-clamp-1">{store.contact_number}</span>
             </p>
           )}
         </div>
