@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { PublicStoreCard } from "@/components/mall/PublicStoreCard";
 import { Loader } from "lucide-react";
@@ -25,7 +26,8 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
           *,
           mall:shopping_malls (
             id,
-            name
+            name,
+            location
           )
         `);
       if (error) throw error;
