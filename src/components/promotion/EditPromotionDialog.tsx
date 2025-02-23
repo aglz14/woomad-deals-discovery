@@ -8,11 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { DatabasePromotion, ValidPromotionType } from "@/types/promotion";
 import { toast } from "sonner";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 interface EditPromotionDialogProps {
   promotion: DatabasePromotion;
@@ -31,47 +27,19 @@ export function EditPromotionDialog({
     title: promotion.title,
     description: promotion.description,
     type: promotion.type,
-    start_date: new Date(promotion.start_date),
-    end_date: new Date(promotion.end_date),
+    start_date: format(new Date(promotion.start_date), "yyyy-MM-dd'T'HH:mm"),
+    end_date: format(new Date(promotion.end_date), "yyyy-MM-dd'T'HH:mm"),
   });
-
-  const [startDate, setStartDate] = useState<Date>(new Date(promotion.start_date));
-  const [endDate, setEndDate] = useState<Date>(new Date(promotion.end_date));
-  const [startTime, setStartTime] = useState(format(new Date(promotion.start_date), "HH:mm"));
-  const [endTime, setEndTime] = useState(format(new Date(promotion.end_date), "HH:mm"));
-
-  const handleStartDateChange = (date: Date | undefined) => {
-    if (date) {
-      setStartDate(date);
-      setFormData(prev => ({ ...prev, start_date: date }));
-    }
-  };
-
-  const handleEndDateChange = (date: Date | undefined) => {
-    if (date) {
-      setEndDate(date);
-      setFormData(prev => ({ ...prev, end_date: date }));
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const [startHours, startMinutes] = startTime.split(":").map(Number);
-      const [endHours, endMinutes] = endTime.split(":").map(Number);
-
-      const finalStartDate = new Date(startDate);
-      finalStartDate.setHours(startHours, startMinutes);
-
-      const finalEndDate = new Date(endDate);
-      finalEndDate.setHours(endHours, endMinutes);
-
       const { error } = await supabase
         .from("promotions")
         .update({
           ...formData,
-          start_date: finalStartDate.toISOString(),
-          end_date: finalEndDate.toISOString(),
+          start_date: new Date(formData.start_date).toISOString(),
+          end_date: new Date(formData.end_date).toISOString(),
         })
         .eq("id", promotion.id);
 
@@ -115,71 +83,25 @@ export function EditPromotionDialog({
               <option value="sale">Oferta</option>
             </select>
           </div>
-          <div className="space-y-2">
-            <Label>Fecha de inicio</Label>
-            <div className="flex gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !startDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "PPP") : <span>Seleccionar fecha</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={handleStartDateChange}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <Input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-[150px]"
-              />
-            </div>
+          <div>
+            <Label htmlFor="start_date">Fecha de inicio</Label>
+            <Input
+              type="datetime-local"
+              id="start_date"
+              value={formData.start_date}
+              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+              required
+            />
           </div>
-          <div className="space-y-2">
-            <Label>Fecha de fin</Label>
-            <div className="flex gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !endDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, "PPP") : <span>Seleccionar fecha</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={handleEndDateChange}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <Input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-[150px]"
-              />
-            </div>
+          <div>
+            <Label htmlFor="end_date">Fecha de fin</Label>
+            <Input
+              type="datetime-local"
+              id="end_date"
+              value={formData.end_date}
+              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+              required
+            />
           </div>
           <div>
             <Label htmlFor="description">Descripción</Label>
