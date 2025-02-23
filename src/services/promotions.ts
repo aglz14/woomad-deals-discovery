@@ -7,31 +7,15 @@ const isValidPromotionType = (type: string): type is ValidPromotionType => {
   return ["promotion", "coupon", "sale"].includes(type);
 };
 
-export const getPromotions = async (
-  userLocation: Location | null, 
-  calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number,
-  maxDistance?: number
-) => {
+export const getPromotions = async (userLocation: Location | null, calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number) => {
   const { data: malls, error: mallsError } = await supabase
     .from("shopping_malls")
     .select("*");
 
   if (mallsError) throw mallsError;
 
-  const filteredMalls = userLocation && maxDistance
-    ? malls.filter(mall => {
-        const distance = calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          mall.latitude,
-          mall.longitude
-        );
-        return distance <= maxDistance;
-      })
-    : malls;
-
   const sortedMalls = userLocation
-    ? filteredMalls.sort((a, b) => {
+    ? malls.sort((a, b) => {
         const distA = calculateDistance(
           userLocation.lat,
           userLocation.lng,
@@ -46,11 +30,7 @@ export const getPromotions = async (
         );
         return distA - distB;
       })
-    : filteredMalls;
-
-  if (sortedMalls.length === 0) {
-    return [];
-  }
+    : malls;
 
   const { data: stores, error: storesError } = await supabase
     .from("stores")
