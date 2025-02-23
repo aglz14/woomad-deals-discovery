@@ -87,6 +87,7 @@ export function EditPromotionDialog({
             >
               <option value="promotion">Promoción</option>
               <option value="coupon">Cupón</option>
+              <option value="sale">Oferta</option>
             </select>
           </div>
           <div>
