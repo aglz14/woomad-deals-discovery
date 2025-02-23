@@ -16,7 +16,7 @@ export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMallId, setSelectedMallId] = useState<string>("all");
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 9;
 
   const { userLocation, calculateDistance } = useLocation();
 
