@@ -1,4 +1,3 @@
-
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -8,14 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-
 export default function Contacto() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
       // Here you would typically send the form data to your backend
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
@@ -27,9 +23,7 @@ export default function Contacto() {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow pt-16">
         {/* Hero Section */}
@@ -58,7 +52,7 @@ export default function Contacto() {
                       <Mail className="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">Email</p>
+                      <p className="font-medium text-gray-900 text-left">Email</p>
                       <a href="mailto:contacto@woomad.com" className="text-gray-600 hover:text-purple-600 transition-colors">
                         contacto@woomad.com
                       </a>
@@ -69,10 +63,8 @@ export default function Contacto() {
                       <Phone className="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">Teléfono</p>
-                      <a href="tel:+34900000000" className="text-gray-600 hover:text-purple-600 transition-colors">
-                        +34 900 000 000
-                      </a>
+                      <p className="font-medium text-gray-900 text-left">Teléfono</p>
+                      <a href="tel:+34900000000" className="text-gray-600 hover:text-purple-600 transition-colors">811 485 7684</a>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -80,8 +72,8 @@ export default function Contacto() {
                       <MapPin className="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">Dirección</p>
-                      <p className="text-gray-600">
+                      <p className="font-medium text-gray-900 text-left">Dirección</p>
+                      <p className="text-gray-600 text-left">
                         Calle Principal 123<br />
                         28001 Madrid, España
                       </p>
@@ -118,6 +110,5 @@ export default function Contacto() {
         </section>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 }
