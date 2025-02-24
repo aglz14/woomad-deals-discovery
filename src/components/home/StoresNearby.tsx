@@ -68,7 +68,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
   const totalPages = Math.ceil((filterStores(stores || []).length) / ITEMS_PER_PAGE);
 
   const handleStoreClick = (storeId: string) => {
-    navigate(`/stores/${storeId}`);
+    navigate(`/store/${storeId}`);
   };
 
   if (isLoading) {
