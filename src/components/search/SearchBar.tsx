@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '../ui/input';
 import { useTranslation } from 'react-i18next';
@@ -7,24 +7,35 @@ import { useTranslation } from 'react-i18next';
 interface SearchBarProps {
   onSearch: (searchTerm: string) => void;
   placeholder?: string;
+  initialValue?: string;
 }
 
-export const SearchBar = ({ onSearch, placeholder }: SearchBarProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
+export const SearchBar = ({ onSearch, placeholder, initialValue = '' }: SearchBarProps) => {
+  const [searchTerm, setSearchTerm] = useState(initialValue);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    setSearchTerm(initialValue);
+  }, [initialValue]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(searchTerm);
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    onSearch(value); // Real-time search
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="relative w-full max-w-2xl mx-auto">
+    <form onSubmit={handleSubmit} className="relative w-full">
       <div className="relative">
         <Input
           type="text"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleChange}
           placeholder={placeholder || t('searchPlaceholder')}
           className="w-full pl-12 pr-4 py-3 text-base bg-white/95 border-2 border-white/20 focus:border-white/40 text-gray-800 rounded-full shadow-lg placeholder:text-gray-500 focus:ring-2 focus:ring-purple-500/20"
         />
