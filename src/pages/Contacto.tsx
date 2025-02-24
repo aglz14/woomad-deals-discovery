@@ -1,8 +1,6 @@
-
 import { Mail, Phone, MapPin } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-
 export default function Contacto() {
   return <div className="min-h-screen flex flex-col">
       <Header />
@@ -34,9 +32,7 @@ export default function Contacto() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900 text-left">Email</p>
-                      <a href="mailto:contacto@woomad.com" className="text-gray-600 hover:text-purple-600 transition-colors">
-                        contacto@woomad.com
-                      </a>
+                      <a href="mailto:contacto@woomad.com" className="text-gray-600 hover:text-purple-600 transition-colors">info@woomad.com</a>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -64,11 +60,7 @@ export default function Contacto() {
 
               {/* Contact Image */}
               <div className="bg-white p-8 rounded-lg shadow-sm">
-                <img 
-                  src="https://images.unsplash.com/photo-1483058712412-4245e9b90334" 
-                  alt="Contact us" 
-                  className="w-full h-full object-cover rounded-lg"
-                />
+                <img src="https://images.unsplash.com/photo-1483058712412-4245e9b90334" alt="Contact us" className="w-full h-full object-cover rounded-lg" />
               </div>
             </div>
           </div>
