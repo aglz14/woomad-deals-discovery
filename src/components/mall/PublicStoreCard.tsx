@@ -12,7 +12,7 @@ interface PublicStoreCardProps {
 export const PublicStoreCard = ({ store, onClick }: PublicStoreCardProps) => {
   return (
     <Card 
-      className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white min-h-[240px] w-full max-w-[500px] mx-auto"
+      className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white min-h-[240px]"
       onClick={onClick}
     >
       <CardHeader className="text-left pb-3">
