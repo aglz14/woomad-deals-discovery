@@ -4,7 +4,6 @@ import { PublicStoreCard } from './PublicStoreCard';
 import { AdminStoreCard } from './AdminStoreCard';
 import { Store } from '@/types/store';
 import { useNavigate } from 'react-router-dom';
-import { SearchBar } from '@/components/search/SearchBar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Layout, Store as StoreIcon } from 'lucide-react';
 
@@ -23,7 +22,6 @@ export const StoresList = ({
 }: StoresListProps) => {
   const navigate = useNavigate();
   const isAdminView = !!onEdit && !!onDelete;
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const handleStoreClick = (storeId: string) => {
@@ -37,42 +35,27 @@ export const StoresList = ({
   const uniqueCategories = Array.from(new Set(stores.map(store => store.category)));
 
   const filteredStores = stores.filter(store => {
-    const matchesSearch = 
-      store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      store.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      store.category.toLowerCase().includes(searchTerm.toLowerCase());
-    
     const matchesCategory = selectedCategory === 'all' || store.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
+    return matchesCategory;
   });
 
   return (
     <div className="space-y-8 animate-fade-in w-full">
       <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-100/20 w-full min-w-[320px] max-w-[500px] mx-auto">
-        <div className="flex flex-col sm:flex-row gap-4 w-full">
-          <div className="flex-1">
-            <SearchBar 
-              onSearch={setSearchTerm}
-              placeholder="Buscar tiendas por nombre, descripción o categoría..."
-              initialValue={searchTerm}
-            />
-          </div>
-          <div className="w-full sm:w-auto">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full sm:w-[200px] bg-white">
-                <SelectValue placeholder="Filtrar por categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las categorías</SelectItem>
-                {uniqueCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="w-full">
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-full bg-white">
+              <SelectValue placeholder="Filtrar por categoría" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas las categorías</SelectItem>
+              {uniqueCategories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
@@ -115,7 +98,7 @@ export const StoresList = ({
           <StoreIcon className="mx-auto h-12 w-12 text-purple-300" />
           <h3 className="mt-4 text-lg font-medium text-gray-900">No se encontraron tiendas</h3>
           <p className="mt-2 text-sm text-gray-500">
-            No hay tiendas que coincidan con tu búsqueda. Intenta con otros términos o categorías.
+            No hay tiendas que coincidan con tu búsqueda. Intenta con otra categoría.
           </p>
         </div>
       )}
