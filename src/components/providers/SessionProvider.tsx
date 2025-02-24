@@ -38,13 +38,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   return (
     <SessionContext.Provider value={{ session, isLoading }}>
-      {isLoading ? (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-pulse text-gray-600">Loading...</div>
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </SessionContext.Provider>
   );
 };
