@@ -6,6 +6,7 @@ import { Store } from '@/types/store';
 import { useNavigate } from 'react-router-dom';
 import { SearchBar } from '@/components/search/SearchBar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Layout, Store as StoreIcon } from 'lucide-react';
 
 interface StoresListProps {
   stores: Store[];
@@ -47,33 +48,51 @@ export const StoresList = ({
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <div className="w-full sm:w-96">
-          <SearchBar 
-            onSearch={setSearchTerm}
-            placeholder="Buscar tiendas..."
-            initialValue={searchTerm}
-          />
+    <div className="space-y-8 animate-fade-in">
+      <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-100/20">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <SearchBar 
+              onSearch={setSearchTerm}
+              placeholder="Buscar tiendas por nombre, descripción o categoría..."
+              initialValue={searchTerm}
+            />
+          </div>
+          <div className="w-full sm:w-auto">
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full sm:w-[200px] bg-white">
+                <SelectValue placeholder="Filtrar por categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las categorías</SelectItem>
+                {uniqueCategories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full sm:w-48">
-            <SelectValue placeholder="Filtrar por categoría" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas las categorías</SelectItem>
-            {uniqueCategories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+
+        <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <Layout className="h-4 w-4" />
+            <span>
+              {filteredStores.length} {filteredStores.length === 1 ? 'tienda encontrada' : 'tiendas encontradas'}
+            </span>
+          </div>
+          {selectedCategory !== 'all' && (
+            <div className="flex items-center gap-2">
+              <span>Mostrando: {selectedCategory}</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {filteredStores.length > 0 ? (
-          filteredStores.map((store) => (
+      {filteredStores.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+          {filteredStores.map((store) => (
             isAdminView ? (
               <AdminStoreCard 
                 key={store.id} 
@@ -89,13 +108,17 @@ export const StoresList = ({
                 onClick={() => handleStoreClick(store.id)}
               />
             )
-          ))
-        ) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-gray-500">No se encontraron tiendas que coincidan con tu búsqueda.</p>
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 bg-white/50 backdrop-blur-sm rounded-2xl border border-purple-100/20 animate-fade-in">
+          <StoreIcon className="mx-auto h-12 w-12 text-purple-300" />
+          <h3 className="mt-4 text-lg font-medium text-gray-900">No se encontraron tiendas</h3>
+          <p className="mt-2 text-sm text-gray-500">
+            No hay tiendas que coincidan con tu búsqueda. Intenta con otros términos o categorías.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
