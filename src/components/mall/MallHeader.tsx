@@ -24,15 +24,15 @@ export const MallHeader = ({
 
   return (
     <div className="bg-white rounded-xl p-4 sm:p-6 lg:p-8 shadow-md space-y-6 transition-all hover:shadow-lg">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
           <div className="p-3 sm:p-4 rounded-xl bg-purple-100 ring-1 ring-purple-200 flex-shrink-0">
             <Building2 className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
           </div>
-          <div className="space-y-4 w-full sm:w-auto">
+          <div className="space-y-4 w-full sm:w-auto text-center">
             <div className="space-y-2">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight break-words">{name}</h1>
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center justify-center gap-2 text-gray-600">
                 <MapPin className="h-5 w-5 flex-shrink-0 text-gray-500" />
                 <p className="text-base sm:text-lg leading-relaxed">{address}</p>
               </div>
@@ -54,7 +54,7 @@ export const MallHeader = ({
             variant="outline"
             size="sm"
             onClick={onEdit}
-            className="hover:bg-purple-50 self-start"
+            className="hover:bg-purple-50 self-center"
           >
             <PencilLine className="h-4 w-4 mr-2" />
             Editar
