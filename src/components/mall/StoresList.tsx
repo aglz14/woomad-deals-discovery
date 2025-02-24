@@ -41,6 +41,8 @@ export const StoresList = ({
           key={store.id}
           store={store}
           onClick={() => handleStoreClick(store.id)}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ))}
     </div>
