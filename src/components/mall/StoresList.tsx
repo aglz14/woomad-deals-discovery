@@ -48,9 +48,9 @@ export const StoresList = ({
   });
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-100/20">
-        <div className="flex flex-col sm:flex-row gap-4">
+    <div className="space-y-8 animate-fade-in w-full">
+      <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-100/20 w-full">
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
           <div className="flex-1">
             <SearchBar 
               onSearch={setSearchTerm}
@@ -91,7 +91,7 @@ export const StoresList = ({
       </div>
 
       {filteredStores.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in w-full">
           {filteredStores.map((store) => (
             isAdminView ? (
               <AdminStoreCard 

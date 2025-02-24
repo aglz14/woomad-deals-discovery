@@ -21,7 +21,7 @@ export const MallStoresSection = ({
   onDeleteStore
 }: MallStoresSectionProps) => {
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Tiendas Disponibles</h2>
         <Button onClick={onAddStore} className="self-start sm:self-auto">
@@ -29,14 +29,12 @@ export const MallStoresSection = ({
           Agregar Tienda
         </Button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <StoresList 
-          stores={stores} 
-          onStoreClick={onStoreClick}
-          onEdit={onEditStore}
-          onDelete={onDeleteStore}
-        />
-      </div>
+      <StoresList 
+        stores={stores} 
+        onStoreClick={onStoreClick}
+        onEdit={onEditStore}
+        onDelete={onDeleteStore}
+      />
     </div>
   );
 };
