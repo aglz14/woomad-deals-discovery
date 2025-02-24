@@ -1,3 +1,4 @@
+
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,27 +9,22 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/use-toast";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
 export default function PublicMallProfile() {
-  const {
-    t
-  } = useTranslation();
-  const {
-    mallId
-  } = useParams();
-  const {
-    toast
-  } = useToast();
-  const {
-    data: mall,
-    isLoading: isLoadingMall
-  } = useQuery({
+  const { t } = useTranslation();
+  const { mallId } = useParams();
+  const { toast } = useToast();
+
+  const { data: mall, isLoading: isLoadingMall } = useQuery({
     queryKey: ["mall", mallId],
     queryFn: async () => {
       console.log("Fetching mall with ID:", mallId);
-      const {
-        data,
-        error
-      } = await supabase.from("shopping_malls").select("*").eq("id", mallId).single();
+      const { data, error } = await supabase
+        .from("shopping_malls")
+        .select("*")
+        .eq("id", mallId)
+        .single();
+
       if (error) {
         console.error("Error fetching mall:", error);
         toast({
@@ -41,18 +37,17 @@ export default function PublicMallProfile() {
       return data;
     }
   });
-  const {
-    data: stores,
-    isLoading: isLoadingStores
-  } = useQuery({
+
+  const { data: stores, isLoading: isLoadingStores } = useQuery({
     queryKey: ["mall-stores", mallId],
     enabled: !!mallId,
     queryFn: async () => {
       console.log("Fetching stores for mall:", mallId);
-      const {
-        data,
-        error
-      } = await supabase.from("stores").select("*").eq("mall_id", mallId);
+      const { data, error } = await supabase
+        .from("stores")
+        .select("*")
+        .eq("mall_id", mallId);
+
       if (error) {
         console.error("Error fetching stores:", error);
         throw error;
@@ -60,8 +55,10 @@ export default function PublicMallProfile() {
       return data;
     }
   });
+
   if (isLoadingMall || isLoadingStores) {
-    return <div className="min-h-screen flex flex-col">
+    return (
+      <div className="min-h-screen flex flex-col">
         <Header />
         <div className="container mx-auto px-4 py-8 flex-grow pt-20">
           <Button variant="ghost" className="mb-6" disabled>
@@ -72,15 +69,20 @@ export default function PublicMallProfile() {
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map(n => <div key={n} className="h-48 bg-gray-200 rounded-lg"></div>)}
+              {[1, 2, 3].map(n => (
+                <div key={n} className="h-48 bg-gray-200 rounded-lg"></div>
+              ))}
             </div>
           </div>
         </div>
         <Footer />
-      </div>;
+      </div>
+    );
   }
+
   if (!mall) {
-    return <div className="min-h-screen flex flex-col">
+    return (
+      <div className="min-h-screen flex flex-col">
         <Header />
         <div className="container mx-auto px-4 py-8 flex-grow pt-20">
           <Button variant="ghost" className="mb-6" asChild>
@@ -100,9 +102,12 @@ export default function PublicMallProfile() {
           </div>
         </div>
         <Footer />
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen flex flex-col">
+
+  return (
+    <div className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-grow bg-gradient-to-b from-purple-50 to-white pt-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -121,16 +126,18 @@ export default function PublicMallProfile() {
                 </div>
                 <div className="space-y-4 w-full sm:w-auto">
                   <div className="space-y-2">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight break-words text-left">{mall.name}</h1>
-                    <div className="flex items-start sm:items-center gap-2 text-gray-600">
-                      <MapPin className="h-5 w-5 flex-shrink-0 text-gray-500 mt-0.5 sm:mt-0" />
-                      <p className="text-base sm:text-lg leading-relaxed text-left">{mall.address}</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight break-words">{mall.name}</h1>
+                    <div className="flex items-center justify-center gap-2 text-gray-600">
+                      <MapPin className="h-5 w-5 flex-shrink-0 text-gray-500" />
+                      <p className="text-base sm:text-lg leading-relaxed text-center">{mall.address}</p>
                     </div>
                   </div>
                   
-                  {mall.description && <p className="text-gray-600 text-base sm:text-lg leading-relaxed max-w-3xl text-left">
+                  {mall.description && (
+                    <p className="text-gray-600 text-base sm:text-lg leading-relaxed max-w-3xl text-center">
                       {mall.description}
-                    </p>}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -139,13 +146,12 @@ export default function PublicMallProfile() {
               <h2 className="text-2xl font-semibold text-gray-900">
                 Tiendas Disponibles
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                <StoresList stores={stores || []} />
-              </div>
+              <StoresList stores={stores || []} />
             </div>
           </div>
         </div>
       </div>
       <Footer />
-    </div>;
+    </div>
+  );
 }
