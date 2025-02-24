@@ -12,6 +12,7 @@ export interface DatabasePromotion {
   terms_conditions?: string;
   image_url?: string;
   store_id?: string;
+  user_id?: string;
   created_at: string;
   store?: {
     id: string;
