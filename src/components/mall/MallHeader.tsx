@@ -32,15 +32,15 @@ export const MallHeader = ({
           <div className="space-y-4 w-full sm:w-auto">
             <div className="space-y-2">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight break-words">{name}</h1>
-              <div className="flex items-start sm:items-center gap-2 text-gray-600">
-                <MapPin className="h-5 w-5 flex-shrink-0 text-gray-500 mt-0.5 sm:mt-0" />
+              <div className="flex items-center justify-center gap-2 text-gray-600">
+                <MapPin className="h-5 w-5 flex-shrink-0 text-gray-500" />
                 <p className="text-base sm:text-lg leading-relaxed">{address}</p>
               </div>
             </div>
             
             {description && (
-              <div className="flex items-start gap-2 max-w-3xl">
-                <InfoIcon className="h-5 w-5 mt-1 flex-shrink-0 text-gray-400" />
+              <div className="flex items-center justify-center gap-2 max-w-3xl">
+                <InfoIcon className="h-5 w-5 flex-shrink-0 text-gray-400" />
                 <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
                   {description}
                 </p>
