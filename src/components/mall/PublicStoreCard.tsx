@@ -12,10 +12,10 @@ interface PublicStoreCardProps {
 export const PublicStoreCard = ({ store, onClick }: PublicStoreCardProps) => {
   return (
     <Card 
-      className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white"
+      className="group hover:shadow-lg transition-all duration-300 cursor-pointer bg-white h-full"
       onClick={onClick}
     >
-      <CardHeader className="text-left pb-3 p-4 sm:p-6">
+      <CardHeader className="p-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
           {store.logo_url ? (
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden flex-shrink-0 bg-purple-50">
@@ -39,7 +39,7 @@ export const PublicStoreCard = ({ store, onClick }: PublicStoreCardProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="text-left p-4 sm:p-6 pt-0">
+      <CardContent className="p-6 pt-0">
         <div className="space-y-4">
           {store.description && (
             <p className="text-sm text-gray-700 break-words leading-relaxed text-center sm:text-left">{store.description}</p>
