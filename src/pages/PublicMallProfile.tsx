@@ -9,11 +9,14 @@ import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/use-toast";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { useState } from "react";
 
 export default function PublicMallProfile() {
   const { t } = useTranslation();
   const { mallId } = useParams();
   const { toast } = useToast();
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const { data: mall, isLoading: isLoadingMall } = useQuery({
     queryKey: ["mall", mallId],
@@ -55,6 +58,12 @@ export default function PublicMallProfile() {
       return data;
     }
   });
+
+  const categories = stores ? [...new Set(stores.map(store => store.category))].sort() : [];
+  
+  const filteredStores = stores?.filter(store => 
+    selectedCategory === "all" ? true : store.category === selectedCategory
+  ) || [];
 
   if (isLoadingMall || isLoadingStores) {
     return (
@@ -143,10 +152,28 @@ export default function PublicMallProfile() {
             </div>
 
             <div className="space-y-6">
-              <h2 className="text-2xl font-semibold text-gray-900">
-                Tiendas Disponibles
-              </h2>
-              <StoresList stores={stores || []} />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h2 className="text-2xl font-semibold text-gray-900">
+                  Tiendas Disponibles
+                </h2>
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue placeholder="Filtrar por categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las categorías</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <StoresList stores={filteredStores} />
             </div>
           </div>
         </div>
