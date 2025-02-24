@@ -34,11 +34,6 @@ export const Footer = () => {
             <h3 className="text-lg font-semibold mb-4 text-gray-900">{t('connect')}</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
-                  Twitter
-                </a>
-              </li>
-              <li>
                 <a href="https://www.instagram.com/woomad.shopping/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-purple-600 transition-colors">
                   Instagram
                 </a>
