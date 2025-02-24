@@ -36,9 +36,9 @@ export const StoresList = ({ stores, onStoreClick, onEdit, onDelete }: StoresLis
   return (
     <div className="w-full space-y-8">
       {/* Filter Section */}
-      <div className="mx-auto w-full max-w-2xl bg-white/50 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-purple-100/20">
+      <div className="mx-auto w-full max-w-2xl bg-white rounded-xl p-4 shadow-md border border-gray-100">
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full bg-white">
+          <SelectTrigger className="w-full bg-white border-gray-200">
             <SelectValue placeholder="Filtrar por categoría" />
           </SelectTrigger>
           <SelectContent>
@@ -51,13 +51,13 @@ export const StoresList = ({ stores, onStoreClick, onEdit, onDelete }: StoresLis
           </SelectContent>
         </Select>
 
-        <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+        <div className="mt-3 flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center gap-2">
-            <Layout className="h-4 w-4" />
+            <Layout className="h-4 w-4 text-purple-500" />
             <span>{filteredStores.length} {filteredStores.length === 1 ? 'tienda encontrada' : 'tiendas encontradas'}</span>
           </div>
           {selectedCategory !== 'all' && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-purple-600 font-medium">
               <span>Mostrando: {selectedCategory}</span>
             </div>
           )}
@@ -66,7 +66,7 @@ export const StoresList = ({ stores, onStoreClick, onEdit, onDelete }: StoresLis
 
       {/* Stores Grid */}
       {filteredStores.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStores.map((store) => (
             isAdminView ? (
               <AdminStoreCard 
@@ -86,7 +86,7 @@ export const StoresList = ({ stores, onStoreClick, onEdit, onDelete }: StoresLis
           ))}
         </div>
       ) : (
-        <div className="mx-auto max-w-2xl text-center p-12 bg-white/50 backdrop-blur-sm rounded-2xl border border-purple-100/20">
+        <div className="mx-auto max-w-md text-center p-8 bg-white rounded-xl shadow-sm border border-gray-100">
           <StoreIcon className="mx-auto h-12 w-12 text-purple-300" />
           <h3 className="mt-4 text-lg font-medium text-gray-900">No se encontraron tiendas</h3>
           <p className="mt-2 text-sm text-gray-500">

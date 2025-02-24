@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Store, Tag, Phone, MapPin } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Store as StoreType } from '@/types/store';
 
 interface PublicStoreCardProps {
@@ -11,68 +10,64 @@ interface PublicStoreCardProps {
 
 export const PublicStoreCard = ({ store, onClick }: PublicStoreCardProps) => {
   return (
-    <Card 
-      className="relative h-full bg-white hover:shadow-lg transition-all duration-300 cursor-pointer group"
+    <div 
+      className="group cursor-pointer bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 overflow-hidden"
       onClick={onClick}
     >
-      <div className="flex flex-col h-full">
-        {/* Header Section */}
-        <div className="p-6">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            {/* Logo/Icon */}
-            {store.logo_url ? (
-              <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-purple-50 flex-shrink-0">
-                <img
-                  src={store.logo_url}
-                  alt={store.name}
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-            ) : (
-              <div className="w-24 h-24 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0">
-                <Store className="w-12 h-12 text-purple-500" />
-              </div>
-            )}
-
-            {/* Store Info */}
-            <div className="flex-1 min-w-0 text-center sm:text-left">
-              <h3 className="text-2xl font-semibold text-gray-900 break-words leading-tight mb-2">
-                {store.name}
-              </h3>
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-gray-600">
-                <Tag className="h-4 w-4 text-purple-500" />
-                <span>{store.category}</span>
-              </div>
+      <div className="p-6">
+        <div className="flex items-start gap-4">
+          {/* Logo/Icon */}
+          {store.logo_url ? (
+            <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0 border border-gray-100">
+              <img
+                src={store.logo_url}
+                alt={store.name}
+                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              />
             </div>
-          </div>
-        </div>
-
-        {/* Content Section */}
-        <div className="p-6 pt-0 flex-1 flex flex-col">
-          {/* Description */}
-          {store.description && (
-            <p className="text-sm text-gray-700 leading-relaxed mb-4 text-center sm:text-left">
-              {store.description}
-            </p>
+          ) : (
+            <div className="w-20 h-20 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0 border border-purple-100">
+              <Store className="w-10 h-10 text-purple-500" />
+            </div>
           )}
 
-          {/* Contact Info */}
-          <div className="mt-auto space-y-3">
-            {store.location_in_mall && (
-              <div className="flex items-center gap-3 text-sm text-gray-600 justify-center sm:justify-start">
-                <MapPin className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                <span className="break-words">{store.location_in_mall}</span>
-              </div>
-            )}
-            {store.contact_number && (
-              <div className="flex items-center gap-3 text-sm text-gray-600 justify-center sm:justify-start">
-                <Phone className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                <span className="break-words">{store.contact_number}</span>
-              </div>
+          {/* Store Info */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-gray-900 leading-tight mb-1 group-hover:text-purple-600 transition-colors">
+              {store.name}
+            </h3>
+            <div className="flex items-center gap-2 mb-2">
+              <Tag className="h-4 w-4 text-purple-500" />
+              <span className="text-sm text-gray-600">{store.category}</span>
+            </div>
+            {store.description && (
+              <p className="text-sm text-gray-600 line-clamp-2">
+                {store.description}
+              </p>
             )}
           </div>
         </div>
       </div>
-    </Card>
+
+      {/* Footer with Contact Info */}
+      {(store.location_in_mall || store.contact_number) && (
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <div className="space-y-2">
+            {store.location_in_mall && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <MapPin className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                <span className="truncate">{store.location_in_mall}</span>
+              </div>
+            )}
+            {store.contact_number && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Phone className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                <span>{store.contact_number}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
