@@ -39,7 +39,7 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors">
+                <a href="https://www.instagram.com/woomad.shopping/" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-purple-600 transition-colors">
                   Instagram
                 </a>
               </li>
