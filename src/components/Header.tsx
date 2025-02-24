@@ -24,15 +24,10 @@ export const Header = () => {
 
   const handleLogout = async () => {
     try {
-      // First navigate to home to avoid any protected route issues
+      await supabase.auth.signOut();
+      // Clear any local storage or state that might be persisting the session
+      localStorage.removeItem('supabase.auth.token');
       navigate('/');
-      
-      // Then attempt to sign out
-      const { error } = await supabase.auth.signOut();
-      if (error && error.message !== "Session not found") {
-        throw error;
-      }
-      
       toast.success("Sesión cerrada con éxito");
     } catch (error: any) {
       console.error('Error during logout:', error);
