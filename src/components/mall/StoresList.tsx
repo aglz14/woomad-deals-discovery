@@ -74,7 +74,7 @@ export const StoresList = ({
       </div>
 
       {filteredStores.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full px-4 sm:px-6 lg:px-8 max-w-[100vw]">
           {filteredStores.map((store) => (
             isAdminView ? (
               <AdminStoreCard 
