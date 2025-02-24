@@ -1,11 +1,8 @@
-
 import { Info, Users, Building2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-
 export default function Nosotros() {
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow pt-16">
         {/* Hero Section */}
@@ -23,12 +20,7 @@ export default function Nosotros() {
         {/* Description Section */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto leading-relaxed">
-              En Woomad, nos dedicamos a revolucionar la forma en que las personas interactúan con los centros comerciales. 
-              Nuestra plataforma conecta a comerciantes y consumidores, creando una experiencia de compra más inteligente, 
-              personalizada y eficiente. A través de la innovación digital y un profundo entendimiento de las necesidades 
-              del mercado retail, estamos construyendo el futuro del comercio minorista.
-            </p>
+            <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto leading-relaxed">En Woomad, nos dedicamos a revolucionar la forma en que las personas interactúan con los centros comerciales. Nuestra plataforma conecta a comerciantes y consumidores, creando una experiencia de compra más inteligente, personalizada y eficiente.</p>
           </div>
         </section>
 
@@ -80,6 +72,5 @@ export default function Nosotros() {
         </section>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 }
