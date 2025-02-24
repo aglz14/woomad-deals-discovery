@@ -14,6 +14,7 @@ import AdminMallProfile from "@/pages/AdminMallProfile";
 import StoreProfile from "@/pages/StoreProfile";
 import PublicStoreProfile from "@/pages/PublicStoreProfile";
 import MallManagement from "@/pages/MallManagement";
+import Signup from "@/pages/Signup";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ function App() {
             <Route path="/store/:storeId/promotions" element={<StoreProfile />} />
             <Route path="/store/:storeId" element={<PublicStoreProfile />} />
             <Route path="/mall-management" element={<MallManagement />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

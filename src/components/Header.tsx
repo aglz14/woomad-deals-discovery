@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "./providers/SessionProvider";
@@ -8,20 +9,16 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { toast } from "sonner";
 import { useState } from "react";
 import { Button } from "./ui/button";
+
 export const Header = () => {
-  const {
-    t
-  } = useTranslation();
-  const {
-    session,
-    isLoading
-  } = useSession();
+  const { t } = useTranslation();
+  const { session, isLoading } = useSession();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      // Clear any local storage or state that might be persisting the session
       localStorage.removeItem('supabase.auth.token');
       navigate('/');
       toast.success("Sesión cerrada con éxito");
@@ -30,10 +27,13 @@ export const Header = () => {
       toast.error("Error al cerrar sesión");
     }
   };
+
   if (isLoading) {
     return null;
   }
-  return <header className="fixed top-0 left-0 right-0 z-50">
+
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
@@ -42,7 +42,8 @@ export const Header = () => {
             </Link>
 
             <div className="flex items-center gap-4">
-              {session?.user ? <DropdownMenu>
+              {session?.user ? (
+                <DropdownMenu>
                   <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 text-white hover:text-white/90 transition-colors rounded-md">
                     <User className="h-4 w-4" />
                     <span>{session.user.email}</span>
@@ -59,13 +60,22 @@ export const Header = () => {
                       <span>Cerrar Sesión</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu> : <>
-                  <Button variant="ghost" onClick={() => setIsAuthModalOpen(true)} className="text-white hover:text-sky-500/90">Iniciar Sesión</Button>
+                </DropdownMenu>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <Button variant="ghost" onClick={() => setIsAuthModalOpen(true)} className="text-white hover:text-sky-500/90">
+                    Iniciar Sesión
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate("/signup")} className="text-white bg-transparent border-white hover:bg-white hover:text-purple-500">
+                    Registrarse
+                  </Button>
                   <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} mode="login" />
-                </>}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </nav>
-    </header>;
+    </header>
+  );
 };
