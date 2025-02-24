@@ -18,9 +18,10 @@ export default function PublicMallProfile() {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const { data: mall, isLoading: isLoadingMall } = useQuery({
+  const { data: mall, isLoading: isLoadingMall, error: mallError } = useQuery({
     queryKey: ["mall", mallId],
     queryFn: async () => {
+      if (!mallId) throw new Error("No mall ID provided");
       console.log("Fetching mall with ID:", mallId);
       const { data, error } = await supabase
         .from("shopping_malls")
@@ -37,14 +38,19 @@ export default function PublicMallProfile() {
         });
         throw error;
       }
+      if (!data) {
+        throw new Error("Mall not found");
+      }
       return data;
-    }
+    },
+    retry: false,
+    enabled: !!mallId
   });
 
   const { data: stores, isLoading: isLoadingStores } = useQuery({
     queryKey: ["mall-stores", mallId],
-    enabled: !!mallId,
     queryFn: async () => {
+      if (!mallId) throw new Error("No mall ID provided");
       console.log("Fetching stores for mall:", mallId);
       const { data, error } = await supabase
         .from("stores")
@@ -56,7 +62,8 @@ export default function PublicMallProfile() {
         throw error;
       }
       return data;
-    }
+    },
+    enabled: !!mallId && !!mall
   });
 
   const categories = stores ? [...new Set(stores.map(store => store.category))].sort() : [];
@@ -89,7 +96,7 @@ export default function PublicMallProfile() {
     );
   }
 
-  if (!mall) {
+  if (mallError || !mall) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />

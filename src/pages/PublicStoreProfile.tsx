@@ -10,53 +10,53 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export default function PublicStoreProfile() {
-  const {
-    storeId
-  } = useParams<{
-    storeId: string;
-  }>();
+  const { storeId } = useParams<{ storeId: string }>();
   const navigate = useNavigate();
-  const {
-    data: store,
-    isLoading: isStoreLoading
-  } = useQuery({
+
+  const { data: store, isLoading: isStoreLoading, error: storeError } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
       if (!storeId) throw new Error("No store ID provided");
-      const {
-        data,
-        error
-      } = await supabase.from("stores").select("*, mall:shopping_malls(*)").eq("id", storeId).maybeSingle();
+      const { data, error } = await supabase
+        .from("stores")
+        .select("*, mall:shopping_malls(*)")
+        .eq("id", storeId)
+        .maybeSingle();
+
       if (error) {
         toast.error("Error al cargar la tienda");
         throw error;
       }
+      if (!data) {
+        throw new Error("Store not found");
+      }
       console.log("Store data:", data);
       return data;
     },
+    retry: false,
     enabled: !!storeId
   });
-  const {
-    data: promotions,
-    isLoading: isPromotionsLoading
-  } = useQuery({
+
+  const { data: promotions, isLoading: isPromotionsLoading } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
       if (!storeId) throw new Error("No store ID provided");
-      const {
-        data,
-        error
-      } = await supabase.from("promotions").select("*").eq("store_id", storeId).gte("end_date", new Date().toISOString()).order("start_date", {
-        ascending: true
-      });
+      const { data, error } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("store_id", storeId)
+        .gte("end_date", new Date().toISOString())
+        .order("start_date", { ascending: true });
+
       if (error) {
         toast.error("Error al cargar las promociones");
         throw error;
       }
       return data;
     },
-    enabled: !!storeId
+    enabled: !!storeId && !!store
   });
+
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
     promotion: 'bg-purple-100 text-purple-800',
@@ -70,7 +70,8 @@ export default function PublicStoreProfile() {
   };
 
   if (isStoreLoading || isPromotionsLoading) {
-    return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
@@ -80,10 +81,13 @@ export default function PublicStoreProfile() {
           </div>
         </main>
         <Footer />
-      </div>;
+      </div>
+    );
   }
-  if (!store) {
-    return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+
+  if (storeError || !store) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
@@ -98,9 +102,12 @@ export default function PublicStoreProfile() {
           </div>
         </main>
         <Footer />
-      </div>;
+      </div>
+    );
   }
-  return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
@@ -175,5 +182,6 @@ export default function PublicStoreProfile() {
         </div>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 }
