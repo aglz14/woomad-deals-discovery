@@ -44,10 +44,10 @@ export default function Signup() {
           <p className="mt-2 text-center text-sm text-gray-600">
             O{" "}
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/")}
               className="font-medium text-purple-600 hover:text-purple-500"
             >
-              inicia sesión si ya tienes una cuenta
+              ir a Woomad.com
             </button>
           </p>
         </div>
