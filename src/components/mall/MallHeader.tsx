@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Building2, MapPin, InfoIcon, PencilLine } from 'lucide-react';
+import { Building2, MapPin, PencilLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/components/providers/SessionProvider';
 
@@ -40,7 +40,6 @@ export const MallHeader = ({
             
             {description && (
               <div className="flex items-center justify-center text-center gap-2 max-w-3xl">
-                <InfoIcon className="h-5 w-5 flex-shrink-0 text-gray-400" />
                 <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
                   {description}
                 </p>
