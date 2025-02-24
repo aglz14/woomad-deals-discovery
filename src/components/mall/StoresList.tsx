@@ -49,7 +49,7 @@ export const StoresList = ({
 
   return (
     <div className="space-y-8 animate-fade-in w-full">
-      <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-100/20 w-full">
+      <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-sm border border-purple-100/20 w-full min-w-[320px] max-w-[500px] mx-auto">
         <div className="flex flex-col sm:flex-row gap-4 w-full">
           <div className="flex-1">
             <SearchBar 
