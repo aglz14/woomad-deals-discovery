@@ -23,12 +23,16 @@ export const Header = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error("Error al cerrar sesión");
-    } else {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
       toast.success("Sesión cerrada con éxito");
-      navigate('/'); // Navigate to index page after successful logout
+      navigate('/');
+    } catch (error: any) {
+      console.error('Error during logout:', error);
+      toast.error(error.message || "Error al cerrar sesión");
     }
   };
 
