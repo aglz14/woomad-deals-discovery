@@ -24,15 +24,19 @@ export const Header = () => {
 
   const handleLogout = async () => {
     try {
+      // First navigate to home to avoid any protected route issues
+      navigate('/');
+      
+      // Then attempt to sign out
       const { error } = await supabase.auth.signOut();
-      if (error) {
+      if (error && error.message !== "Session not found") {
         throw error;
       }
+      
       toast.success("Sesión cerrada con éxito");
-      navigate('/');
     } catch (error: any) {
       console.error('Error during logout:', error);
-      toast.error(error.message || "Error al cerrar sesión");
+      toast.error("Error al cerrar sesión");
     }
   };
 
