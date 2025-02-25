@@ -15,6 +15,7 @@ import StoreProfile from "@/pages/StoreProfile";
 import PublicStoreProfile from "@/pages/PublicStoreProfile";
 import MallManagement from "@/pages/MallManagement";
 import Signup from "@/pages/Signup";
+import PasswordReset from "@/pages/PasswordReset";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ function App() {
             <Route path="/store/:storeId" element={<PublicStoreProfile />} />
             <Route path="/mall-management" element={<MallManagement />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/auth/callback" element={<PasswordReset />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
