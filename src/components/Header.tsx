@@ -35,7 +35,7 @@ export const Header = () => {
   return <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 backdrop-blur-sm">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 px-[40px]">
+          <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center">
               <img src="/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png" alt="Woomad Commerce" className="h-8" />
             </Link>
