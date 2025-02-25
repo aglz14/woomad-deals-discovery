@@ -81,15 +81,15 @@ export function PublicStoreCard({
           )}
         </div>
         <div className="flex-1 space-y-1">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-lg text-gray-900 text-left">{store.name}</h3>
+          <h3 className="font-semibold text-lg text-gray-900 text-left">{store.name}</h3>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-gray-500 text-left">{store.category}</p>
             {activePromotionsCount !== undefined && activePromotionsCount > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge variant="secondary">
                 {activePromotionsCount} promoción{activePromotionsCount !== 1 ? 'es' : ''} activa{activePromotionsCount !== 1 ? 's' : ''}
               </Badge>
             )}
           </div>
-          <p className="text-sm text-gray-500 text-left">{store.category}</p>
           {store.mall && (
             <p className="text-sm text-purple-600 text-left">{store.mall.name}</p>
           )}
