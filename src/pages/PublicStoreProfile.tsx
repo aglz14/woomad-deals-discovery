@@ -8,21 +8,25 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-
 export default function PublicStoreProfile() {
-  const { storeId } = useParams<{ storeId: string }>();
+  const {
+    storeId
+  } = useParams<{
+    storeId: string;
+  }>();
   const navigate = useNavigate();
-
-  const { data: store, isLoading: isStoreLoading, error: storeError } = useQuery({
+  const {
+    data: store,
+    isLoading: isStoreLoading,
+    error: storeError
+  } = useQuery({
     queryKey: ["store", storeId],
     queryFn: async () => {
       if (!storeId) throw new Error("No store ID provided");
-      const { data, error } = await supabase
-        .from("stores")
-        .select("*, mall:shopping_malls(*)")
-        .eq("id", storeId)
-        .maybeSingle();
-
+      const {
+        data,
+        error
+      } = await supabase.from("stores").select("*, mall:shopping_malls(*)").eq("id", storeId).maybeSingle();
       if (error) {
         toast.error("Error al cargar la tienda");
         throw error;
@@ -36,18 +40,19 @@ export default function PublicStoreProfile() {
     retry: false,
     enabled: !!storeId
   });
-
-  const { data: promotions, isLoading: isPromotionsLoading } = useQuery({
+  const {
+    data: promotions,
+    isLoading: isPromotionsLoading
+  } = useQuery({
     queryKey: ["promotions", storeId],
     queryFn: async () => {
       if (!storeId) throw new Error("No store ID provided");
-      const { data, error } = await supabase
-        .from("promotions")
-        .select("*")
-        .eq("store_id", storeId)
-        .gte("end_date", new Date().toISOString())
-        .order("start_date", { ascending: true });
-
+      const {
+        data,
+        error
+      } = await supabase.from("promotions").select("*").eq("store_id", storeId).gte("end_date", new Date().toISOString()).order("start_date", {
+        ascending: true
+      });
       if (error) {
         toast.error("Error al cargar las promociones");
         throw error;
@@ -56,22 +61,18 @@ export default function PublicStoreProfile() {
     },
     enabled: !!storeId && !!store
   });
-
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
     promotion: 'bg-purple-100 text-purple-800',
     sale: 'bg-red-100 text-red-800'
   };
-
   const typeLabels = {
     coupon: 'Cupón',
     promotion: 'Promoción',
     sale: 'Oferta'
   };
-
   if (isStoreLoading || isPromotionsLoading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+    return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
@@ -81,13 +82,10 @@ export default function PublicStoreProfile() {
           </div>
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
   if (storeError || !store) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+    return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
         <main className="flex-grow pt-16">
           <div className="container mx-auto px-4 py-8">
@@ -102,12 +100,9 @@ export default function PublicStoreProfile() {
           </div>
         </main>
         <Footer />
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+  return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
@@ -124,7 +119,7 @@ export default function PublicStoreProfile() {
                     {store.logo_url ? <img src={store.logo_url} alt={store.name} className="w-16 h-16 object-contain rounded-lg" /> : <Store className="w-16 h-16 text-purple-500" />}
                     <div>
                       <h3 className="text-xl font-semibold">{store.name}</h3>
-                      <p className="text-gray-600">{store.category}</p>
+                      <p className="text-gray-600 text-left">{store.category}</p>
                     </div>
                   </div>
                   {store.description && <p className="text-gray-600 text-left">{store.description}</p>}
@@ -140,8 +135,7 @@ export default function PublicStoreProfile() {
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-2xl font-bold mb-4">Promociones Actuales</h2>
                 {promotions && promotions.length > 0 ? <div className="space-y-4">
-                    {promotions.map((promo) => (
-                      <Card key={promo.id}>
+                    {promotions.map(promo => <Card key={promo.id}>
                         <CardHeader>
                           <div className="flex items-start justify-between">
                             <div className="space-y-2 text-left w-full">
@@ -162,8 +156,7 @@ export default function PublicStoreProfile() {
                             </span>
                           </div>
                         </CardContent>
-                      </Card>
-                    ))}
+                      </Card>)}
                   </div> : <Card>
                     <CardHeader>
                       <CardTitle className="text-center text-gray-500">
@@ -182,6 +175,5 @@ export default function PublicStoreProfile() {
         </div>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 }
