@@ -27,12 +27,15 @@ export const AuthForm = ({ mode, onClose, onModeChange }: AuthFormProps) => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`
+          }
         });
         if (error) throw error;
         toast.success("¡Revisa tu correo para confirmar tu cuenta!");
       } else if (mode === "reset") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin,
+          redirectTo: `${window.location.origin}/auth/callback`
         });
         if (error) throw error;
         toast.success("¡Revisa tu correo para restablecer tu contraseña!");
