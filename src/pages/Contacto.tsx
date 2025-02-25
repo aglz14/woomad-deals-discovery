@@ -32,7 +32,7 @@ export default function Contacto() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900 text-left">Email</p>
-                      <a href="mailto:contacto@woomad.com" className="text-gray-600 hover:text-purple-600 transition-colors">info@woomad.com</a>
+                      <a href="mailto:contacto@woomad.com" className="text-gray-600 hover:text-purple-600 transition-colors">suivos.world@gmail.com</a>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
