@@ -82,37 +82,33 @@ export function PublicStoreCard({
         </div>
         <div className="flex-1 space-y-1">
           <h3 className="font-semibold text-lg text-gray-900 text-left">{store.name}</h3>
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-500 text-left">{store.category}</p>
-            {activePromotionsCount !== undefined && activePromotionsCount > 0 && (
-              <Badge variant="secondary">
-                {activePromotionsCount} promoción{activePromotionsCount !== 1 ? 'es' : ''} activa{activePromotionsCount !== 1 ? 's' : ''}
-              </Badge>
-            )}
-          </div>
+          <p className="text-sm text-gray-500 text-left">{store.category}</p>
           {store.mall && (
             <p className="text-sm text-purple-600 text-left">{store.mall.name}</p>
           )}
         </div>
       </CardHeader>
 
-      {(store.description || store.location_in_mall || store.contact_number) && (
-        <CardContent className="space-y-2">
-          {store.description && (
-            <p className="text-sm text-gray-600 text-left">{store.description}</p>
-          )}
-          {store.location_in_mall && (
-            <p className="text-sm text-gray-500 text-left">
-              Ubicación: {store.location_in_mall}
-            </p>
-          )}
-          {store.contact_number && (
-            <p className="text-sm text-gray-500 text-left">
-              Contacto: {store.contact_number}
-            </p>
-          )}
-        </CardContent>
-      )}
+      <CardContent className="space-y-2">
+        {store.description && (
+          <p className="text-sm text-gray-600 text-left">{store.description}</p>
+        )}
+        {store.location_in_mall && (
+          <p className="text-sm text-gray-500 text-left">
+            Ubicación: {store.location_in_mall}
+          </p>
+        )}
+        {store.contact_number && (
+          <p className="text-sm text-gray-500 text-left">
+            Contacto: {store.contact_number}
+          </p>
+        )}
+        <div className="pt-2">
+          <Badge variant={activePromotionsCount && activePromotionsCount > 0 ? "secondary" : "outline"}>
+            {activePromotionsCount || 0} promoción{activePromotionsCount !== 1 ? 'es' : ''} activa{activePromotionsCount !== 1 ? 's' : ''}
+          </Badge>
+        </div>
+      </CardContent>
     </Card>
   );
 }
