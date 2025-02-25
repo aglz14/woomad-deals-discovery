@@ -31,7 +31,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
   const PromotionContent = ({ isDialog = false }: { isDialog?: boolean }) => (
     <>
       {hasImage && (
-        <div className={`relative ${isDialog ? 'h-64' : 'h-48'} w-full overflow-hidden`}>
+        <div className={`relative ${isDialog ? 'h-48 md:h-64' : 'h-48'} w-full overflow-hidden`}>
           <img
             src={promotion.image_url}
             alt={promotion.title}
@@ -49,7 +49,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
             >
               {typeLabels[promotion.type]}
             </Badge>
-            <CardTitle className={`leading-tight ${isDialog ? '' : 'line-clamp-2'} text-left`}>
+            <CardTitle className={`leading-tight ${isDialog ? 'text-xl md:text-2xl' : 'text-lg md:text-xl line-clamp-2'} text-left`}>
               {promotion.title}
             </CardTitle>
           </div>
@@ -98,7 +98,7 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
       </Card>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95%] md:max-w-2xl max-h-[90vh] overflow-y-auto p-4 md:p-6">
           <DialogHeader>
             <DialogTitle className="sr-only">Detalles de la promoción</DialogTitle>
           </DialogHeader>
