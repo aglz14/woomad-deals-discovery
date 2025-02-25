@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Store } from "@/types/store";
 import { useSession } from "@/components/providers/SessionProvider";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 interface PublicStoreCardProps {
   store: Store;
@@ -20,6 +23,21 @@ export function PublicStoreCard({
 }: PublicStoreCardProps) {
   const { session } = useSession();
   const isOwner = session?.user?.id === store.user_id;
+
+  const { data: activePromotionsCount } = useQuery({
+    queryKey: ["active-promotions-count", store.id],
+    queryFn: async () => {
+      const now = new Date().toISOString();
+      const { count, error } = await supabase
+        .from("promotions")
+        .select("*", { count: 'exact', head: true })
+        .eq('store_id', store.id)
+        .gt('end_date', now);
+
+      if (error) throw error;
+      return count || 0;
+    },
+  });
 
   return (
     <Card onClick={onClick} className="group cursor-pointer hover:shadow-lg transition-shadow duration-300 relative">
@@ -63,7 +81,14 @@ export function PublicStoreCard({
           )}
         </div>
         <div className="flex-1 space-y-1">
-          <h3 className="font-semibold text-lg text-gray-900 text-left">{store.name}</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg text-gray-900 text-left">{store.name}</h3>
+            {activePromotionsCount !== undefined && activePromotionsCount > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {activePromotionsCount} promoción{activePromotionsCount !== 1 ? 'es' : ''} activa{activePromotionsCount !== 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
           <p className="text-sm text-gray-500 text-left">{store.category}</p>
           {store.mall && (
             <p className="text-sm text-purple-600 text-left">{store.mall.name}</p>
