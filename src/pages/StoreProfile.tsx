@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +12,11 @@ import { StoreLoadingState } from "@/components/store/StoreLoadingState";
 import { StoreNotFound } from "@/components/store/StoreNotFound";
 import { StoreInfo } from "@/components/store/StoreInfo";
 import { PromotionsList } from "@/components/store/PromotionsList";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useSession } from "@/components/providers/SessionProvider";
+import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 
 // Helper function to validate promotion type
 const isValidPromotionType = (type: string): type is ValidPromotionType => {
@@ -20,7 +26,9 @@ const isValidPromotionType = (type: string): type is ValidPromotionType => {
 export default function StoreProfile() {
   const { storeId } = useParams();
   const navigate = useNavigate();
+  const { session } = useSession();
   const [promotionToEdit, setPromotionToEdit] = useState<DatabasePromotion | null>(null);
+  const [isAddingPromotion, setIsAddingPromotion] = useState(false);
 
   const { data: store, isLoading: isStoreLoading } = useQuery({
     queryKey: ["store", storeId],
@@ -91,6 +99,8 @@ export default function StoreProfile() {
     }
   };
 
+  const isOwner = session?.user?.id === store?.user_id;
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
@@ -113,9 +123,34 @@ export default function StoreProfile() {
                 <StoreInfo store={store} />
               </div>
               <div className="w-full">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Promociones Actuales
-                </h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Promociones Actuales
+                  </h2>
+                  {isOwner && (
+                    <Dialog open={isAddingPromotion} onOpenChange={setIsAddingPromotion}>
+                      <DialogTrigger asChild>
+                        <Button>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Agregar Promoción
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Agregar Promoción</DialogTitle>
+                        </DialogHeader>
+                        <AddPromotionForm
+                          onSuccess={() => {
+                            setIsAddingPromotion(false);
+                            refetchPromotions();
+                          }}
+                          onCancel={() => setIsAddingPromotion(false)}
+                          preselectedStoreId={storeId}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
                 <PromotionsList
                   promotions={promotions || []}
                   onEdit={setPromotionToEdit}
