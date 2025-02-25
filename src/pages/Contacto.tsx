@@ -41,7 +41,7 @@ export default function Contacto() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900 text-left">Teléfono</p>
-                      <a href="tel:+34900000000" className="text-gray-600 hover:text-purple-600 transition-colors">811 485 7684</a>
+                      <a href="tel:+34900000000" className="text-gray-600 hover:text-purple-600 transition-colors">811 4857684</a>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
