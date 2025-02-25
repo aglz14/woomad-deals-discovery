@@ -19,43 +19,46 @@ export const HomeHero = ({ userLocation, onSearch, onMallSelect, malls, selected
   const { t } = useTranslation();
   
   return (
-    <div className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white py-16 pt-24">
-      <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center space-y-8 animate-fade-in">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              {userLocation ? t("nearMe") : t("deals")}
-            </h1>
-            <p className="text-lg md:text-xl text-white/90">
-              {t("searchPlaceholder")}
-            </p>
-            {userLocation && (
-              <div className="flex items-center justify-center gap-2 text-sm text-white/80">
-                <MapPin className="w-4 h-4" />
-                <span>{t("nearMe")}</span>
-              </div>
-            )}
-          </div>
-          
-          <div className="mt-8 space-y-4">
-            <SearchBar onSearch={onSearch} />
+    <div className="relative bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white overflow-hidden">
+      <div className="absolute inset-0 bg-[url('/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png')] opacity-10 bg-center bg-no-repeat bg-contain animate-pulse"></div>
+      <div className="relative py-16 pt-24 lg:pt-32">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center space-y-8">
+            <div className="space-y-4 animate-fade-in">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+                {userLocation ? t("nearMe") : t("deals")}
+              </h1>
+              <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+                {t("searchPlaceholder")}
+              </p>
+              {userLocation && (
+                <div className="flex items-center justify-center gap-2 text-sm text-white/80">
+                  <MapPin className="w-4 h-4" />
+                  <span>{t("nearMe")}</span>
+                </div>
+              )}
+            </div>
             
-            <div className="max-w-md mx-auto">
-              <Select value={selectedMallId} onValueChange={onMallSelect}>
-                <SelectTrigger className="bg-white/95 border-2 border-white/20 text-gray-800">
-                  <SelectValue placeholder={t("selectMall")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t("allMalls")}
-                  </SelectItem>
-                  {malls.map((mall) => (
-                    <SelectItem key={mall.id} value={mall.id}>
-                      {mall.name}
+            <div className="mt-8 space-y-4 animate-fade-up">
+              <SearchBar onSearch={onSearch} />
+              
+              <div className="max-w-md mx-auto">
+                <Select value={selectedMallId} onValueChange={onMallSelect}>
+                  <SelectTrigger className="bg-white/95 border-2 border-white/20 text-gray-800 h-12">
+                    <SelectValue placeholder={t("selectMall")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all" className="cursor-pointer">
+                      {t("allMalls")}
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    {malls.map((mall) => (
+                      <SelectItem key={mall.id} value={mall.id} className="cursor-pointer">
+                        {mall.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>

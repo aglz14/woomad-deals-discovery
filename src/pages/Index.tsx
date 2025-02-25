@@ -78,7 +78,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 via-white to-purple-50">
       <Header />
       
       <main className="flex-grow pt-16">
@@ -92,8 +92,8 @@ export default function Index() {
 
         <div className="container mx-auto px-4 py-12 space-y-16">
           <ErrorBoundary>
-            <div className="space-y-16">
-              <section>
+            <div className="space-y-16 animate-fade-in">
+              <section className="rounded-2xl bg-white p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <PromotionsList
                   isLoading={isLoading}
                   promotions={promotions}
@@ -105,14 +105,14 @@ export default function Index() {
                 />
               </section>
 
-              <section>
+              <section className="rounded-2xl bg-gradient-to-r from-purple-50 to-blue-50 p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <StoresNearby 
                   searchTerm={searchTerm}
                   selectedMallId={selectedMallId}
                 />
               </section>
 
-              <section>
+              <section className="rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <MallsNearby 
                   searchTerm={searchTerm}
                   selectedMallId={selectedMallId}
