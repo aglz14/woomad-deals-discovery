@@ -1,16 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar, Store, MapPin } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { format } from 'date-fns';
 import { Badge } from './ui/badge';
 import { DatabasePromotion } from '@/types/promotion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 
 interface PromotionCardProps {
   promotion: DatabasePromotion;
 }
 
 export const PromotionCard = ({ promotion }: PromotionCardProps) => {
+  const [showDialog, setShowDialog] = useState(false);
+
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800 border-blue-200',
     promotion: 'bg-purple-100 text-purple-800 border-purple-200',
@@ -25,10 +28,10 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
 
   const hasImage = !!promotion.image_url;
 
-  return (
-    <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 bg-white">
+  const PromotionContent = ({ isDialog = false }: { isDialog?: boolean }) => (
+    <>
       {hasImage && (
-        <div className="relative h-48 w-full overflow-hidden">
+        <div className={`relative ${isDialog ? 'h-64' : 'h-48'} w-full overflow-hidden`}>
           <img
             src={promotion.image_url}
             alt={promotion.title}
@@ -46,7 +49,9 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
             >
               {typeLabels[promotion.type]}
             </Badge>
-            <CardTitle className="leading-tight line-clamp-2 text-left">{promotion.title}</CardTitle>
+            <CardTitle className={`leading-tight ${isDialog ? '' : 'line-clamp-2'} text-left`}>
+              {promotion.title}
+            </CardTitle>
           </div>
         </div>
 
@@ -76,8 +81,32 @@ export const PromotionCard = ({ promotion }: PromotionCardProps) => {
       </CardHeader>
 
       <CardContent>
-        <p className="text-gray-600 text-sm line-clamp-3 text-left">{promotion.description}</p>
+        <p className={`text-gray-600 text-sm ${isDialog ? '' : 'line-clamp-3'} text-left`}>
+          {promotion.description}
+        </p>
       </CardContent>
-    </Card>
+    </>
+  );
+
+  return (
+    <>
+      <Card 
+        className="overflow-hidden group hover:shadow-lg transition-all duration-300 bg-white cursor-pointer" 
+        onClick={() => setShowDialog(true)}
+      >
+        <PromotionContent />
+      </Card>
+
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Detalles de la promoción</DialogTitle>
+          </DialogHeader>
+          <Card className="border-none shadow-none">
+            <PromotionContent isDialog={true} />
+          </Card>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
