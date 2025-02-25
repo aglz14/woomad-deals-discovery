@@ -11,6 +11,7 @@ export default function PasswordReset() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isValidToken, setIsValidToken] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -37,6 +38,8 @@ export default function PasswordReset() {
       if (error) throw error;
 
       toast.success("Contraseña actualizada con éxito");
+      // Sign out after password reset to force a clean login
+      await supabase.auth.signOut();
       navigate("/");
     } catch (error: any) {
       toast.error(error.message);
@@ -59,29 +62,42 @@ export default function PasswordReset() {
           return;
         }
 
-        // Set the session with the recovery token
-        const { data: { session }, error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: '',
-        });
+        try {
+          // Set the session with the recovery token
+          const { data: { session }, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: '',
+          });
 
-        if (error || !session) {
+          if (error || !session) {
+            throw error;
+          }
+
+          setIsValidToken(true);
+        } catch (error) {
+          console.error('Error setting session:', error);
           toast.error("Error al procesar el token de recuperación");
           navigate("/");
-          return;
         }
-      } else {
-        // Check if we have an active session for password reset
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          toast.error("Enlace inválido o expirado");
-          navigate("/");
-        }
+      } else if (!fragment) {
+        // If there's no recovery token in URL, redirect to home
+        navigate("/");
       }
     };
 
     handleRecoveryToken();
   }, [location, navigate]);
+
+  // If token is not valid yet, show loading state
+  if (!isValidToken) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p>Validando enlace de recuperación...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
