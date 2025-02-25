@@ -1,17 +1,25 @@
 
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+
 export const Footer = () => {
   const {
     t
   } = useTranslation();
   const year = new Date().getFullYear();
+  
   return <footer className="bg-white border-t border-gray-200">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-left">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">Woomad</h3>
-            <p className="text-gray-600">Making Retail Great Again!</p>
+            <Link to="/">
+              <img 
+                src="/lovable-uploads/c852587b-0ed0-4fee-9630-1f53f53a9ea3.png" 
+                alt="Woomad Commerce" 
+                className="h-8 hover:opacity-80 transition-opacity"
+              />
+            </Link>
+            <p className="text-gray-600 mt-4">Making Retail Great Again!</p>
           </div>
           
           <div className="text-left">
