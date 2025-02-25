@@ -33,7 +33,9 @@ export const MallStoresSection = ({
     <div className="space-y-4 sm:space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">Tiendas Disponibles</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
+            Tiendas Disponibles ({filteredStores.length})
+          </h2>
           <Select
             value={selectedCategory}
             onValueChange={setSelectedCategory}
