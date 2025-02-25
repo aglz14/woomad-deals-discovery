@@ -105,10 +105,10 @@ export default function StoreProfile() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       <main className="flex-grow pt-16">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           <button
             onClick={() => navigate(-1)}
-            className="mb-8 text-purple-600 hover:text-purple-700 flex items-center gap-2 transition-colors"
+            className="mb-4 sm:mb-6 lg:mb-8 text-purple-600 hover:text-purple-700 flex items-center gap-2 transition-colors"
           >
             ← Volver
           </button>
@@ -118,24 +118,24 @@ export default function StoreProfile() {
           ) : !store ? (
             <StoreNotFound />
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               <div className="w-full">
                 <StoreInfo store={store} />
               </div>
               <div className="w-full">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     Promociones Actuales
                   </h2>
                   {isOwner && (
                     <Dialog open={isAddingPromotion} onOpenChange={setIsAddingPromotion}>
                       <DialogTrigger asChild>
-                        <Button>
+                        <Button className="w-full sm:w-auto">
                           <Plus className="h-4 w-4 mr-2" />
                           Agregar Promoción
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="w-[95%] sm:w-full max-w-2xl">
                         <DialogHeader>
                           <DialogTitle>Agregar Promoción</DialogTitle>
                         </DialogHeader>
