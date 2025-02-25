@@ -37,9 +37,9 @@ export default function PasswordReset() {
 
       if (error) throw error;
 
-      toast.success("Contraseña actualizada con éxito");
-      // Sign out after password reset to force a clean login
+      // Sign out and clean up the session
       await supabase.auth.signOut();
+      toast.success("Contraseña actualizada con éxito");
       navigate("/");
     } catch (error: any) {
       toast.error(error.message);
@@ -51,6 +51,9 @@ export default function PasswordReset() {
   // Handle the recovery token from URL
   useEffect(() => {
     const handleRecoveryToken = async () => {
+      // Clear any existing session first
+      await supabase.auth.signOut();
+      
       const fragment = location.hash;
       if (fragment.includes('access_token') && fragment.includes('type=recovery')) {
         // Extract the access token

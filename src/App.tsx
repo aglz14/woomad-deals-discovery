@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { SessionProvider } from "@/components/providers/SessionProvider";
@@ -22,10 +22,13 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <SessionProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Routes>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Routes>
+          {/* Password reset route outside SessionProvider to prevent automatic redirects */}
+          <Route path="/auth/callback" element={<PasswordReset />} />
+          
+          <SessionProvider>
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<About />} />
             <Route path="/nosotros" element={<Nosotros />} />
@@ -37,13 +40,12 @@ function App() {
             <Route path="/store/:storeId" element={<PublicStoreProfile />} />
             <Route path="/mall-management" element={<MallManagement />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/auth/callback" element={<PasswordReset />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
+          </SessionProvider>
+        </Routes>
         <Toaster />
-      </QueryClientProvider>
-    </SessionProvider>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
