@@ -18,8 +18,9 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
   const ITEMS_PER_PAGE = 9;
 
   const { data: stores, isLoading } = useQuery({
-    queryKey: ["stores"],
+    queryKey: ["stores-with-active-promotions"],
     queryFn: async () => {
+      const now = new Date().toISOString();
       const { data, error } = await supabase
         .from("stores")
         .select(`
@@ -30,10 +31,17 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
             latitude,
             longitude,
             address
-          )
-        `);
+          ),
+          promotions!inner (*)
+        `)
+        .gt('promotions.end_date', now)
+        .order('name');
+
       if (error) throw error;
-      return data;
+      
+      // Remove duplicate stores (a store might have multiple active promotions)
+      const uniqueStores = Array.from(new Map(data.map(store => [store.id, store])).values());
+      return uniqueStores;
     },
   });
 
@@ -85,9 +93,9 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
   if (!stores?.length) {
     return (
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas Cercanas</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas con Promociones Activas</h2>
         <div className="text-center py-16 bg-gradient-to-b from-purple-50 to-white rounded-lg border border-purple-100">
-          <p className="text-gray-500">No hay tiendas disponibles en este momento.</p>
+          <p className="text-gray-500">No hay tiendas con promociones activas en este momento.</p>
         </div>
       </div>
     );
@@ -96,9 +104,9 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
   if (currentItems.length === 0) {
     return (
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas Cercanas</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas con Promociones Activas</h2>
         <div className="text-center py-16 bg-gradient-to-b from-purple-50 to-white rounded-lg border border-purple-100">
-          <p className="text-gray-500">No se encontraron tiendas que coincidan con tu búsqueda.</p>
+          <p className="text-gray-500">No se encontraron tiendas con promociones activas que coincidan con tu búsqueda.</p>
         </div>
       </div>
     );
@@ -106,7 +114,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-900">Tiendas Cercanas</h2>
+      <h2 className="text-2xl font-bold text-gray-900">Tiendas con Promociones Activas</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((store) => (
           <PublicStoreCard 
