@@ -20,7 +20,7 @@ export const HomeHero = ({ userLocation, onSearch, onMallSelect, malls, selected
   
   return (
     <div className="relative bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png')] opacity-10 bg-center bg-no-repeat bg-contain animate-pulse"></div>
+      <div className="absolute inset-0 bg-[url('/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png')] opacity-5 bg-center bg-no-repeat bg-contain animate-pulse"></div>
       <div className="relative py-16 pt-24 lg:pt-32">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center space-y-8">
