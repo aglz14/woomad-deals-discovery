@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -161,7 +160,7 @@ export default function PublicMallProfile() {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h2 className="text-2xl font-semibold text-gray-900">
-                  Tiendas Disponibles
+                  Tiendas Disponibles ({filteredStores.length})
                 </h2>
                 <Select
                   value={selectedCategory}

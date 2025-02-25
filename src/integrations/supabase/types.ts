@@ -121,6 +121,7 @@ export type Database = {
           description: string | null
           floor: string | null
           id: string
+          index: number
           location_in_mall: string | null
           logo_url: string | null
           mall_id: string | null
@@ -134,6 +135,7 @@ export type Database = {
           description?: string | null
           floor?: string | null
           id?: string
+          index?: number
           location_in_mall?: string | null
           logo_url?: string | null
           mall_id?: string | null
@@ -147,6 +149,7 @@ export type Database = {
           description?: string | null
           floor?: string | null
           id?: string
+          index?: number
           location_in_mall?: string | null
           logo_url?: string | null
           mall_id?: string | null
