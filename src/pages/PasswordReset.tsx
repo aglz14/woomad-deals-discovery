@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ export default function PasswordReset() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Handle password reset
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,18 +45,43 @@ export default function PasswordReset() {
     }
   };
 
-  // Check if we have access to update the password
+  // Handle the recovery token from URL
   useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Enlace inválido o expirado");
-        navigate("/");
+    const handleRecoveryToken = async () => {
+      const fragment = location.hash;
+      if (fragment.includes('access_token') && fragment.includes('type=recovery')) {
+        // Extract the access token
+        const accessToken = new URLSearchParams(fragment.substring(1)).get('access_token');
+        
+        if (!accessToken) {
+          toast.error("Token de recuperación no válido");
+          navigate("/");
+          return;
+        }
+
+        // Set the session with the recovery token
+        const { data: { session }, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: '',
+        });
+
+        if (error || !session) {
+          toast.error("Error al procesar el token de recuperación");
+          navigate("/");
+          return;
+        }
+      } else {
+        // Check if we have an active session for password reset
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          toast.error("Enlace inválido o expirado");
+          navigate("/");
+        }
       }
     };
-    
-    checkSession();
-  }, [navigate]);
+
+    handleRecoveryToken();
+  }, [location, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
