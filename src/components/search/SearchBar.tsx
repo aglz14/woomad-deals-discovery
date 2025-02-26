@@ -8,9 +8,10 @@ interface SearchBarProps {
   onSearch: (searchTerm: string) => void;
   placeholder?: string;
   initialValue?: string;
+  className?: string;
 }
 
-export const SearchBar = ({ onSearch, placeholder, initialValue = '' }: SearchBarProps) => {
+export const SearchBar = ({ onSearch, placeholder, initialValue = '', className }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState(initialValue);
   const { t } = useTranslation();
 
@@ -30,7 +31,7 @@ export const SearchBar = ({ onSearch, placeholder, initialValue = '' }: SearchBa
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative w-full group">
+    <form onSubmit={handleSubmit} className={`relative w-full group ${className || ''}`}>
       <div className="relative transform transition-transform duration-300 group-hover:scale-[1.02]">
         <Input
           type="text"
