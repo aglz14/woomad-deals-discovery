@@ -170,7 +170,7 @@ export default function PublicMallProfile() {
                 <h2 className="text-2xl font-semibold text-gray-900">
                   Tiendas Disponibles ({filteredStores.length})
                 </h2>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-w-[280px]">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-w-[280px] max-w-[600px]">
                   <SearchBar 
                     onSearch={setSearchTerm}
                     placeholder="Buscar por nombre, descripción o ubicación..."
