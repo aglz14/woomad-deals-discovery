@@ -44,3 +44,4 @@ export const SearchBar = ({ onSearch, placeholder, initialValue = '' }: SearchBa
     </form>
   );
 };
+
