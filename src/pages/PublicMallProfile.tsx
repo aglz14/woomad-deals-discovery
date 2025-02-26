@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -167,11 +166,11 @@ export default function PublicMallProfile() {
             </div>
 
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <h2 className="text-2xl font-semibold text-gray-900">
                   Tiendas Disponibles ({filteredStores.length})
                 </h2>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-w-[280px]">
                   <SearchBar 
                     onSearch={setSearchTerm}
                     placeholder="Buscar por nombre, descripción o ubicación..."
@@ -181,13 +180,13 @@ export default function PublicMallProfile() {
                     value={selectedCategory}
                     onValueChange={setSelectedCategory}
                   >
-                    <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px] h-10">
                       <SelectValue placeholder="Filtrar por categoría" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas las categorías</SelectItem>
+                    <SelectContent className="max-h-[300px]">
+                      <SelectItem value="all" className="py-2.5">Todas las categorías</SelectItem>
                       {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
+                        <SelectItem key={category} value={category} className="py-2.5">
                           {category}
                         </SelectItem>
                       ))}
