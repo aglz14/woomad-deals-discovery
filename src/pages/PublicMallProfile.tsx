@@ -1,3 +1,4 @@
+
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,12 +11,14 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useState } from "react";
+import { SearchBar } from "@/components/search/SearchBar";
 
 export default function PublicMallProfile() {
   const { t } = useTranslation();
   const { mallId } = useParams();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: mall, isLoading: isLoadingMall, error: mallError } = useQuery({
     queryKey: ["mall", mallId],
@@ -67,9 +70,15 @@ export default function PublicMallProfile() {
 
   const categories = stores ? [...new Set(stores.map(store => store.category))].sort() : [];
   
-  const filteredStores = stores?.filter(store => 
-    selectedCategory === "all" ? true : store.category === selectedCategory
-  ) || [];
+  const filteredStores = stores?.filter(store => {
+    const matchesCategory = selectedCategory === "all" ? true : store.category === selectedCategory;
+    const matchesSearch = searchTerm.trim() === "" ? true : 
+      store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (store.description || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (store.location_in_mall || "").toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesCategory && matchesSearch;
+  }) || [];
 
   if (isLoadingMall || isLoadingStores) {
     return (
@@ -162,22 +171,29 @@ export default function PublicMallProfile() {
                 <h2 className="text-2xl font-semibold text-gray-900">
                   Tiendas Disponibles ({filteredStores.length})
                 </h2>
-                <Select
-                  value={selectedCategory}
-                  onValueChange={setSelectedCategory}
-                >
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue placeholder="Filtrar por categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas las categorías</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                  <SearchBar 
+                    onSearch={setSearchTerm}
+                    placeholder="Buscar por nombre, descripción o ubicación..."
+                    initialValue={searchTerm}
+                  />
+                  <Select
+                    value={selectedCategory}
+                    onValueChange={setSelectedCategory}
+                  >
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                      <SelectValue placeholder="Filtrar por categoría" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas las categorías</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <StoresList stores={filteredStores} />
             </div>
