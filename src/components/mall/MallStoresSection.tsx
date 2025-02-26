@@ -40,21 +40,22 @@ export const MallStoresSection = ({
   return (
     <div className="space-y-4 sm:space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full max-w-[600px]">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
-            Tiendas Disponibles ({filteredStores.length})
-          </h2>
-          <div className="flex flex-col sm:flex-row gap-4 w-full">
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap">
+          Tiendas Disponibles ({filteredStores.length})
+        </h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto sm:max-w-none">
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <SearchBar 
               onSearch={setSearchTerm}
               placeholder="Buscar por nombre, descripción o ubicación..."
               initialValue={searchTerm}
+              className="w-full sm:w-[300px]"
             />
             <Select
               value={selectedCategory}
               onValueChange={setSelectedCategory}
             >
-              <SelectTrigger className="w-full sm:w-[240px] min-w-[240px] h-10">
+              <SelectTrigger className="w-full sm:w-[240px] h-10">
                 <SelectValue placeholder="Filtrar por categoría" />
               </SelectTrigger>
               <SelectContent>
@@ -67,11 +68,11 @@ export const MallStoresSection = ({
               </SelectContent>
             </Select>
           </div>
+          <Button onClick={onAddStore} className="w-full sm:w-auto">
+            <Plus className="h-4 w-4 mr-2" />
+            Agregar Tienda
+          </Button>
         </div>
-        <Button onClick={onAddStore} className="w-full sm:w-auto self-start sm:self-auto">
-          <Plus className="h-4 w-4 mr-2" />
-          Agregar Tienda
-        </Button>
       </div>
       <StoresList 
         stores={filteredStores} 
