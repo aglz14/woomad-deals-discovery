@@ -68,7 +68,7 @@ export const MallStoresSection = ({
             </Select>
           </div>
         </div>
-        <Button onClick={onAddStore} className="self-start sm:self-auto">
+        <Button onClick={onAddStore} className="w-full sm:w-auto self-start sm:self-auto">
           <Plus className="h-4 w-4 mr-2" />
           Agregar Tienda
         </Button>
