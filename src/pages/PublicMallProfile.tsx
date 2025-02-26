@@ -180,7 +180,7 @@ export default function PublicMallProfile() {
                     value={selectedCategory}
                     onValueChange={setSelectedCategory}
                   >
-                    <SelectTrigger className="w-full sm:w-[200px] h-10">
+                    <SelectTrigger className="w-full sm:w-[240px] h-10">
                       <SelectValue placeholder="Filtrar por categoría" />
                     </SelectTrigger>
                     <SelectContent className="max-h-[300px]">
