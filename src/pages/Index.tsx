@@ -95,7 +95,7 @@ export default function Index() {
             <div className="w-full md:w-1/2 lg:w-2/3">
               <SearchBar 
                 onSearch={handleSearch} 
-                placeholder={t("searchPromotionsAndStores") || "Buscar promociones y tiendas..."} 
+                placeholder="Busca ofertas, tiendas y centros comerciales a 50 km"
                 className="w-full"
               />
             </div>
