@@ -1,14 +1,17 @@
+
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 interface AuthFormProps {
   mode: "login" | "signup" | "reset";
   onClose: () => void;
   onModeChange: (mode: "login" | "signup" | "reset") => void;
 }
+
 export const AuthForm = ({
   mode,
   onClose,
@@ -20,6 +23,7 @@ export const AuthForm = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -62,12 +66,13 @@ export const AuthForm = ({
       setLoading(false);
     }
   };
+
   if (mode === "reset") {
     return <div className="space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input type="email" placeholder="Correo electrónico" value={email} onChange={e => setEmail(e.target.value)} required />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Cargando..." : "Enviar enlace de recuperación"}
+            {loading ? "Cargando..." : "Enviar enlace"}
           </Button>
         </form>
         <div className="text-center">
@@ -77,6 +82,7 @@ export const AuthForm = ({
         </div>
       </div>;
   }
+
   return <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input type="email" placeholder="Correo electrónico" value={email} onChange={e => setEmail(e.target.value)} required />
