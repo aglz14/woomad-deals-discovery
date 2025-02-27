@@ -11,11 +11,62 @@ export default function PasswordReset() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isValidToken, setIsValidToken] = useState(false);
+  const [showResetForm, setShowResetForm] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle password reset
+  useEffect(() => {
+    const handleAuthCallback = async () => {
+      const fragment = location.hash;
+      
+      // Clear any existing session first to avoid conflicts
+      await supabase.auth.signOut();
+
+      if (!fragment) {
+        navigate("/");
+        return;
+      }
+
+      const params = new URLSearchParams(fragment.substring(1));
+      const accessToken = params.get('access_token');
+      const type = params.get('type');
+      
+      if (!accessToken) {
+        toast.error("Token no válido");
+        navigate("/");
+        return;
+      }
+
+      try {
+        const { data: { session }, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: '',
+        });
+
+        if (error) throw error;
+
+        if (type === 'recovery') {
+          // Show password reset form
+          setShowResetForm(true);
+        } else {
+          // Handle email confirmation or other auth callbacks
+          if (session) {
+            toast.success("Autenticación exitosa");
+            navigate("/");
+          } else {
+            throw new Error("No se pudo establecer la sesión");
+          }
+        }
+      } catch (error: any) {
+        console.error('Error handling auth callback:', error);
+        toast.error(error.message || "Error procesando la autenticación");
+        navigate("/");
+      }
+    };
+
+    handleAuthCallback();
+  }, [location, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -48,55 +99,11 @@ export default function PasswordReset() {
     }
   };
 
-  // Handle the recovery token from URL
-  useEffect(() => {
-    const handleRecoveryToken = async () => {
-      // Clear any existing session first
-      await supabase.auth.signOut();
-      
-      const fragment = location.hash;
-      if (fragment.includes('access_token') && fragment.includes('type=recovery')) {
-        // Extract the access token
-        const accessToken = new URLSearchParams(fragment.substring(1)).get('access_token');
-        
-        if (!accessToken) {
-          toast.error("Token de recuperación no válido");
-          navigate("/");
-          return;
-        }
-
-        try {
-          // Set the session with the recovery token
-          const { data: { session }, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: '',
-          });
-
-          if (error || !session) {
-            throw error;
-          }
-
-          setIsValidToken(true);
-        } catch (error) {
-          console.error('Error setting session:', error);
-          toast.error("Error al procesar el token de recuperación");
-          navigate("/");
-        }
-      } else if (!fragment) {
-        // If there's no recovery token in URL, redirect to home
-        navigate("/");
-      }
-    };
-
-    handleRecoveryToken();
-  }, [location, navigate]);
-
-  // If token is not valid yet, show loading state
-  if (!isValidToken) {
+  if (!showResetForm) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p>Validando enlace de recuperación...</p>
+          <p>Procesando autenticación...</p>
         </div>
       </div>
     );
