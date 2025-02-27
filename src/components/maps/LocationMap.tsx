@@ -19,6 +19,7 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const [mapReady, setMapReady] = useState(false);
 
   const { data: malls } = useQuery({
     queryKey: ['shopping-malls-map'],
@@ -62,6 +63,7 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       // Wait for map to load before doing anything else
       map.current.on('load', () => {
         console.log('Map loaded successfully');
+        setMapReady(true);
       });
 
       // Handle any errors
@@ -76,18 +78,27 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       if (map.current) {
         map.current.remove();
         map.current = null;
+        setMapReady(false);
       }
     };
   }, [userLocation]);
 
+  // Update markers when map is ready and malls data changes
   useEffect(() => {
-    if (!map.current || !malls) return;
+    if (!mapReady || !map.current || !malls) return;
 
+    console.log('Adding markers for', malls.length, 'malls');
+    
     // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
     malls.forEach(mall => {
+      if (!mall.longitude || !mall.latitude) {
+        console.warn('Mall missing coordinates:', mall.name);
+        return;
+      }
+
       const storeCount = mall.stores?.length || 0;
       
       // Create custom marker element
@@ -110,14 +121,18 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
         `);
 
       // Add marker to map
-      const marker = new mapboxgl.Marker(el)
-        .setLngLat([mall.longitude, mall.latitude])
-        .setPopup(popup)
-        .addTo(map.current!);
+      try {
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([mall.longitude, mall.latitude])
+          .setPopup(popup)
+          .addTo(map.current!);
 
-      markersRef.current.push(marker);
+        markersRef.current.push(marker);
+      } catch (error) {
+        console.error('Error adding marker for mall:', mall.name, error);
+      }
     });
-  }, [malls]);
+  }, [malls, mapReady]);
 
   return (
     <div ref={mapContainer} className={`relative w-full h-[400px] rounded-lg shadow-lg bg-white z-10 ${className}`} />
