@@ -5,7 +5,6 @@ import { LocationMap } from "@/components/maps/LocationMap";
 
 interface HomeHeroProps {
   userLocation: { lat: number; lng: number; } | null;
-  onSearch: (term: string) => void;
 }
 
 export const HomeHero = ({ userLocation }: HomeHeroProps) => {
