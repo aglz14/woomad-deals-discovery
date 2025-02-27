@@ -5,7 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
 import { Toaster as UIToaster } from '@/components/ui/toaster'
-import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
@@ -36,7 +36,7 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="promocerca-theme">
+    <ThemeProvider attribute="class" defaultTheme="light" storageKey="promocerca-theme">
       <QueryClientProvider client={queryClient}>
         <SessionProvider>
           <BrowserRouter>
