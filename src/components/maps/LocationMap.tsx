@@ -1,10 +1,10 @@
-
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Store } from '@/types/store';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from "@/components/ui/button";
 
 interface LocationMapProps {
   userLocation: { lat: number; lng: number } | null;
@@ -28,6 +28,17 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       return data;
     }
   });
+
+  const handleTokenSubmit = () => {
+    if (mapboxToken.trim()) {
+      try {
+        mapboxgl.accessToken = mapboxToken;
+        setShowTokenInput(false);
+      } catch (error) {
+        console.error('Invalid token:', error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!mapContainer.current || map.current || !mapboxToken) return;
@@ -83,7 +94,6 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
     };
   }, [userLocation, mapboxToken]);
 
-  // Update markers when malls data changes
   useEffect(() => {
     if (!map.current || !malls) return;
 
@@ -128,13 +138,27 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       <div className="relative w-full h-[400px] rounded-lg shadow-lg bg-white z-10 p-6 flex flex-col items-center justify-center space-y-4">
         <p className="text-gray-700 text-center">Please enter your Mapbox access token to display the map.</p>
         <p className="text-sm text-gray-500 text-center">You can find your token in your Mapbox account dashboard.</p>
-        <input
-          type="text"
-          className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-          placeholder="Enter your Mapbox access token"
-          value={mapboxToken}
-          onChange={(e) => setMapboxToken(e.target.value)}
-        />
+        <div className="w-full max-w-md space-y-2">
+          <input
+            type="text"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white placeholder:text-gray-500"
+            placeholder="Enter your Mapbox access token"
+            value={mapboxToken}
+            onChange={(e) => setMapboxToken(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleTokenSubmit();
+              }
+            }}
+          />
+          <Button 
+            onClick={handleTokenSubmit}
+            className="w-full"
+            disabled={!mapboxToken.trim()}
+          >
+            Load Map
+          </Button>
+        </div>
         <a 
           href="https://account.mapbox.com/access-tokens/" 
           target="_blank" 
