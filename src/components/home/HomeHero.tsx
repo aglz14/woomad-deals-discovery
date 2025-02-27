@@ -2,21 +2,20 @@
 import { MapPin } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { useTranslation } from "react-i18next";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationMap } from "@/components/maps/LocationMap";
 
 interface HomeHeroProps {
   userLocation: { lat: number; lng: number; } | null;
   onSearch: (term: string) => void;
-  onMallSelect: (mallId: string) => void;
-  malls: Array<{
+  onMallSelect?: (mallId: string) => void;
+  malls?: Array<{
     id: string;
     name: string;
   }>;
-  selectedMallId: string;
+  selectedMallId?: string;
 }
 
-export const HomeHero = ({ userLocation, onSearch, onMallSelect, malls, selectedMallId }: HomeHeroProps) => {
+export const HomeHero = ({ userLocation, onSearch }: HomeHeroProps) => {
   const { t } = useTranslation();
   
   return (
@@ -42,24 +41,6 @@ export const HomeHero = ({ userLocation, onSearch, onMallSelect, malls, selected
             
             <div className="mt-8 space-y-4 animate-fade-up">
               <SearchBar onSearch={onSearch} />
-              
-              <div className="max-w-md mx-auto">
-                <Select value={selectedMallId} onValueChange={onMallSelect}>
-                  <SelectTrigger className="bg-white/95 border-2 border-white/20 text-gray-800 h-12">
-                    <SelectValue placeholder={t("selectMall")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all" className="cursor-pointer">
-                      {t("allMalls")}
-                    </SelectItem>
-                    {malls.map((mall) => (
-                      <SelectItem key={mall.id} value={mall.id} className="cursor-pointer">
-                        {mall.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
             <div className="mt-8 animate-fade-up">

@@ -11,12 +11,15 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMallId, setSelectedMallId] = useState<string>("all");
   const ITEMS_PER_PAGE = 9;
+  const { t } = useTranslation();
 
   const { userLocation, calculateDistance } = useLocation();
 
@@ -85,12 +88,29 @@ export default function Index() {
         <HomeHero 
           userLocation={userLocation} 
           onSearch={handleSearch}
-          onMallSelect={handleMallFilter}
-          malls={malls || []}
-          selectedMallId={selectedMallId}
         />
 
         <div className="container mx-auto px-4 py-12 space-y-16">
+          <div className="flex justify-end mb-6">
+            <div className="max-w-xs w-full">
+              <Select value={selectedMallId} onValueChange={handleMallFilter}>
+                <SelectTrigger className="border-2 border-purple-100">
+                  <SelectValue placeholder={t("selectMall") || "Select a Mall"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all" className="cursor-pointer">
+                    {t("allMalls") || "All Malls"}
+                  </SelectItem>
+                  {malls?.map((mall) => (
+                    <SelectItem key={mall.id} value={mall.id} className="cursor-pointer">
+                      {mall.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
           <ErrorBoundary>
             <div className="space-y-16 animate-fade-in">
               <section className="rounded-2xl bg-white p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
