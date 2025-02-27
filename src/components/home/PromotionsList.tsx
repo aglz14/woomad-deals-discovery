@@ -4,6 +4,7 @@ import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { DatabasePromotion } from "@/types/promotion";
 import { useTranslation } from "react-i18next";
+import { MapPin } from "lucide-react";
 
 interface PromotionsListProps {
   isLoading: boolean;
@@ -25,6 +26,7 @@ export const PromotionsList = ({
   searchTerm 
 }: PromotionsListProps) => {
   const { t } = useTranslation();
+  const FIXED_RADIUS_KM = 10;
 
   if (isLoading) {
     return (
@@ -69,7 +71,14 @@ export const PromotionsList = ({
 
   return (
     <div className="space-y-8 animate-fade-up">
-      <h2 className="text-2xl font-bold text-gray-900">Promociones Cercanas</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Promociones Cercanas</h2>
+        <span className="text-sm text-gray-500 flex items-center gap-1">
+          <MapPin className="h-4 w-4" />
+          Radio de {FIXED_RADIUS_KM}km
+        </span>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((promotion) => (
           <div key={promotion.id} className="transform transition-all duration-300 hover:scale-[1.02]">
