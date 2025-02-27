@@ -3,19 +3,23 @@ import { MallCard } from "@/components/mall/MallCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Building2 } from "lucide-react";
+import { Building2, MapPin } from "lucide-react";
 import { useState } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { useLocation } from "@/hooks/use-location";
 
 interface MallsNearbyProps {
   searchTerm: string;
   selectedMallId: string;
 }
 
+const MAX_DISTANCE_KM = 10; // Show malls within 10km
+
 export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
+  const { userLocation, calculateDistance } = useLocation();
 
   const { data: malls, isLoading } = useQuery({
     queryKey: ["shopping-malls"],
@@ -27,14 +31,30 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
   });
 
   const filteredMalls = malls?.filter(mall => {
+    // First filter by mall ID if selected
     if (selectedMallId !== 'all' && mall.id !== selectedMallId) return false;
-    if (!searchTerm) return true;
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      mall.name.toLowerCase().includes(searchLower) ||
-      mall.address.toLowerCase().includes(searchLower) ||
-      mall.description?.toLowerCase().includes(searchLower)
-    );
+    
+    // Then filter by search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = mall.name.toLowerCase().includes(searchLower) ||
+        mall.address.toLowerCase().includes(searchLower) ||
+        mall.description?.toLowerCase().includes(searchLower);
+      if (!matchesSearch) return false;
+    }
+
+    // Finally, filter by distance if user location is available
+    if (userLocation) {
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        mall.latitude,
+        mall.longitude
+      );
+      return distance <= MAX_DISTANCE_KM;
+    }
+
+    return true; // Include all malls if user location is not available
   });
 
   const getCurrentPageItems = () => {
@@ -63,8 +83,12 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
     return (
       <div className="text-center py-12 bg-gray-50 rounded-lg">
         <Building2 className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-4 text-lg font-semibold text-gray-900">No se encontraron centros comerciales</h3>
-        <p className="mt-2 text-gray-500">Intenta ajustar tus filtros de búsqueda</p>
+        <h3 className="mt-4 text-lg font-semibold text-gray-900">No se encontraron centros comerciales cercanos</h3>
+        <p className="mt-2 text-gray-500">
+          {userLocation 
+            ? "No hay centros comerciales en un radio de 10km"
+            : "Activa tu ubicación para ver centros comerciales cercanos"}
+        </p>
       </div>
     );
   }
@@ -73,7 +97,16 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">Centros Comerciales Cercanos</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Centros Comerciales Cercanos</h2>
+        {userLocation && (
+          <span className="text-sm text-gray-500 flex items-center gap-1">
+            <MapPin className="h-4 w-4" />
+            Radio de {MAX_DISTANCE_KM}km
+          </span>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((mall) => (
           <MallCard
