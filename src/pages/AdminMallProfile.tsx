@@ -14,20 +14,20 @@ import { AdminMallContent } from "@/components/mall/AdminMallContent";
 import { toast } from "sonner";
 
 export default function AdminMallProfile() {
-  const { mallId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
   const [storeToEdit, setStoreToEdit] = useState<string | null>(null);
 
   const { data: mall, isLoading: isLoadingMall, refetch: refetchMall } = useQuery({
-    queryKey: ["mall", mallId],
+    queryKey: ["mall", id],
     queryFn: async () => {
-      console.log("Fetching mall with ID:", mallId);
+      console.log("Fetching mall with ID:", id);
       const { data, error } = await supabase
         .from("shopping_malls")
         .select("*")
-        .eq("id", mallId)
+        .eq("id", id)
         .maybeSingle();
 
       if (error) {
@@ -43,14 +43,14 @@ export default function AdminMallProfile() {
   });
 
   const { data: stores, isLoading: isLoadingStores, refetch: refetchStores } = useQuery({
-    queryKey: ["mall-stores", mallId],
-    enabled: !!mallId,
+    queryKey: ["mall-stores", id],
+    enabled: !!id,
     queryFn: async () => {
-      console.log("Fetching stores for mall:", mallId);
+      console.log("Fetching stores for mall:", id);
       const { data, error } = await supabase
         .from("stores")
         .select("*")
-        .eq("mall_id", mallId);
+        .eq("mall_id", id);
 
       if (error) {
         console.error("Error fetching stores:", error);
@@ -101,7 +101,7 @@ export default function AdminMallProfile() {
           onAddStore={() => setIsAddStoreDialogOpen(true)}
           onEditStore={(storeId) => setStoreToEdit(storeId)}
           onDeleteStore={handleDeleteStore}
-          onStoreClick={(storeId) => navigate(`/store/${storeId}/promotions`)}
+          onStoreClick={(storeId) => navigate(`/admin/store/${storeId}`)}
         />
       </main>
       <Footer />
