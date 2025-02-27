@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,8 +23,33 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
   const { userLocation, calculateDistance } = useLocation();
 
   const { data: stores, isLoading } = useQuery({
-    queryKey: ["stores-with-active-promotions"],
+    queryKey: ["stores-with-active-promotions", userLocation],
     queryFn: async () => {
+      if (!userLocation) return [];
+
+      // First, get all malls within the radius
+      const { data: malls, error: mallsError } = await supabase
+        .from("shopping_malls")
+        .select("*");
+
+      if (mallsError) throw mallsError;
+
+      // Filter malls by distance
+      const nearbyMallIds = malls
+        .filter(mall => {
+          const distance = calculateDistance(
+            userLocation.lat,
+            userLocation.lng,
+            mall.latitude,
+            mall.longitude
+          );
+          return distance <= FIXED_RADIUS_KM;
+        })
+        .map(mall => mall.id);
+
+      if (nearbyMallIds.length === 0) return [];
+
+      // Then get stores with active promotions from those malls
       const now = new Date().toISOString();
       const { data, error } = await supabase
         .from("stores")
@@ -38,13 +64,17 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
           ),
           promotions!inner (*)
         `)
+        .in('mall_id', nearbyMallIds)
         .gt('promotions.end_date', now)
         .order('name');
 
       if (error) throw error;
+      
+      // Remove duplicate stores (a store might have multiple active promotions)
       const uniqueStores = Array.from(new Map(data.map(store => [store.id, store])).values());
       return uniqueStores;
     },
+    enabled: !!userLocation, // Only run query if we have user location
   });
 
   const filterStores = (stores: any[]) => {
@@ -62,19 +92,6 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
     if (selectedMallId && selectedMallId !== "all") {
       filtered = filtered.filter((store) => store.mall_id === selectedMallId);
-    }
-
-    if (userLocation) {
-      filtered = filtered.filter((store) => {
-        if (!store.mall?.latitude || !store.mall?.longitude) return false;
-        const distance = calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          store.mall.latitude,
-          store.mall.longitude
-        );
-        return distance <= FIXED_RADIUS_KM;
-      });
     }
 
     return filtered;
