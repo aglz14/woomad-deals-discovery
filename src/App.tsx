@@ -1,61 +1,73 @@
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { SessionProvider } from "@/components/providers/SessionProvider";
-import Index from "@/pages/Index";
-import About from "@/pages/About";
-import Nosotros from "@/pages/Nosotros";
-import Contacto from "@/pages/Contacto";
-import Promotions from "@/pages/Promotions";
-import NotFound from "@/pages/NotFound";
-import PublicMallProfile from "@/pages/PublicMallProfile";
-import AdminMallProfile from "@/pages/AdminMallProfile";
-import StoreProfile from "@/pages/StoreProfile";
-import PublicStoreProfile from "@/pages/PublicStoreProfile";
-import MallManagement from "@/pages/MallManagement";
-import Signup from "@/pages/Signup";
-import PasswordReset from "@/pages/PasswordReset";
-import "./App.css";
+import './App.css'
+import { lazy, Suspense } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Toaster } from '@/components/ui/sonner'
+import { Toaster as UIToaster } from '@/components/ui/toaster'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { SessionProvider } from '@/components/providers/SessionProvider'
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
-const queryClient = new QueryClient();
+// Lazy imports for code splitting and better performance
+const Index = lazy(() => import('./pages/Index'))
+const NotFound = lazy(() => import('./pages/NotFound'))
+const PasswordReset = lazy(() => import('./pages/PasswordReset'))
+const Signup = lazy(() => import('./pages/Signup'))
+const About = lazy(() => import('./pages/About'))
+const Nosotros = lazy(() => import('./pages/Nosotros'))
+const Contacto = lazy(() => import('./pages/Contacto'))
+const Promotions = lazy(() => import('./pages/Promotions'))
+const PublicMallProfile = lazy(() => import('./pages/PublicMallProfile'))
+const PublicStoreProfile = lazy(() => import('./pages/PublicStoreProfile'))
+const AdminMallProfile = lazy(() => import('./pages/AdminMallProfile'))
+const StoreProfile = lazy(() => import('./pages/StoreProfile'))
+const MallDetails = lazy(() => import('./pages/MallDetails'))
+const MallManagement = lazy(() => import('./pages/MallManagement'))
+const AllPromos = lazy(() => import('./pages/AllPromos'))
 
-// Layout component to wrap routes that need session
-const ProtectedLayout = () => {
-  return (
-    <SessionProvider>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/nosotros" element={<Nosotros />} />
-        <Route path="/contacto" element={<Contacto />} />
-        <Route path="/promotions" element={<Promotions />} />
-        <Route path="/mall/:mallId" element={<PublicMallProfile />} />
-        <Route path="/admin/mall/:mallId" element={<AdminMallProfile />} />
-        <Route path="/store/:storeId/promotions" element={<StoreProfile />} />
-        <Route path="/store/:storeId" element={<PublicStoreProfile />} />
-        <Route path="/mall-management" element={<MallManagement />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </SessionProvider>
-  );
-};
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          {/* Public routes outside SessionProvider */}
-          <Route path="/auth/callback" element={<PasswordReset />} />
-          {/* Protected routes wrapped in SessionProvider */}
-          <Route path="/*" element={<ProtectedLayout />} />
-        </Routes>
-        <Toaster />
-      </Router>
-    </QueryClientProvider>
-  );
+    <ThemeProvider defaultTheme="light" storageKey="promocerca-theme">
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <BrowserRouter>
+            <ErrorBoundary fallback={<div>Algo ha ido mal</div>}>
+              <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Cargando...</div>}>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/password-reset" element={<PasswordReset />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/nosotros" element={<Nosotros />} />
+                  <Route path="/contacto" element={<Contacto />} />
+                  <Route path="/admin/promotions" element={<Promotions />} />
+                  <Route path="/admin/mall/:id" element={<AdminMallProfile />} />
+                  <Route path="/admin/store/:id" element={<StoreProfile />} />
+                  <Route path="/mall/:id" element={<PublicMallProfile />} />
+                  <Route path="/store/:id" element={<PublicStoreProfile />} />
+                  <Route path="/mall-details/:id" element={<MallDetails />} />
+                  <Route path="/mall-management/:id" element={<MallManagement />} />
+                  <Route path="/allpromos" element={<AllPromos />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </ErrorBoundary>
+          </BrowserRouter>
+          <Toaster />
+          <UIToaster />
+        </SessionProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
+  )
 }
 
-export default App;
+export default App
