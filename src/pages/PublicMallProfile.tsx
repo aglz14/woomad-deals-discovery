@@ -1,3 +1,4 @@
+
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,20 +15,20 @@ import { SearchBar } from "@/components/search/SearchBar";
 
 export default function PublicMallProfile() {
   const { t } = useTranslation();
-  const { mallId } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: mall, isLoading: isLoadingMall, error: mallError } = useQuery({
-    queryKey: ["mall", mallId],
+    queryKey: ["mall", id],
     queryFn: async () => {
-      if (!mallId) throw new Error("No mall ID provided");
-      console.log("Fetching mall with ID:", mallId);
+      if (!id) throw new Error("No mall ID provided");
+      console.log("Fetching mall with ID:", id);
       const { data, error } = await supabase
         .from("shopping_malls")
         .select("*")
-        .eq("id", mallId)
+        .eq("id", id)
         .single();
 
       if (error) {
@@ -45,18 +46,18 @@ export default function PublicMallProfile() {
       return data;
     },
     retry: false,
-    enabled: !!mallId
+    enabled: !!id
   });
 
   const { data: stores, isLoading: isLoadingStores } = useQuery({
-    queryKey: ["mall-stores", mallId],
+    queryKey: ["mall-stores", id],
     queryFn: async () => {
-      if (!mallId) throw new Error("No mall ID provided");
-      console.log("Fetching stores for mall:", mallId);
+      if (!id) throw new Error("No mall ID provided");
+      console.log("Fetching stores for mall:", id);
       const { data, error } = await supabase
         .from("stores")
         .select("*")
-        .eq("mall_id", mallId);
+        .eq("mall_id", id);
 
       if (error) {
         console.error("Error fetching stores:", error);
@@ -64,7 +65,7 @@ export default function PublicMallProfile() {
       }
       return data;
     },
-    enabled: !!mallId && !!mall
+    enabled: !!id && !!mall
   });
 
   const categories = stores ? [...new Set(stores.map(store => store.category))].sort() : [];
