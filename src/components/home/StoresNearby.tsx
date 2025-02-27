@@ -1,21 +1,25 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { PublicStoreCard } from "@/components/mall/PublicStoreCard";
-import { Loader } from "lucide-react";
+import { Loader, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "@/hooks/use-location";
 
 interface StoresNearbyProps {
   searchTerm: string;
   selectedMallId: string;
 }
 
+const MAX_DISTANCE_KM = 10; // Show stores within 10km, same as malls
+
 export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
+  const { userLocation, calculateDistance } = useLocation();
 
   const { data: stores, isLoading } = useQuery({
     queryKey: ["stores-with-active-promotions"],
@@ -62,6 +66,20 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
       filtered = filtered.filter((store) => store.mall_id === selectedMallId);
     }
 
+    // Filter by distance if user location is available
+    if (userLocation) {
+      filtered = filtered.filter((store) => {
+        if (!store.mall?.latitude || !store.mall?.longitude) return false;
+        const distance = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          store.mall.latitude,
+          store.mall.longitude
+        );
+        return distance <= MAX_DISTANCE_KM;
+      });
+    }
+
     return filtered;
   };
 
@@ -88,8 +106,6 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
     );
   }
 
-  const currentItems = getCurrentPageItems();
-
   if (!stores?.length) {
     return (
       <div>
@@ -101,12 +117,18 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
     );
   }
 
+  const currentItems = getCurrentPageItems();
+
   if (currentItems.length === 0) {
     return (
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas con Promociones Activas</h2>
         <div className="text-center py-16 bg-gradient-to-b from-purple-50 to-white rounded-lg border border-purple-100">
-          <p className="text-gray-500">No se encontraron tiendas con promociones activas que coincidan con tu búsqueda.</p>
+          <p className="text-gray-500">
+            {userLocation 
+              ? "No hay tiendas con promociones activas en un radio de 10km"
+              : "Activa tu ubicación para ver tiendas cercanas con promociones activas"}
+          </p>
         </div>
       </div>
     );
@@ -114,7 +136,16 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-900">Tiendas con Promociones Activas</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Tiendas con Promociones Activas</h2>
+        {userLocation && (
+          <span className="text-sm text-gray-500 flex items-center gap-1">
+            <MapPin className="h-4 w-4" />
+            Radio de {MAX_DISTANCE_KM}km
+          </span>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((store) => (
           <PublicStoreCard 
