@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { useTranslation } from "react-i18next";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LocationMap } from "@/components/maps/LocationMap";
 
 interface HomeHeroProps {
   userLocation: { lat: number; lng: number; } | null;
@@ -21,9 +22,9 @@ export const HomeHero = ({ userLocation, onSearch, onMallSelect, malls, selected
   return (
     <div className="relative bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white overflow-hidden">
       <div className="absolute inset-0 bg-[url('/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png')] opacity-5 bg-center bg-no-repeat bg-contain"></div>
-      <div className="relative py-16 pt-24 lg:pt-32">
+      <div className="relative py-8 pt-24 lg:pt-28">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
+          <div className="max-w-5xl mx-auto text-center space-y-6">
             <div className="space-y-4 animate-fade-in">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
                 {userLocation ? t("nearMe") : t("deals")}
@@ -59,6 +60,10 @@ export const HomeHero = ({ userLocation, onSearch, onMallSelect, malls, selected
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="mt-8 animate-fade-up">
+              <LocationMap userLocation={userLocation} className="mt-6" />
             </div>
           </div>
         </div>
