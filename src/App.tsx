@@ -36,10 +36,10 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" storageKey="promocerca-theme">
-      <QueryClientProvider client={queryClient}>
-        <SessionProvider>
-          <BrowserRouter>
+    <BrowserRouter>
+      <ThemeProvider attribute="class" defaultTheme="light" storageKey="promocerca-theme">
+        <QueryClientProvider client={queryClient}>
+          <SessionProvider>
             <ErrorBoundary fallback={<div>Algo ha ido mal</div>}>
               <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Cargando...</div>}>
                 <Routes>
@@ -61,12 +61,12 @@ function App() {
                 </Routes>
               </Suspense>
             </ErrorBoundary>
-          </BrowserRouter>
-          <Toaster />
-          <UIToaster />
-        </SessionProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+            <Toaster />
+            <UIToaster />
+          </SessionProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   )
 }
 
