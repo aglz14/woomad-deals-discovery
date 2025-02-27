@@ -14,7 +14,7 @@ interface StoresNearbyProps {
   selectedMallId: string;
 }
 
-const FIXED_RADIUS_KM = 10;
+const FIXED_RADIUS_KM = 50;
 
 export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) {
   const navigate = useNavigate();
