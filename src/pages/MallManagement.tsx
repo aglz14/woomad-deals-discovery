@@ -62,7 +62,7 @@ export default function MallManagement() {
   }, [navigate]);
 
   const handleStoreClick = (storeId: string) => {
-    navigate(`/store/${storeId}/promotions`);
+    navigate(`/admin/store/${storeId}`);
   };
 
   const handleDeleteStore = async (storeId: string) => {

@@ -55,7 +55,7 @@ function App() {
                   <Route path="/mall/:id" element={<PublicMallProfile />} />
                   <Route path="/store/:id" element={<PublicStoreProfile />} />
                   <Route path="/mall-details/:id" element={<MallDetails />} />
-                  <Route path="/mall-management/:id" element={<MallManagement />} />
+                  <Route path="/mall-management/:mallId" element={<MallManagement />} />
                   <Route path="/allpromos" element={<AllPromos />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
