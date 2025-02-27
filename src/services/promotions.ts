@@ -8,40 +8,42 @@ const isValidPromotionType = (type: string): type is ValidPromotionType => {
 };
 
 export const getPromotions = async (userLocation: Location | null, calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number) => {
+  if (!userLocation) return [];
+
+  // First, get all malls within the radius
   const { data: malls, error: mallsError } = await supabase
     .from("shopping_malls")
     .select("*");
 
   if (mallsError) throw mallsError;
 
-  const sortedMalls = userLocation
-    ? malls.sort((a, b) => {
-        const distA = calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          a.latitude,
-          a.longitude
-        );
-        const distB = calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          b.latitude,
-          b.longitude
-        );
-        return distA - distB;
-      })
-    : malls;
+  // Filter malls by distance (10km radius)
+  const FIXED_RADIUS_KM = 10;
+  const nearbyMallIds = malls
+    .filter(mall => {
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        mall.latitude,
+        mall.longitude
+      );
+      return distance <= FIXED_RADIUS_KM;
+    })
+    .map(mall => mall.id);
 
+  if (nearbyMallIds.length === 0) return [];
+
+  // Get stores from nearby malls
   const { data: stores, error: storesError } = await supabase
     .from("stores")
-    .select("*")
-    .in(
-      "mall_id",
-      sortedMalls.map((m) => m.id)
-    );
+    .select("id")
+    .in("mall_id", nearbyMallIds);
 
   if (storesError) throw storesError;
 
+  if (stores.length === 0) return [];
+
+  // Get active promotions from nearby stores
   const { data: rawPromotions, error: promotionsError } = await supabase
     .from("promotions")
     .select(`
