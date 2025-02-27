@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,25 +9,23 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
 export default function PublicStoreProfile() {
-  const {
-    storeId
-  } = useParams<{
-    storeId: string;
-  }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
   const {
     data: store,
     isLoading: isStoreLoading,
     error: storeError
   } = useQuery({
-    queryKey: ["store", storeId],
+    queryKey: ["store", id],
     queryFn: async () => {
-      if (!storeId) throw new Error("No store ID provided");
+      if (!id) throw new Error("No store ID provided");
       const {
         data,
         error
-      } = await supabase.from("stores").select("*, mall:shopping_malls(*)").eq("id", storeId).maybeSingle();
+      } = await supabase.from("stores").select("*, mall:shopping_malls(*)").eq("id", id).maybeSingle();
       if (error) {
         toast.error("Error al cargar la tienda");
         throw error;
@@ -38,19 +37,20 @@ export default function PublicStoreProfile() {
       return data;
     },
     retry: false,
-    enabled: !!storeId
+    enabled: !!id
   });
+  
   const {
     data: promotions,
     isLoading: isPromotionsLoading
   } = useQuery({
-    queryKey: ["promotions", storeId],
+    queryKey: ["promotions", id],
     queryFn: async () => {
-      if (!storeId) throw new Error("No store ID provided");
+      if (!id) throw new Error("No store ID provided");
       const {
         data,
         error
-      } = await supabase.from("promotions").select("*").eq("store_id", storeId).gte("end_date", new Date().toISOString()).order("start_date", {
+      } = await supabase.from("promotions").select("*").eq("store_id", id).gte("end_date", new Date().toISOString()).order("start_date", {
         ascending: true
       });
       if (error) {
@@ -59,18 +59,21 @@ export default function PublicStoreProfile() {
       }
       return data;
     },
-    enabled: !!storeId && !!store
+    enabled: !!id && !!store
   });
+  
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
     promotion: 'bg-purple-100 text-purple-800',
     sale: 'bg-red-100 text-red-800'
   };
+  
   const typeLabels = {
     coupon: 'Cupón',
     promotion: 'Promoción',
     sale: 'Oferta'
   };
+  
   if (isStoreLoading || isPromotionsLoading) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -84,6 +87,7 @@ export default function PublicStoreProfile() {
         <Footer />
       </div>;
   }
+  
   if (storeError || !store) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -102,6 +106,7 @@ export default function PublicStoreProfile() {
         <Footer />
       </div>;
   }
+  
   return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       <main className="flex-grow pt-16">
