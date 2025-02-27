@@ -105,9 +105,6 @@ export default function AllPromos() {
               {t("backToHome") || "Volver al inicio"}
             </Link>
             <h1 className="text-3xl sm:text-4xl font-bold mt-4 mb-6">Todas las Promociones</h1>
-            <p className="text-gray-600 max-w-3xl">
-              {t("allPromotionsDesc") || "Explora todas las promociones disponibles en nuestra plataforma sin limitaciones de distancia."}
-            </p>
           </div>
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
