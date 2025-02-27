@@ -33,28 +33,49 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: userLocation ? [userLocation.lng, userLocation.lat] : [-99.1332, 19.4326], // Default to Mexico City if no user location
-      zoom: userLocation ? 12 : 5
-    });
+    // Wait for styles to be loaded
+    const initializeMap = () => {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current!,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: userLocation ? [userLocation.lng, userLocation.lat] : [-99.1332, 19.4326], // Default to Mexico City if no user location
+        zoom: userLocation ? 12 : 5,
+        attributionControl: false
+      });
 
-    // Add navigation controls
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      // Add navigation controls
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-    // Add user location control
-    map.current.addControl(new mapboxgl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true
-      },
-      trackUserLocation: true,
-      showUserHeading: true
-    }));
+      // Add user location control
+      map.current.addControl(new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserHeading: true
+      }));
+
+      // Add attribution control
+      map.current.addControl(new mapboxgl.AttributionControl(), 'bottom-right');
+
+      // Wait for map to load before doing anything else
+      map.current.on('load', () => {
+        console.log('Map loaded successfully');
+      });
+
+      // Handle any errors
+      map.current.on('error', (e) => {
+        console.error('Map error:', e);
+      });
+    };
+
+    initializeMap();
 
     return () => {
-      map.current?.remove();
-      map.current = null;
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
     };
   }, [userLocation]);
 
@@ -96,7 +117,7 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
 
       markersRef.current.push(marker);
     });
-  }, [malls, map.current]);
+  }, [malls]);
 
   return (
     <div ref={mapContainer} className={`w-full h-[400px] rounded-lg shadow-lg ${className}`} />
