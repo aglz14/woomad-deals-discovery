@@ -1,11 +1,13 @@
+
 import { MallCard } from "@/components/mall/MallCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Building2, MapPin } from "lucide-react";
+import { Building2, MapPin, AlertCircle, Loader } from "lucide-react";
 import { useState } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useLocation } from "@/hooks/use-location";
+import { EmptyStateDisplay } from "@/components/EmptyStateDisplay";
 
 interface MallsNearbyProps {
   searchTerm: string;
@@ -72,7 +74,8 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <Loader className="w-8 h-8 animate-spin text-purple-500" />
         <p className="text-gray-500">Cargando centros comerciales...</p>
       </div>
     );
@@ -80,14 +83,15 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
 
   if (!filteredMalls?.length) {
     return (
-      <div className="text-center py-12 bg-gray-50 rounded-lg">
-        <Building2 className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-4 text-lg font-semibold text-gray-900">No se encontraron centros comerciales cercanos</h3>
-        <p className="mt-2 text-gray-500">
-          {userLocation 
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Centros Comerciales Cercanos</h2>
+        <EmptyStateDisplay
+          title="No se encontraron centros comerciales cercanos"
+          message={userLocation 
             ? "No hay centros comerciales en un radio de 50km"
             : "Activa tu ubicación para ver centros comerciales cercanos"}
-        </p>
+          icon={Building2}
+        />
       </div>
     );
   }

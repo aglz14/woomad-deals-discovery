@@ -1,13 +1,13 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { MapPin } from "lucide-react";
+import { MapPin, AlertCircle, Loader } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "@/hooks/use-location";
 import { StoresGrid } from "./StoresGrid";
-import { StoresStateDisplay } from "./StoresStateDisplay";
+import { EmptyStateDisplay } from "@/components/EmptyStateDisplay";
 
 interface StoresNearbyProps {
   searchTerm: string;
@@ -113,15 +113,40 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
   const currentItems = getCurrentPageItems();
 
-  if (isLoading || !stores?.length || currentItems.length === 0) {
+  if (isLoading) {
     return (
-      <StoresStateDisplay
-        isLoading={isLoading}
-        isEmpty={!stores?.length}
-        noResults={stores?.length > 0 && currentItems.length === 0}
-        searchRadius={FIXED_RADIUS_KM}
-        hasLocation={!!userLocation}
-      />
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <Loader className="w-8 h-8 animate-spin text-purple-500" />
+        <p className="text-gray-500">Cargando tiendas cercanas...</p>
+      </div>
+    );
+  }
+
+  if (!stores?.length) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas con Promociones Activas</h2>
+        <EmptyStateDisplay
+          title="No hay tiendas con promociones activas"
+          message={userLocation 
+            ? "No hay tiendas con promociones activas en este momento."
+            : "Activa tu ubicación para ver tiendas cercanas con promociones activas"}
+          icon={AlertCircle}
+        />
+      </div>
+    );
+  }
+
+  if (currentItems.length === 0) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas con Promociones Activas</h2>
+        <EmptyStateDisplay
+          title="No se encontraron resultados"
+          message="Intenta ajustar tu búsqueda o filtros para encontrar tiendas"
+          icon={AlertCircle}
+        />
+      </div>
     );
   }
 

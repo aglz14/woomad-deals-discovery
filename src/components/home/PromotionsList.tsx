@@ -1,9 +1,11 @@
+
 import { Loader } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { DatabasePromotion } from "@/types/promotion";
 import { useTranslation } from "react-i18next";
-import { MapPin } from "lucide-react";
+import { MapPin, AlertCircle } from "lucide-react";
+import { EmptyStateDisplay } from "@/components/EmptyStateDisplay";
 
 interface PromotionsListProps {
   isLoading: boolean;
@@ -40,14 +42,11 @@ export const PromotionsList = ({
     return (
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
-        <div className="text-center py-16 bg-gradient-to-b from-purple-50 to-white rounded-lg border border-purple-100 shadow-sm">
-          <div className="max-w-md mx-auto space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900">{t('noActivePromotions')}</h2>
-            <p className="text-gray-500">
-              {t('checkBackLater')}
-            </p>
-          </div>
-        </div>
+        <EmptyStateDisplay
+          title={t('noActivePromotions') || "No hay promociones activas"}
+          message={t('checkBackLater') || "Vuelve más tarde para descubrir nuevas ofertas"}
+          icon={AlertCircle}
+        />
       </div>
     );
   }
@@ -56,14 +55,11 @@ export const PromotionsList = ({
     return (
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
-        <div className="text-center py-16 bg-gradient-to-b from-purple-50 to-white rounded-lg border border-purple-100 shadow-sm">
-          <div className="max-w-md mx-auto space-y-4">
-            <h2 className="text-xl font-semibold text-gray-900">{t('noMatchesFound')}</h2>
-            <p className="text-gray-500">
-              {t('tryAdjustingSearch')}
-            </p>
-          </div>
-        </div>
+        <EmptyStateDisplay
+          title={t('noMatchesFound') || "No se encontraron resultados"}
+          message={t('tryAdjustingSearch') || "Intenta ajustar tu búsqueda o filtros para encontrar promociones"}
+          icon={AlertCircle}
+        />
       </div>
     );
   }
