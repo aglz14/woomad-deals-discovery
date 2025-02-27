@@ -61,7 +61,7 @@ export const Footer = () => {
             <ul className="space-y-4">
               <li>
                 <a 
-                  href="https://www.instagram.com/woomad.shopping/" 
+                  href="https://www.instagram.com/woomad.commerce/" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-gray-600 hover:text-purple-600 transition-colors inline-flex items-center gap-2 group"
