@@ -4,7 +4,7 @@ import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { DatabasePromotion } from "@/types/promotion";
 import { useTranslation } from "react-i18next";
-import { MapPin, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { EmptyStateDisplay } from "@/components/EmptyStateDisplay";
 
 interface PromotionsListProps {
@@ -27,7 +27,6 @@ export const PromotionsList = ({
   searchTerm 
 }: PromotionsListProps) => {
   const { t } = useTranslation();
-  const FIXED_RADIUS_KM = 50;
 
   if (isLoading) {
     return (
@@ -41,7 +40,7 @@ export const PromotionsList = ({
   if (!promotions?.length) {
     return (
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones</h2>
         <EmptyStateDisplay
           title={t('noActivePromotions') || "No hay promociones activas"}
           message={t('checkBackLater') || "Vuelve más tarde para descubrir nuevas ofertas"}
@@ -54,7 +53,7 @@ export const PromotionsList = ({
   if (currentItems.length === 0) {
     return (
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones Cercanas</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Promociones</h2>
         <EmptyStateDisplay
           title={t('noMatchesFound') || "No se encontraron resultados"}
           message={t('tryAdjustingSearch') || "Intenta ajustar tu búsqueda o filtros para encontrar promociones"}
@@ -67,11 +66,7 @@ export const PromotionsList = ({
   return (
     <div className="space-y-8 animate-fade-up">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Promociones Cercanas</h2>
-        <span className="text-sm text-gray-500 flex items-center gap-1">
-          <MapPin className="h-4 w-4" />
-          Radio de {FIXED_RADIUS_KM}km
-        </span>
+        <h2 className="text-2xl font-bold text-gray-900">Promociones</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
