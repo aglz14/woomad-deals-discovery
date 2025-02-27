@@ -32,7 +32,7 @@ export const SearchBar = ({ onSearch, placeholder, initialValue = '', className 
 
   return (
     <form onSubmit={handleSubmit} className={`relative w-full group ${className || ''}`}>
-      <div className="relative transform transition-transform duration-300 group-hover:scale-[1.02]">
+      <div className="relative transform transition-transform duration-300 group-hover:scale-[1.02] w-full">
         <Input
           type="text"
           value={searchTerm}
