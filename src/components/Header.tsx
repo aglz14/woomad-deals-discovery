@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "./providers/SessionProvider";
@@ -48,7 +49,7 @@ export const Header = () => {
                     <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56 bg-white shadow-lg z-50" align="end">
-                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/promotions")}>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/allpromos")}>
                       <Star className="mr-2 h-4 w-4" />
                       <span>Promociones</span>
                     </DropdownMenuItem>
