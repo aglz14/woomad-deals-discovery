@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +5,6 @@ import { useState } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "@/hooks/use-location";
-import { RadiusSlider } from "./RadiusSlider";
 import { StoresGrid } from "./StoresGrid";
 import { StoresStateDisplay } from "./StoresStateDisplay";
 
@@ -15,14 +13,11 @@ interface StoresNearbyProps {
   selectedMallId: string;
 }
 
-const MIN_DISTANCE_KM = 1;
-const MAX_DISTANCE_KM = 50;
-const DEFAULT_DISTANCE_KM = 10;
+const FIXED_RADIUS_KM = 10;
 
 export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchRadius, setSearchRadius] = useState(DEFAULT_DISTANCE_KM);
   const ITEMS_PER_PAGE = 9;
   const { userLocation, calculateDistance } = useLocation();
 
@@ -78,7 +73,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
           store.mall.latitude,
           store.mall.longitude
         );
-        return distance <= searchRadius;
+        return distance <= FIXED_RADIUS_KM;
       });
     }
 
@@ -99,11 +94,6 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
     navigate(`/store/${storeId}`);
   };
 
-  const handleRadiusChange = (value: number[]) => {
-    setSearchRadius(value[0]);
-    setCurrentPage(1);
-  };
-
   const currentItems = getCurrentPageItems();
 
   if (isLoading || !stores?.length || currentItems.length === 0) {
@@ -112,7 +102,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
         isLoading={isLoading}
         isEmpty={!stores?.length}
         noResults={stores?.length > 0 && currentItems.length === 0}
-        searchRadius={searchRadius}
+        searchRadius={FIXED_RADIUS_KM}
         hasLocation={!!userLocation}
       />
     );
@@ -125,19 +115,10 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
         {userLocation && (
           <span className="text-sm text-gray-500 flex items-center gap-1">
             <MapPin className="h-4 w-4" />
-            Radio de {searchRadius}km
+            Radio de {FIXED_RADIUS_KM}km
           </span>
         )}
       </div>
-
-      {userLocation && (
-        <RadiusSlider
-          searchRadius={searchRadius}
-          onRadiusChange={handleRadiusChange}
-          minDistance={MIN_DISTANCE_KM}
-          maxDistance={MAX_DISTANCE_KM}
-        />
-      )}
 
       <StoresGrid 
         stores={currentItems}

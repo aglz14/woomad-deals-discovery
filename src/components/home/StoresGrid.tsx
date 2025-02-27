@@ -4,6 +4,9 @@ import { PublicStoreCard } from "@/components/mall/PublicStoreCard";
 interface Store {
   id: string;
   name: string;
+  category: string;
+  mall_id: string;
+  user_id: string;
   mall?: {
     id: string;
     name: string;
