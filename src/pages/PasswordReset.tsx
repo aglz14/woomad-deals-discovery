@@ -17,22 +17,34 @@ export default function PasswordReset() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const fragment = location.hash;
-      
       // Clear any existing session first to avoid conflicts
       await supabase.auth.signOut();
 
-      if (!fragment) {
-        navigate("/");
-        return;
+      // Check both hash and search parameters
+      const fragment = location.hash;
+      const search = location.search;
+      
+      let accessToken = null;
+      let type = null;
+
+      // Check hash parameters first (old format)
+      if (fragment) {
+        const hashParams = new URLSearchParams(fragment.substring(1));
+        accessToken = hashParams.get('access_token');
+        type = hashParams.get('type');
       }
 
-      const params = new URLSearchParams(fragment.substring(1));
-      const accessToken = params.get('access_token');
-      const type = params.get('type');
-      
+      // If not in hash, check search parameters (new format)
+      if (!accessToken && search) {
+        const searchParams = new URLSearchParams(search);
+        accessToken = searchParams.get('access_token');
+        type = searchParams.get('type');
+      }
+
+      // If no token found in either location, show error
       if (!accessToken) {
-        toast.error("Token no válido");
+        console.error('No access token found in URL');
+        toast.error("Token no válido o expirado");
         navigate("/");
         return;
       }
@@ -48,14 +60,18 @@ export default function PasswordReset() {
         if (type === 'recovery') {
           // Show password reset form
           setShowResetForm(true);
-        } else {
-          // Handle email confirmation or other auth callbacks
+        } else if (type === 'signup' || type === 'magiclink') {
+          // Handle email confirmation or magic link
           if (session) {
             toast.success("Autenticación exitosa");
             navigate("/");
           } else {
             throw new Error("No se pudo establecer la sesión");
           }
+        } else {
+          console.error('Unknown auth callback type:', type);
+          toast.error("Tipo de autenticación no válido");
+          navigate("/");
         }
       } catch (error: any) {
         console.error('Error handling auth callback:', error);
@@ -103,7 +119,8 @@ export default function PasswordReset() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p>Procesando autenticación...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Procesando autenticación...</p>
         </div>
       </div>
     );
