@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -111,7 +110,6 @@ export default function AllPromos() {
             <div className="w-full md:w-1/2 lg:w-2/3 mb-4 md:mb-0">
               <SearchBar 
                 onSearch={handleSearch} 
-                placeholder={t("searchAllPromotions") || "Buscar en todas las promociones disponibles"}
                 className="w-full"
               />
             </div>
