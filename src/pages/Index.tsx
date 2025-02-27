@@ -90,9 +90,9 @@ export default function Index() {
           userLocation={userLocation}
         />
 
-        <div className="container mx-auto px-4 py-12 space-y-16">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-            <div className="w-full md:w-1/2 lg:w-2/3">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12 space-y-8 sm:space-y-12 md:space-y-16">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 sm:mb-6">
+            <div className="w-full md:w-1/2 lg:w-2/3 mb-4 md:mb-0">
               <SearchBar 
                 onSearch={handleSearch} 
                 placeholder="Busca ofertas, tiendas y centros comerciales a 50 km"
@@ -101,7 +101,7 @@ export default function Index() {
             </div>
             <div className="w-full md:w-1/2 lg:w-1/3 md:max-w-xs">
               <Select value={selectedMallId} onValueChange={handleMallFilter}>
-                <SelectTrigger className="border-2 border-purple-100">
+                <SelectTrigger className="border-2 border-purple-100 w-full">
                   <SelectValue placeholder={t("selectMall") || "Select a Mall"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -119,8 +119,8 @@ export default function Index() {
           </div>
           
           <ErrorBoundary>
-            <div className="space-y-16 animate-fade-in">
-              <section className="rounded-2xl bg-white p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="space-y-8 sm:space-y-12 md:space-y-16 animate-fade-in">
+              <section className="rounded-2xl bg-white p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <PromotionsList
                   isLoading={isLoading}
                   promotions={promotions}
@@ -132,14 +132,14 @@ export default function Index() {
                 />
               </section>
 
-              <section className="rounded-2xl bg-gradient-to-r from-purple-50 to-blue-50 p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <section className="rounded-2xl bg-gradient-to-r from-purple-50 to-blue-50 p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <StoresNearby 
                   searchTerm={searchTerm}
                   selectedMallId={selectedMallId}
                 />
               </section>
 
-              <section className="rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <section className="rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <MallsNearby 
                   searchTerm={searchTerm}
                   selectedMallId={selectedMallId}
