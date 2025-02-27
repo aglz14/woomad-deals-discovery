@@ -167,34 +167,36 @@ export default function PublicMallProfile() {
             </div>
 
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <h2 className="text-2xl font-semibold text-gray-900">
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                   Tiendas Disponibles ({filteredStores.length})
                 </h2>
-                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-w-[280px] max-w-[600px]">
-                  <SearchBar 
-                    onSearch={setSearchTerm}
-                    placeholder="Buscar por nombre, descripción o ubicación..."
-                    initialValue={searchTerm}
-                  />
-                  <Select
-                    value={selectedCategory}
-                    onValueChange={setSelectedCategory}
-                  >
-                    <SelectTrigger className="w-full sm:w-[240px] min-w-[240px] h-10">
-                      <SelectValue placeholder="Filtrar por categoría" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      <SelectItem value="all" className="py-2.5">Todas las categorías</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category} className="py-2.5">
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-w-[280px] max-w-[600px]">
+                <SearchBar 
+                  onSearch={setSearchTerm}
+                  placeholder="Buscar por nombre, descripción o ubicación..."
+                  initialValue={searchTerm}
+                />
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="w-full sm:w-[240px] min-w-[240px] h-10">
+                    <SelectValue placeholder="Filtrar por categoría" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="all" className="py-2.5">Todas las categorías</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category} className="py-2.5">
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <StoresList stores={filteredStores} />
             </div>
           </div>
