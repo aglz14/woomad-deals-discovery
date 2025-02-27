@@ -1,4 +1,3 @@
-
 import { Loader } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -26,7 +25,7 @@ export const PromotionsList = ({
   searchTerm 
 }: PromotionsListProps) => {
   const { t } = useTranslation();
-  const FIXED_RADIUS_KM = 10;
+  const FIXED_RADIUS_KM = 50;
 
   if (isLoading) {
     return (

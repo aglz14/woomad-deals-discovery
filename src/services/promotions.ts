@@ -17,8 +17,8 @@ export const getPromotions = async (userLocation: Location | null, calculateDist
 
   if (mallsError) throw mallsError;
 
-  // Filter malls by distance (10km radius)
-  const FIXED_RADIUS_KM = 10;
+  // Filter malls by distance (50km radius)
+  const FIXED_RADIUS_KM = 50;
   const nearbyMallIds = malls
     .filter(mall => {
       const distance = calculateDistance(

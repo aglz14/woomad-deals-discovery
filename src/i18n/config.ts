@@ -8,7 +8,7 @@ const resources = {
     translation: {
       "deals": "Encuentra las mejores ofertas cerca de ti",
       "nearMe": "Ofertas Cerca de Mí",
-      "searchPlaceholder": "Busca tiendas, centros comerciales y ofertas a 10 km",
+      "searchPlaceholder": "Busca tiendas, centros comerciales y ofertas a 50 km",
       "address": "Dirección",
       "storeName": "Nombre de la Tienda",
       "description": "Descripción",

@@ -1,4 +1,3 @@
-
 import { MallCard } from "@/components/mall/MallCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +12,7 @@ interface MallsNearbyProps {
   selectedMallId: string;
 }
 
-const MAX_DISTANCE_KM = 10; // Show malls within 10km
+const MAX_DISTANCE_KM = 50; // Show malls within 50km
 
 export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) => {
   const navigate = useNavigate();
@@ -86,7 +85,7 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
         <h3 className="mt-4 text-lg font-semibold text-gray-900">No se encontraron centros comerciales cercanos</h3>
         <p className="mt-2 text-gray-500">
           {userLocation 
-            ? "No hay centros comerciales en un radio de 10km"
+            ? "No hay centros comerciales en un radio de 50km"
             : "Activa tu ubicación para ver centros comerciales cercanos"}
         </p>
       </div>
