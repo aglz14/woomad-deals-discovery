@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useSession } from "./providers/SessionProvider";
 import { AuthModal } from "./auth/AuthModal";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronDown, LogOut, Star, User } from "lucide-react";
+import { ChevronDown, LogOut, Plus, Star, User } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -52,6 +52,10 @@ export const Header = () => {
                     <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/allpromos")}>
                       <Star className="mr-2 h-4 w-4" />
                       <span>Promociones</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/admin/promotions")}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      <span>Crear Promoción</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
