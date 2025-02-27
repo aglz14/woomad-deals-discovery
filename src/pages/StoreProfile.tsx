@@ -24,20 +24,20 @@ const isValidPromotionType = (type: string): type is ValidPromotionType => {
 };
 
 export default function StoreProfile() {
-  const { storeId } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { session } = useSession();
   const [promotionToEdit, setPromotionToEdit] = useState<DatabasePromotion | null>(null);
   const [isAddingPromotion, setIsAddingPromotion] = useState(false);
 
   const { data: store, isLoading: isStoreLoading } = useQuery({
-    queryKey: ["store", storeId],
+    queryKey: ["store", id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("stores")
-        .select("*")
-        .eq("id", storeId)
-        .single();
+        .select("*, mall:shopping_malls(id, name, latitude, longitude, address)")
+        .eq("id", id)
+        .maybeSingle();
       if (error) {
         toast.error("Failed to fetch store details");
         throw error;
@@ -47,7 +47,7 @@ export default function StoreProfile() {
   });
 
   const { data: promotions, isLoading: isPromotionsLoading, refetch: refetchPromotions } = useQuery({
-    queryKey: ["promotions", storeId],
+    queryKey: ["promotions", id],
     queryFn: async () => {
       const { data: rawData, error } = await supabase
         .from("promotions")
@@ -64,7 +64,7 @@ export default function StoreProfile() {
             )
           )
         `)
-        .eq("store_id", storeId)
+        .eq("store_id", id)
         .order("start_date", { ascending: true });
       
       if (error) {
@@ -145,7 +145,7 @@ export default function StoreProfile() {
                             refetchPromotions();
                           }}
                           onCancel={() => setIsAddingPromotion(false)}
-                          preselectedStoreId={storeId}
+                          preselectedStoreId={id}
                         />
                       </DialogContent>
                     </Dialog>
