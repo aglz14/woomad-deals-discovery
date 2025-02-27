@@ -13,6 +13,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
+import { SearchBar } from "@/components/search/SearchBar";
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,13 +87,19 @@ export default function Index() {
       
       <main className="flex-grow pt-16">
         <HomeHero 
-          userLocation={userLocation} 
-          onSearch={handleSearch}
+          userLocation={userLocation}
         />
 
         <div className="container mx-auto px-4 py-12 space-y-16">
-          <div className="flex justify-end mb-6">
-            <div className="max-w-xs w-full">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+            <div className="w-full md:w-1/2 lg:w-2/3">
+              <SearchBar 
+                onSearch={handleSearch} 
+                placeholder={t("searchPromotionsAndStores") || "Buscar promociones y tiendas..."} 
+                className="w-full"
+              />
+            </div>
+            <div className="w-full md:w-1/2 lg:w-1/3 md:max-w-xs">
               <Select value={selectedMallId} onValueChange={handleMallFilter}>
                 <SelectTrigger className="border-2 border-purple-100">
                   <SelectValue placeholder={t("selectMall") || "Select a Mall"} />

@@ -1,21 +1,14 @@
 
 import { MapPin } from "lucide-react";
-import { SearchBar } from "@/components/search/SearchBar";
 import { useTranslation } from "react-i18next";
 import { LocationMap } from "@/components/maps/LocationMap";
 
 interface HomeHeroProps {
   userLocation: { lat: number; lng: number; } | null;
   onSearch: (term: string) => void;
-  onMallSelect?: (mallId: string) => void;
-  malls?: Array<{
-    id: string;
-    name: string;
-  }>;
-  selectedMallId?: string;
 }
 
-export const HomeHero = ({ userLocation, onSearch }: HomeHeroProps) => {
+export const HomeHero = ({ userLocation }: HomeHeroProps) => {
   const { t } = useTranslation();
   
   return (
@@ -37,10 +30,6 @@ export const HomeHero = ({ userLocation, onSearch }: HomeHeroProps) => {
                   <span>{t("nearMe")}</span>
                 </div>
               )}
-            </div>
-            
-            <div className="mt-8 space-y-4 animate-fade-up">
-              <SearchBar onSearch={onSearch} />
             </div>
 
             <div className="mt-8 animate-fade-up">
