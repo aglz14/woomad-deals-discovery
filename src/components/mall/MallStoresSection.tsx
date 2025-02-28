@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Plus, Search, Filter, Trash2, Pencil, X } from "lucide-react";
+import { Plus, Search, Filter, Trash2, Pencil, X, MapPin, Phone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -52,16 +51,16 @@ export const MallStoresSection = ({
 }: MallStoresSectionProps) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const categories = [...new Set(stores.map(store => store.category))].sort();
-  
+
   const filteredStores = stores.filter(store => {
     const matchesCategory = selectedCategory === "all" ? true : store.category === selectedCategory;
     const matchesSearch = searchTerm.trim() === "" ? true : 
       store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (store.description || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (store.location_in_mall || "").toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesCategory && matchesSearch;
   });
 
@@ -96,7 +95,7 @@ export const MallStoresSection = ({
             </Button>
           )}
         </div>
-        
+
         <div className="w-full md:w-1/2 flex items-center gap-2">
           <Filter className="text-gray-500 h-4 w-4" />
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
@@ -137,81 +136,74 @@ export const MallStoresSection = ({
               className="overflow-hidden transition-all hover:shadow-md cursor-pointer group"
               onClick={() => onStoreClick(store.id)}
             >
-              <CardContent className="p-0">
-                <div className="p-4 flex flex-col h-full">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1 mr-2">
-                      <h3 className="font-medium text-lg text-gray-900 line-clamp-1">{store.name}</h3>
-                      <Badge variant="outline" className="mt-1">{store.category}</Badge>
-                    </div>
-                    
-                    <div className="flex gap-1">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onEditStore(store.id);
-                              }}
-                            >
-                              <Pencil className="h-4 w-4 text-purple-600" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Editar</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDeleteStore(store.id);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Eliminar</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1 mr-2">
+                    <h3 className="font-medium text-lg text-gray-900 line-clamp-1">{store.name}</h3>
+                    <Badge variant="outline" className="mt-1">{store.category}</Badge>
                   </div>
-                  
-                  {store.logo_url ? (
-                    <div className="w-full h-32 bg-gray-100 rounded-md mb-3 overflow-hidden">
-                      <img 
-                        src={store.logo_url} 
-                        alt={`${store.name} logo`} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-full h-32 flex items-center justify-center bg-gray-100 rounded-md mb-3">
-                      <span className="text-gray-400 text-sm">No logo</span>
+
+                  <div className="flex gap-1">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditStore(store.id);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4 text-purple-600" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Editar</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteStore(store.id);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Eliminar</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+
+                <p className="text-gray-600 text-sm line-clamp-2 mt-3 mb-4 flex-grow">
+                  {store.description || "No description available"}
+                </p>
+
+                <div className="mt-auto space-y-1.5">
+                  {store.location_in_mall && (
+                    <div className="flex items-center text-xs text-gray-500">
+                      <MapPin className="h-3.5 w-3.5 mr-1.5 text-purple-500" />
+                      <span className="line-clamp-1">{store.location_in_mall}</span>
                     </div>
                   )}
-                  
-                  <p className="text-gray-500 text-sm line-clamp-2 mb-3">
-                    {store.description || "No description available"}
-                  </p>
-                  
-                  {store.location_in_mall && (
-                    <p className="text-xs text-gray-400 mt-auto">
-                      <span className="font-medium">Ubicación:</span> {store.location_in_mall}
-                    </p>
+                  {store.contact_number && (
+                    <div className="flex items-center text-xs text-gray-500">
+                      <Phone className="h-3.5 w-3.5 mr-1.5 text-purple-500" />
+                      <span>{store.contact_number}</span>
+                    </div>
                   )}
                 </div>
               </CardContent>
@@ -219,7 +211,7 @@ export const MallStoresSection = ({
           ))}
         </div>
       )}
-      
+
       <div className="flex justify-between items-center pt-4">
         <p className="text-sm text-gray-500">
           Mostrando {filteredStores.length} de {stores.length} tiendas
