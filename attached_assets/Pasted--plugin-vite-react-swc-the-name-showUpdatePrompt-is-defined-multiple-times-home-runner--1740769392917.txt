@@ -1,0 +1,279 @@
+[plugin:vite:react-swc] × the name `showUpdatePrompt` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/PWAInstallPrompt.tsx:15:1]
+ 12 │ export function PWAInstallPrompt() {
+ 13 │   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+ 14 │   const [isInstalled, setIsInstalled] = useState(false);
+ 15 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+    ·          ────────┬───────
+    ·                  ╰── previous definition of `showUpdatePrompt` here
+ 16 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+ 17 │   
+ 18 │   // Register and set up the service worker
+ 19 │   const {
+ 20 │     needRefresh,
+ 21 │     updateServiceWorker,
+ 22 │   } = useRegisterSW({
+ 23 │     onRegistered(r) {
+ 24 │       console.log('Service worker registered:', r);
+ 25 │     },
+ 26 │     onRegisterError(error) {
+ 27 │       console.error('Service worker registration error:', error);
+ 28 │     },
+ 29 │     immediate: true,
+ 30 │     // This parameter will help avoid unnecessary update prompts
+ 31 │     skipWaiting: false
+ 32 │   });
+ 33 │ 
+ 34 │   useEffect(() => {
+ 35 │     // Check if already installed
+ 36 │     if (window.matchMedia('(display-mode: standalone)').matches) {
+ 37 │       setIsInstalled(true);
+ 38 │       return;
+ 39 │     }
+ 40 │ 
+ 41 │     // Store the install prompt event for later use
+ 42 │     const handleBeforeInstallPrompt = (e: Event) => {
+ 43 │       e.preventDefault();
+ 44 │       setInstallPrompt(e as BeforeInstallPromptEvent);
+ 45 │     };
+ 46 │ 
+ 47 │     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 48 │     
+ 49 │     return () => {
+ 50 │       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 51 │     };
+ 52 │   }, []);
+ 53 │ 
+ 54 │   const handleInstallClick = async () => {
+ 55 │     if (!installPrompt) return;
+ 56 │     
+ 57 │     await installPrompt.prompt();
+ 58 │     const choiceResult = await installPrompt.userChoice;
+ 59 │     
+ 60 │     if (choiceResult.outcome === 'accepted') {
+ 61 │       console.log('User accepted the install prompt');
+ 62 │       setIsInstalled(true);
+ 63 │     }
+ 64 │     
+ 65 │     setInstallPrompt(null);
+ 66 │   };
+ 67 │ 
+ 68 │   // Only show update prompt if there's an actual update
+ 69 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+    ·          ────────┬───────
+    ·                  ╰── `showUpdatePrompt` redefined here
+ 70 │   
+ 71 │   // Track if we've already shown this update prompt
+ 72 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+    ╰────
+  × the name `setShowUpdatePrompt` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/PWAInstallPrompt.tsx:15:1]
+ 12 │ export function PWAInstallPrompt() {
+ 13 │   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+ 14 │   const [isInstalled, setIsInstalled] = useState(false);
+ 15 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+    ·                            ─────────┬─────────
+    ·                                     ╰── previous definition of `setShowUpdatePrompt` here
+ 16 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+ 17 │   
+ 18 │   // Register and set up the service worker
+ 19 │   const {
+ 20 │     needRefresh,
+ 21 │     updateServiceWorker,
+ 22 │   } = useRegisterSW({
+ 23 │     onRegistered(r) {
+ 24 │       console.log('Service worker registered:', r);
+ 25 │     },
+ 26 │     onRegisterError(error) {
+ 27 │       console.error('Service worker registration error:', error);
+ 28 │     },
+ 29 │     immediate: true,
+ 30 │     // This parameter will help avoid unnecessary update prompts
+ 31 │     skipWaiting: false
+ 32 │   });
+ 33 │ 
+ 34 │   useEffect(() => {
+ 35 │     // Check if already installed
+ 36 │     if (window.matchMedia('(display-mode: standalone)').matches) {
+ 37 │       setIsInstalled(true);
+ 38 │       return;
+ 39 │     }
+ 40 │ 
+ 41 │     // Store the install prompt event for later use
+ 42 │     const handleBeforeInstallPrompt = (e: Event) => {
+ 43 │       e.preventDefault();
+ 44 │       setInstallPrompt(e as BeforeInstallPromptEvent);
+ 45 │     };
+ 46 │ 
+ 47 │     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 48 │     
+ 49 │     return () => {
+ 50 │       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 51 │     };
+ 52 │   }, []);
+ 53 │ 
+ 54 │   const handleInstallClick = async () => {
+ 55 │     if (!installPrompt) return;
+ 56 │     
+ 57 │     await installPrompt.prompt();
+ 58 │     const choiceResult = await installPrompt.userChoice;
+ 59 │     
+ 60 │     if (choiceResult.outcome === 'accepted') {
+ 61 │       console.log('User accepted the install prompt');
+ 62 │       setIsInstalled(true);
+ 63 │     }
+ 64 │     
+ 65 │     setInstallPrompt(null);
+ 66 │   };
+ 67 │ 
+ 68 │   // Only show update prompt if there's an actual update
+ 69 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+    ·                            ─────────┬─────────
+    ·                                     ╰── `setShowUpdatePrompt` redefined here
+ 70 │   
+ 71 │   // Track if we've already shown this update prompt
+ 72 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+    ╰────
+  × the name `hasAttemptedUpdate` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/PWAInstallPrompt.tsx:16:1]
+ 13 │   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+ 14 │   const [isInstalled, setIsInstalled] = useState(false);
+ 15 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+ 16 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+    ·          ─────────┬────────
+    ·                   ╰── previous definition of `hasAttemptedUpdate` here
+ 17 │   
+ 18 │   // Register and set up the service worker
+ 19 │   const {
+ 20 │     needRefresh,
+ 21 │     updateServiceWorker,
+ 22 │   } = useRegisterSW({
+ 23 │     onRegistered(r) {
+ 24 │       console.log('Service worker registered:', r);
+ 25 │     },
+ 26 │     onRegisterError(error) {
+ 27 │       console.error('Service worker registration error:', error);
+ 28 │     },
+ 29 │     immediate: true,
+ 30 │     // This parameter will help avoid unnecessary update prompts
+ 31 │     skipWaiting: false
+ 32 │   });
+ 33 │ 
+ 34 │   useEffect(() => {
+ 35 │     // Check if already installed
+ 36 │     if (window.matchMedia('(display-mode: standalone)').matches) {
+ 37 │       setIsInstalled(true);
+ 38 │       return;
+ 39 │     }
+ 40 │ 
+ 41 │     // Store the install prompt event for later use
+ 42 │     const handleBeforeInstallPrompt = (e: Event) => {
+ 43 │       e.preventDefault();
+ 44 │       setInstallPrompt(e as BeforeInstallPromptEvent);
+ 45 │     };
+ 46 │ 
+ 47 │     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 48 │     
+ 49 │     return () => {
+ 50 │       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 51 │     };
+ 52 │   }, []);
+ 53 │ 
+ 54 │   const handleInstallClick = async () => {
+ 55 │     if (!installPrompt) return;
+ 56 │     
+ 57 │     await installPrompt.prompt();
+ 58 │     const choiceResult = await installPrompt.userChoice;
+ 59 │     
+ 60 │     if (choiceResult.outcome === 'accepted') {
+ 61 │       console.log('User accepted the install prompt');
+ 62 │       setIsInstalled(true);
+ 63 │     }
+ 64 │     
+ 65 │     setInstallPrompt(null);
+ 66 │   };
+ 67 │ 
+ 68 │   // Only show update prompt if there's an actual update
+ 69 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+ 70 │   
+ 71 │   // Track if we've already shown this update prompt
+ 72 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+    ·          ─────────┬────────
+    ·                   ╰── `hasAttemptedUpdate` redefined here
+ 73 │ 
+ 74 │   useEffect(() => {
+ 75 │     // Reset the flag when needRefresh changes
+    ╰────
+  × the name `setHasAttemptedUpdate` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/PWAInstallPrompt.tsx:16:1]
+ 13 │   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+ 14 │   const [isInstalled, setIsInstalled] = useState(false);
+ 15 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+ 16 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+    ·                              ──────────┬──────────
+    ·                                        ╰── previous definition of `setHasAttemptedUpdate` here
+ 17 │   
+ 18 │   // Register and set up the service worker
+ 19 │   const {
+ 20 │     needRefresh,
+ 21 │     updateServiceWorker,
+ 22 │   } = useRegisterSW({
+ 23 │     onRegistered(r) {
+ 24 │       console.log('Service worker registered:', r);
+ 25 │     },
+ 26 │     onRegisterError(error) {
+ 27 │       console.error('Service worker registration error:', error);
+ 28 │     },
+ 29 │     immediate: true,
+ 30 │     // This parameter will help avoid unnecessary update prompts
+ 31 │     skipWaiting: false
+ 32 │   });
+ 33 │ 
+ 34 │   useEffect(() => {
+ 35 │     // Check if already installed
+ 36 │     if (window.matchMedia('(display-mode: standalone)').matches) {
+ 37 │       setIsInstalled(true);
+ 38 │       return;
+ 39 │     }
+ 40 │ 
+ 41 │     // Store the install prompt event for later use
+ 42 │     const handleBeforeInstallPrompt = (e: Event) => {
+ 43 │       e.preventDefault();
+ 44 │       setInstallPrompt(e as BeforeInstallPromptEvent);
+ 45 │     };
+ 46 │ 
+ 47 │     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 48 │     
+ 49 │     return () => {
+ 50 │       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+ 51 │     };
+ 52 │   }, []);
+ 53 │ 
+ 54 │   const handleInstallClick = async () => {
+ 55 │     if (!installPrompt) return;
+ 56 │     
+ 57 │     await installPrompt.prompt();
+ 58 │     const choiceResult = await installPrompt.userChoice;
+ 59 │     
+ 60 │     if (choiceResult.outcome === 'accepted') {
+ 61 │       console.log('User accepted the install prompt');
+ 62 │       setIsInstalled(true);
+ 63 │     }
+ 64 │     
+ 65 │     setInstallPrompt(null);
+ 66 │   };
+ 67 │ 
+ 68 │   // Only show update prompt if there's an actual update
+ 69 │   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+ 70 │   
+ 71 │   // Track if we've already shown this update prompt
+ 72 │   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+    ·                              ──────────┬──────────
+    ·                                        ╰── `setHasAttemptedUpdate` redefined here
+ 73 │ 
+ 74 │   useEffect(() => {
+ 75 │     // Reset the flag when needRefresh changes
+    ╰────
+/home/runner/workspace/src/components/PWAInstallPrompt.tsx:15:1
+Click outside, press Esc key, or fix the code to dismiss.
+You can also disable this overlay by setting server.hmr.overlay to false in vite.config.ts.
