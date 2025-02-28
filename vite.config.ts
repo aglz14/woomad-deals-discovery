@@ -13,8 +13,9 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      selfDestroying: false,
       manifest: {
         name: 'Woomad - Ofertas en centros comerciales',
         short_name: 'Woomad',

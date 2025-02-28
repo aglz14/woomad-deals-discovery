@@ -12,6 +12,8 @@ interface BeforeInstallPromptEvent extends Event {
 export function PWAInstallPrompt() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+  const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
   
   // Register and set up the service worker
   const {
@@ -101,13 +103,21 @@ export function PWAInstallPrompt() {
             setHasAttemptedUpdate(true);
             
             // Update the service worker
-            // Since updateServiceWorker might not return a Promise in all cases
-            const result = updateServiceWorker(true);
-            
-            // Force reload after a short delay regardless of Promise status
-            setTimeout(() => {
-              console.log("Reloading page after service worker update attempt...");
-              window.location.reload(true); // Force reload from server
+            try {
+              // Call updateServiceWorker without expecting a Promise return
+              updateServiceWorker(true);
+              console.log("Service worker update triggered");
+              
+              // Force reload after a short delay
+              setTimeout(() => {
+                console.log("Reloading page after service worker update attempt...");
+                window.location.reload(true); // Force reload from server
+              }, 1000);
+            } catch (error) {
+              console.error("Error updating service worker:", error);
+              // Even if there's an error, reload the page to get a fresh state
+              setTimeout(() => window.location.reload(true), 1000);
+            }r
             }, 1000);
           }}
         >
