@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { MapPin, AlertCircle, Loader } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useLocation } from "@/hooks/use-location";
 import { StoresGrid } from "./StoresGrid";
 import { EmptyStateDisplay } from "@/components/EmptyStateDisplay";
+import { toast } from "@/components/ui/use-toast"; // Added import for toast notifications
+
 
 interface StoresNearbyProps {
   searchTerm: string;
@@ -52,7 +53,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
               console.warn(`Mall sin coordenadas: ${mall.name} (${mall.id})`);
               return false;
             }
-            
+
             const distance = calculateDistance(
               userLocation.lat,
               userLocation.lng,
@@ -69,30 +70,49 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
         if (nearbyMallIds.length === 0) return [];
 
-      // Then get stores with active promotions from those malls
-      const now = new Date().toISOString();
-      const { data, error } = await supabase
-        .from("stores")
-        .select(`
-          *,
-          mall:shopping_malls (
-            id,
-            name,
-            latitude,
-            longitude,
-            address
-          ),
-          promotions!inner (*)
-        `)
-        .in('mall_id', nearbyMallIds)
-        .gt('promotions.end_date', now)
-        .order('name');
+        // Then get stores with active promotions from those malls
+        const now = new Date().toISOString();
+        const { data, error } = await supabase
+          .from("stores")
+          .select(`
+            id, name, address, description, image_url, 
+            latitude, longitude, 
+            store_promotions!inner(
+              id, 
+              promotions(id, title, description, start_date, end_date, image_url)
+            )
+          `)
+          .in('mall_id', nearbyMallIds)
+          .eq('store_promotions.promotions.active', true);
 
-      if (error) throw error;
-      
-      // Remove duplicate stores (a store might have multiple active promotions)
-      const uniqueStores = Array.from(new Map(data.map(store => [store.id, store])).values());
-      return uniqueStores;
+
+        if (error) {
+          toast.error("Error al cargar tiendas cercanas"); // Using toast for error handling
+          console.error(error);
+          return [];
+        }
+
+        // Calculate distance for each store
+        const storesWithDistance = data.map(store => ({
+          ...store,
+          distance: calculateDistance(
+            userLocation.lat,
+            userLocation.lng,
+            store.latitude,
+            store.longitude
+          )
+        }));
+
+        // Remove duplicate stores (a store might have multiple active promotions)
+        const uniqueStores = Array.from(new Map(storesWithDistance.map(store => [store.id, store])).values());
+
+        // Sort stores by distance
+        const sortedStores = uniqueStores.sort((a, b) => a.distance - b.distance);
+        return sortedStores;
+      } catch (error) {
+        console.error("Error fetching stores:", error);
+        return [];
+      }
     },
     enabled: !!userLocation, // Only run query if we have user location
   });
