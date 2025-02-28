@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { HomeHero } from "@/components/home/HomeHero";
@@ -23,14 +24,13 @@ export default function Index() {
   const ITEMS_PER_PAGE = 9;
   const { t } = useTranslation();
 
-  const { userLocation, calculateDistance, error: locationError } = useLocation();
+  const { userLocation, calculateDistance } = useLocation();
 
   const { data: promotions, isLoading } = useQuery({
     queryKey: ["promotions", userLocation],
     queryFn: () => getPromotions(userLocation, calculateDistance),
-    enabled: !!userLocation && !locationError, // Only run if location is available
   });
-
+  
   // Animation classes for content sections
   const sectionClasses = "px-4 py-8 sm:py-12 md:py-16 transition-all duration-300 hover:bg-gray-50/50";
   const sectionHeaderClasses = "flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4";
@@ -48,10 +48,10 @@ export default function Index() {
   const filterPromotions = (promotions: any[]) => {
     if (!promotions) return [];
     let filtered = promotions;
-
+    
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(promotion =>
+      filtered = filtered.filter(promotion => 
         promotion.store.name.toLowerCase().includes(searchLower) ||
         promotion.store.mall.name.toLowerCase().includes(searchLower) ||
         promotion.title.toLowerCase().includes(searchLower) ||
@@ -60,7 +60,7 @@ export default function Index() {
     }
 
     if (selectedMallId && selectedMallId !== 'all') {
-      filtered = filtered.filter(promotion =>
+      filtered = filtered.filter(promotion => 
         promotion.store.mall.id === selectedMallId
       );
     }
@@ -88,24 +88,12 @@ export default function Index() {
     setCurrentPage(1);
   };
 
-  const renderLocationMessage = () => {
-    if (locationError) {
-      return <p className="text-red-500">Error: {locationError}</p>;
-    } else if (userLocation?.loading) {
-      return <p>Loading location...</p>;
-    } else if (!userLocation) {
-      return <p>Location unavailable. Please enable location services.</p>;
-    }
-    return null;
-  };
-
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 via-white to-purple-50">
       <Header />
-
+      
       <main className="flex-grow pt-16">
-        <HomeHero
+        <HomeHero 
           userLocation={userLocation}
         />
 
@@ -128,8 +116,8 @@ export default function Index() {
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 sm:mb-6">
             <div className="w-full md:w-1/2 lg:w-2/3 mb-4 md:mb-0">
-              <SearchBar
-                onSearch={handleSearch}
+              <SearchBar 
+                onSearch={handleSearch} 
                 placeholder="Busca ofertas, tiendas y centros comerciales a 50 km"
                 className="w-full"
               />
@@ -152,9 +140,8 @@ export default function Index() {
               </Select>
             </div>
           </div>
-
+          
           <ErrorBoundary>
-            {renderLocationMessage()} {/* Added location message rendering */}
             <div className="space-y-8 sm:space-y-12 md:space-y-16 animate-fade-in">
               <section className="rounded-2xl bg-white p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <PromotionsList
@@ -169,14 +156,14 @@ export default function Index() {
               </section>
 
               <section className="rounded-2xl bg-gradient-to-r from-purple-50 to-blue-50 p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <StoresNearby
+                <StoresNearby 
                   searchTerm={searchTerm}
                   selectedMallId={selectedMallId}
                 />
               </section>
 
               <section className="rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <MallsNearby
+                <MallsNearby 
                   searchTerm={searchTerm}
                   selectedMallId={selectedMallId}
                 />
