@@ -13,7 +13,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSession } from "@/hooks/useSession";
+import { useSession } from "@/components/providers/SessionProvider";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddPromotionForm } from "@/components/forms/AddPromotionForm";
