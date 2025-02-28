@@ -65,11 +65,8 @@ export function PWAInstallPrompt() {
     setInstallPrompt(null);
   };
 
-  // Only show update prompt if there's an actual update
-  const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
-  
-  // Track if we've already shown this update prompt
-  const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+  // Comments for clarity
+  // showUpdatePrompt and hasAttemptedUpdate are already defined above
 
   useEffect(() => {
     // Reset the flag when needRefresh changes
