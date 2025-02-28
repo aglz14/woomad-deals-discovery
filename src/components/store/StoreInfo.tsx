@@ -1,10 +1,7 @@
 
-import { Store } from "lucide-react";
-import { MapPin } from "lucide-react";
+import { Phone, MapPin, Store } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-import { Phone, MapPin, Store } from 'lucide-react';
 
 interface StoreInfoProps {
   store: {
