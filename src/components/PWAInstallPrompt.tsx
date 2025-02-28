@@ -97,16 +97,18 @@ export function PWAInstallPrompt() {
             console.log("Updating service worker...");
             // First hide the prompt to avoid confusion
             setShowUpdatePrompt(false);
-            // Then update the service worker with force refresh
-            updateServiceWorker(true).then(() => {
-              console.log("Service worker updated, reloading page...");
-              // Force reload after service worker update completes
+            // Mark that we've attempted this update
+            setHasAttemptedUpdate(true);
+            
+            // Update the service worker
+            // Since updateServiceWorker might not return a Promise in all cases
+            const result = updateServiceWorker(true);
+            
+            // Force reload after a short delay regardless of Promise status
+            setTimeout(() => {
+              console.log("Reloading page after service worker update attempt...");
               window.location.reload(true); // Force reload from server
-            }).catch(err => {
-              console.error("Failed to update service worker:", err);
-              // Re-show the prompt if update fails
-              setShowUpdatePrompt(true);
-            });
+            }, 1000);
           }}
         >
           Actualizar
