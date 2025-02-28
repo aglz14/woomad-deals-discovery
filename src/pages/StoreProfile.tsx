@@ -106,7 +106,13 @@ export default function StoreProfile() {
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           <button
-            onClick={() => navigate("/admin/stores")} // Modified to navigate to /admin/stores
+            onClick={() => {
+              if (store?.mall_id) {
+                navigate(`/admin/mall/${store.mall_id}`);
+              } else {
+                navigate(-1);
+              }
+            }}
             className="mb-4 sm:mb-6 lg:mb-8 text-purple-600 hover:text-purple-700 flex items-center gap-2 transition-colors"
           >
             ← Volver
