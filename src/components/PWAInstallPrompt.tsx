@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { useRegisterSW } from 'virtual:pwa-register/react';
@@ -14,7 +13,7 @@ export function PWAInstallPrompt() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
-  
+
   // Register and set up the service worker
   const {
     needRefresh,
@@ -45,7 +44,7 @@ export function PWAInstallPrompt() {
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
@@ -53,15 +52,15 @@ export function PWAInstallPrompt() {
 
   const handleInstallClick = async () => {
     if (!installPrompt) return;
-    
+
     await installPrompt.prompt();
     const choiceResult = await installPrompt.userChoice;
-    
+
     if (choiceResult.outcome === 'accepted') {
       console.log('User accepted the install prompt');
       setIsInstalled(true);
     }
-    
+
     setInstallPrompt(null);
   };
 
@@ -75,18 +74,18 @@ export function PWAInstallPrompt() {
       setShowUpdatePrompt(false);
       return;
     }
-    
+
     // Only show the prompt if we haven't attempted to update yet
     if (needRefresh && !hasAttemptedUpdate) {
       // Add a delay before showing the update prompt
       const timer = setTimeout(() => {
         setShowUpdatePrompt(true);
       }, 2000); // 2 second delay
-      
+
       return () => clearTimeout(timer);
     }
   }, [needRefresh, hasAttemptedUpdate]);
-  
+
   if (showUpdatePrompt) {
     return (
       <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
@@ -98,13 +97,13 @@ export function PWAInstallPrompt() {
             setShowUpdatePrompt(false);
             // Mark that we've attempted this update
             setHasAttemptedUpdate(true);
-            
+
             // Update the service worker
             try {
               // Call updateServiceWorker without expecting a Promise return
               updateServiceWorker(true);
               console.log("Service worker update triggered");
-              
+
               // Force reload after a short delay
               setTimeout(() => {
                 console.log("Reloading page after service worker update attempt...");
