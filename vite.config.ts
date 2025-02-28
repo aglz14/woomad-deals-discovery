@@ -13,13 +13,13 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      registerType: 'autoUpdate', // Changed to autoUpdate for better handling
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'robots.txt'], // Added robots.txt
       selfDestroying: false,
       manifest: {
-        name: 'Woomad - Ofertas en centros comerciales',
+        name: 'Woomad - Ofertas en centros comerciales', // Kept original name
         short_name: 'Woomad',
-        description: 'Encuentra ofertas en centros comerciales cerca de ti',
+        description: 'Encuentra ofertas en centros comerciales cerca de ti', //Kept original description
         theme_color: '#7c3aed',
         background_color: '#ffffff',
         display: 'standalone',
@@ -42,6 +42,10 @@ export default defineConfig(({ mode }) => ({
             purpose: 'maskable'
           }
         ]
+      },
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
       }
     }),
     mode === 'development' &&

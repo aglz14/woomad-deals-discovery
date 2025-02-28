@@ -63,7 +63,7 @@ function App() {
             </ErrorBoundary>
             <Toaster />
             <UIToaster />
-            <PWAInstallPrompt /> {/* Added PWAInstallPrompt */}
+            <PWAInstallPrompt />
           </SessionProvider>
         </QueryClientProvider>
       </ThemeProvider>
