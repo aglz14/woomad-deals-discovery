@@ -131,3 +131,18 @@ export const PromotionsList = ({
     </div>
   );
 };
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Skeleton component for loading state of promotion cards
+export const PromotionCardSkeleton = () => {
+  return (
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+      <Skeleton className="h-48 w-full" />
+      <div className="p-4 space-y-3">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </div>
+  );
+};
