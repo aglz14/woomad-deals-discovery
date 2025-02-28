@@ -66,20 +66,27 @@ export function PWAInstallPrompt() {
   // Only show update prompt if there's an actual update
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
   
+  // Track if we've already shown this update prompt
+  const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+
   useEffect(() => {
-    // We can add logic here to check if the update is significant
-    // For now, we'll just add a small delay to avoid showing the prompt unnecessarily
-    if (needRefresh) {
+    // Reset the flag when needRefresh changes
+    if (!needRefresh) {
+      setHasAttemptedUpdate(false);
+      setShowUpdatePrompt(false);
+      return;
+    }
+    
+    // Only show the prompt if we haven't attempted to update yet
+    if (needRefresh && !hasAttemptedUpdate) {
       // Add a delay before showing the update prompt
       const timer = setTimeout(() => {
         setShowUpdatePrompt(true);
       }, 2000); // 2 second delay
       
       return () => clearTimeout(timer);
-    } else {
-      setShowUpdatePrompt(false);
     }
-  }, [needRefresh]);
+  }, [needRefresh, hasAttemptedUpdate]);
   
   if (showUpdatePrompt) {
     return (
@@ -88,11 +95,18 @@ export function PWAInstallPrompt() {
         <Button 
           onClick={() => {
             console.log("Updating service worker...");
-            updateServiceWorker(true);
-            // Force reload the page after a short delay to ensure the update is applied
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            // First hide the prompt to avoid confusion
+            setShowUpdatePrompt(false);
+            // Then update the service worker with force refresh
+            updateServiceWorker(true).then(() => {
+              console.log("Service worker updated, reloading page...");
+              // Force reload after service worker update completes
+              window.location.reload(true); // Force reload from server
+            }).catch(err => {
+              console.error("Failed to update service worker:", err);
+              // Re-show the prompt if update fails
+              setShowUpdatePrompt(true);
+            });
           }}
         >
           Actualizar
