@@ -14,21 +14,3 @@
       return data;
     },
   });
-
-{stores?.map((store) => {
-              // Filter active promotions
-              const activePromotions = store.promotions?.filter(
-                promo => new Date(promo.end_date) >= new Date()
-              ) || [];
-
-              return (
-                <div key={store.id} className="col-span-1">
-                  <AdminStoreCard
-                    store={{...store, promotions: activePromotions}}
-                    onEdit={handleEditStore}
-                    onDelete={setStoreToDelete}
-                    onClick={handleStoreClick}
-                  />
-                </div>
-              );
-            })}

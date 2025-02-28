@@ -97,7 +97,9 @@ interface AdminStoreCardProps {
 
 export function AdminStoreCard({ store, onEdit, onDelete, onClick }: AdminStoreCardProps) {
   const { t } = useTranslation();
-  const activePromotionsCount = store.promotions?.length || 0;
+  const activePromotionsCount = store.promotions?.filter(
+    (promo) => new Date(promo.end_date) >= new Date()
+  ).length || 0;
 
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer"
@@ -115,7 +117,7 @@ export function AdminStoreCard({ store, onEdit, onDelete, onClick }: AdminStoreC
           </p>
         )}
         <div className="pt-2">
-          <Badge variant={activePromotionsCount > 0 ? "secondary" : "outline"} className="whitespace-nowrap">
+          <Badge variant={activePromotionsCount > 0 ? "secondary" : "outline"}>
             {activePromotionsCount} {activePromotionsCount === 1 ? t('promotion') : t('promotions')}
           </Badge>
         </div>
