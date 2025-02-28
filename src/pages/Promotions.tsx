@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { Plus, Trash2, SearchIcon, Pencil } from "lucide-react";
+import { Plus, Trash2, SearchIcon, Pencil, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,7 @@ export default function Promotions() {
         toast.error(t("errorTitle"));
       }
     };
-    
+
     checkAuth();
   }, [navigate, t]);
 
@@ -83,7 +82,7 @@ export default function Promotions() {
     setMallToDelete(null);
   };
 
-  const filteredMalls = malls?.filter(mall => 
+  const filteredMalls = malls?.filter(mall =>
     mall.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     mall.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
     mall.description?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -96,7 +95,7 @@ export default function Promotions() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
-      
+
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="space-y-6">
@@ -144,16 +143,25 @@ export default function Promotions() {
               </div>
             </div>
 
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder={t('searchMalls')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-md pl-10"
-              />
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            {/* Improved Search Bar and Filter */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex flex-col sm:flex-row gap-4 items-stretch">
+                <div className="flex-grow">
+                  <div className="relative">
+                    <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      placeholder={t('searchMalls')}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 bg-gray-50 border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 h-10"
+                    />
+                  </div>
+                </div>
+                {/* Placeholder for future filter -  No filter data available in original code */}
+              </div>
             </div>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMalls?.map((mall) => (
