@@ -76,14 +76,14 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
           .from("stores")
           .select(`
             id, name, address, description, image_url, 
-            latitude, longitude, 
-            store_promotions!inner(
-              id, 
-              promotions(id, title, description, start_date, end_date, image_url)
+            latitude, longitude, mall_id,
+            promotions!inner(
+              id, title, description, start_date, end_date, image_url, active
             )
           `)
           .in('mall_id', nearbyMallIds)
-          .eq('store_promotions.promotions.active', true);
+          .gte('promotions.end_date', now)
+          .eq('promotions.active', true);
 
 
         if (error) {
@@ -108,6 +108,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
         // Sort stores by distance
         const sortedStores = uniqueStores.sort((a, b) => a.distance - b.distance);
+        console.log("Stores with promotions found:", sortedStores.length, sortedStores);
         return sortedStores;
       } catch (error) {
         console.error("Error fetching stores:", error);
@@ -126,7 +127,8 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
       filtered = filtered.filter(
         (store) =>
           store.name.toLowerCase().includes(searchLower) ||
-          store.mall?.name.toLowerCase().includes(searchLower)
+          (store.address && store.address.toLowerCase().includes(searchLower)) ||
+          (store.description && store.description.toLowerCase().includes(searchLower))
       );
     }
 

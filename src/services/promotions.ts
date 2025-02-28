@@ -1,7 +1,26 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { DatabasePromotion, ValidPromotionType } from "@/types/promotion";
+import { supabase } from "@/integrations/supabase";
 import { Location } from "@/hooks/use-location";
+
+export type ValidPromotionType = "promotion" | "coupon" | "sale";
+
+export interface DatabasePromotion {
+  id: string;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  image_url: string;
+  type: ValidPromotionType;
+  store: {
+    id: string;
+    name: string;
+    mall: {
+      id: string;
+      name: string;
+    }
+  };
+}
 
 const isValidPromotionType = (type: string): type is ValidPromotionType => {
   return ["promotion", "coupon", "sale"].includes(type);
@@ -51,42 +70,41 @@ export const getPromotions = async (userLocation: Location | null, calculateDist
 
     if (nearbyMallIds.length === 0) return [];
 
-  // Get stores from nearby malls
-  const { data: stores, error: storesError } = await supabase
-    .from("stores")
-    .select("id")
-    .in("mall_id", nearbyMallIds);
+    // Get stores from nearby malls
+    const { data: stores, error: storesError } = await supabase
+      .from("stores")
+      .select("id")
+      .in("mall_id", nearbyMallIds);
 
-  if (storesError) throw storesError;
+    if (storesError) throw storesError;
 
-  if (stores.length === 0) return [];
+    if (stores.length === 0) return [];
 
-  // Get active promotions from nearby stores
-  const { data: rawPromotions, error: promotionsError } = await supabase
-    .from("promotions")
-    .select(`
-      *,
-      store:stores (
+    // Get active promotions from nearby stores
+    const { data: rawPromotions, error: promotionsError } = await supabase
+      .from("promotions")
+      .select(`
         *,
-        mall:shopping_malls (*)
+        store:stores (
+          *,
+          mall:shopping_malls (*)
+        )
+      `)
+      .in(
+        "store_id",
+        stores.map((s) => s.id)
       )
-      )
-    `)
-    .in(
-      "store_id",
-      stores.map((s) => s.id)
-    )
-    .gte("end_date", new Date().toISOString())
-    .order("start_date", { ascending: true });
+      .gte("end_date", new Date().toISOString())
+      .order("start_date", { ascending: true });
 
-  if (promotionsError) throw promotionsError;
+    if (promotionsError) throw promotionsError;
 
-  return (rawPromotions as DatabasePromotion[])
-    .filter(promo => isValidPromotionType(promo.type))
-    .map(promo => ({
-      ...promo,
-      type: promo.type as ValidPromotionType
-    }));
+    const promotionsWithType = (rawPromotions as DatabasePromotion[])
+      .filter(promo => isValidPromotionType(promo.type))
+      .map(promo => ({
+        ...promo,
+        type: promo.type as ValidPromotionType
+      }));
     
     return promotionsWithType;
   } catch (error) {
