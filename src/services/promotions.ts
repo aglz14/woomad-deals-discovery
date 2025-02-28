@@ -47,7 +47,7 @@ export const getPromotions = async (userLocation: Location | null, calculateDist
       })
       .map(mall => mall.id);
 
-    console.log(`Centros comerciales cercanos encontrados: ${nearbyMallIds.length}`)`);
+    console.log(`Centros comerciales cercanos encontrados: ${nearbyMallIds.length}`);
 
     if (nearbyMallIds.length === 0) return [];
 
@@ -69,6 +69,7 @@ export const getPromotions = async (userLocation: Location | null, calculateDist
       store:stores (
         *,
         mall:shopping_malls (*)
+      )
       )
     `)
     .in(
