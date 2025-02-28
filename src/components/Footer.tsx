@@ -13,19 +13,21 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           {/* Brand Column */}
           <div className="space-y-6">
-            <Link 
-              to="/" 
-              className="inline-block transform hover:scale-105 transition-transform duration-200"
-            >
-              <img 
-                src="/lovable-uploads/c852587b-0ed0-4fee-9630-1f53f53a9ea3.png" 
-                alt="Woomad Commerce" 
-                className="h-10"
-              />
-            </Link>
-            <p className="text-gray-600 text-sm leading-relaxed max-w-xs">
-              Making Retail Great Again!
-            </p>
+            <div className="flex flex-col items-center">
+              <Link 
+                to="/" 
+                className="inline-block transform hover:scale-105 transition-transform duration-200"
+              >
+                <img 
+                  src="/lovable-uploads/c852587b-0ed0-4fee-9630-1f53f53a9ea3.png" 
+                  alt="Woomad Commerce" 
+                  className="h-10"
+                />
+              </Link>
+              <p className="text-gray-600 text-sm mt-2 text-center">
+                Making Retail Great Again!
+              </p>
+            </div>
           </div>
           
           {/* Quick Links Column */}
