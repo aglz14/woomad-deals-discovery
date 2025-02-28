@@ -1,4 +1,3 @@
-
 import { Loader } from "lucide-react";
 import { PromotionCard } from "@/components/PromotionCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
@@ -30,9 +29,16 @@ export const PromotionsList = ({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 space-y-4">
-        <Loader className="w-8 h-8 animate-spin text-purple-500" />
-        <p className="text-gray-500">Buscando las mejores ofertas para ti...</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Promociones</h2>
+          <div className="hidden sm:block h-1 w-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <PromotionCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }

@@ -30,6 +30,11 @@ export default function Index() {
     queryKey: ["promotions", userLocation],
     queryFn: () => getPromotions(userLocation, calculateDistance),
   });
+  
+  // Animation classes for content sections
+  const sectionClasses = "px-4 py-8 sm:py-12 md:py-16 transition-all duration-300 hover:bg-gray-50/50";
+  const sectionHeaderClasses = "flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4";
+  const sectionTitleClasses = "text-2xl sm:text-3xl font-bold text-gray-900";
 
   const { data: malls } = useQuery({
     queryKey: ["shopping-malls"],

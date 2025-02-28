@@ -139,3 +139,77 @@ export const SearchBar = ({ onSearch }: { onSearch: (query: string) => void }) =
     </div>
   );
 };
+import { useState } from "react";
+import { Search, MapPin, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+interface SearchBarProps {
+  onSearch: (term: string) => void;
+  hasLocation?: boolean;
+  className?: string;
+  placeholder?: string;
+}
+
+export const SearchBar = ({ 
+  onSearch, 
+  hasLocation = false, 
+  className = "", 
+  placeholder 
+}: SearchBarProps) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchTerm);
+  };
+  
+  const clearSearch = () => {
+    setSearchTerm("");
+    onSearch("");
+  };
+  
+  return (
+    <form 
+      onSubmit={handleSubmit} 
+      className={`relative w-full max-w-2xl mx-auto animate-fade-up ${className}`}
+    >
+      <div className="relative flex items-center">
+        <div className="absolute left-3 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-400" />
+        </div>
+        
+        {hasLocation && (
+          <div className="absolute right-16 flex items-center pointer-events-none">
+            <MapPin className="h-4 w-4 text-blue-500" />
+          </div>
+        )}
+        
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={placeholder || t("searchPlaceholder")}
+          className="block w-full pl-10 pr-14 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-full shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-200"
+        />
+        
+        {searchTerm && (
+          <button
+            type="button"
+            onClick={clearSearch}
+            className="absolute right-14 p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+        
+        <button
+          type="submit"
+          className="absolute right-2 flex items-center justify-center p-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full text-white hover:from-purple-600 hover:to-blue-600 transition-all duration-200"
+        >
+          <Search className="h-4 w-4" />
+        </button>
+      </div>
+    </form>
+  );
+};
