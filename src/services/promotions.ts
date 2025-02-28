@@ -8,30 +8,48 @@ const isValidPromotionType = (type: string): type is ValidPromotionType => {
 };
 
 export const getPromotions = async (userLocation: Location | null, calculateDistance: (lat1: number, lon1: number, lat2: number, lon2: number) => number) => {
-  if (!userLocation) return [];
+  if (!userLocation) {
+    console.warn("No hay ubicación de usuario disponible para getPromotions");
+    return [];
+  }
 
-  // First, get all malls within the radius
-  const { data: malls, error: mallsError } = await supabase
-    .from("shopping_malls")
-    .select("*");
+  console.log("Obteniendo promociones con ubicación:", userLocation);
 
-  if (mallsError) throw mallsError;
+  try {
+    // First, get all malls within the radius
+    const { data: malls, error: mallsError } = await supabase
+      .from("shopping_malls")
+      .select("*");
 
-  // Filter malls by distance (50km radius)
-  const FIXED_RADIUS_KM = 50;
-  const nearbyMallIds = malls
-    .filter(mall => {
-      const distance = calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        mall.latitude,
-        mall.longitude
-      );
-      return distance <= FIXED_RADIUS_KM;
-    })
-    .map(mall => mall.id);
+    if (mallsError) {
+      console.error("Error al obtener centros comerciales:", mallsError);
+      throw mallsError;
+    }
 
-  if (nearbyMallIds.length === 0) return [];
+    console.log(`Centros comerciales obtenidos: ${malls?.length || 0}`);
+
+    // Filter malls by distance (50km radius)
+    const FIXED_RADIUS_KM = 50;
+    const nearbyMallIds = malls
+      .filter(mall => {
+        if (!mall.latitude || !mall.longitude) {
+          console.warn(`Mall sin coordenadas: ${mall.name} (${mall.id})`);
+          return false;
+        }
+        
+        const distance = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          mall.latitude,
+          mall.longitude
+        );
+        return distance <= FIXED_RADIUS_KM;
+      })
+      .map(mall => mall.id);
+
+    console.log(`Centros comerciales cercanos encontrados: ${nearbyMallIds.length}`);
+
+    if (nearbyMallIds.length === 0) return [];
 
   // Get stores from nearby malls
   const { data: stores, error: storesError } = await supabase
