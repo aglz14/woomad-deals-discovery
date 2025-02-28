@@ -1,0 +1,74 @@
+12:32:00 PM: Netlify Build                                                 
+12:32:00 PM: ────────────────────────────────────────────────────────────────
+12:32:00 PM: ​
+12:32:00 PM: ❯ Version
+12:32:00 PM:   @netlify/build 29.59.2
+12:32:00 PM: ​
+12:32:00 PM: ❯ Flags
+12:32:00 PM:   accountId: 6539ab3c340b0c0097424520
+12:32:00 PM:   baseRelDir: true
+12:32:00 PM:   buildId: 67c201007cb01324082a285e
+12:32:00 PM:   deployId: 67c201007cb01324082a2860
+12:32:00 PM: ​
+12:32:00 PM: ❯ Current directory
+12:32:00 PM:   /opt/build/repo
+12:32:00 PM: ​
+12:32:00 PM: ❯ Config file
+12:32:00 PM:   No config file was defined: using default values.
+12:32:00 PM: ​
+12:32:00 PM: ❯ Context
+12:32:00 PM:   production
+12:32:01 PM: ​
+12:32:01 PM: ❯ Installing plugins
+12:32:01 PM:    - @netlify/plugin-emails@1.1.1
+12:32:01 PM: ​
+12:32:01 PM: ❯ Loading plugins
+12:32:01 PM:    - @netlify/plugin-emails@1.1.1 from Netlify app
+12:32:03 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
+12:32:03 PM: ​
+12:32:03 PM: Build command from Netlify app                                
+12:32:03 PM: ────────────────────────────────────────────────────────────────
+12:32:03 PM: ​
+12:32:03 PM: $ bun run build
+12:32:03 PM: $ node scripts/generate-pwa-icons.js && vite build
+12:32:03 PM: file:///opt/build/repo/scripts/generate-pwa-icons.js:2
+12:32:03 PM: const fs = require('fs');
+12:32:03 PM:            ^
+12:32:03 PM: ReferenceError: require is not defined in ES module scope, you can use import instead
+12:32:03 PM: This file is being treated as an ES module because it has a '.js' file extension and '/opt/build/repo/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+12:32:03 PM:     at file:///opt/build/repo/scripts/generate-pwa-icons.js:2:12
+12:32:03 PM:     at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+12:32:03 PM:     at async ModuleLoader.import (node:internal/modules/esm/loader:337:24)
+12:32:03 PM:     at async loadESM (node:internal/process/esm_loader:34:7)
+12:32:03 PM:     at async handleMainPromise (node:internal/modules/run_main:106:12)
+12:32:03 PM: Node.js v18.20.7
+12:32:03 PM: error: script "build" exited with code 1
+12:32:03 PM: ​
+12:32:03 PM: "build.command" failed                                        
+12:32:03 PM: ────────────────────────────────────────────────────────────────
+12:32:03 PM: ​
+12:32:03 PM:   Error message
+12:32:03 PM:   Command failed with exit code 1: bun run build (https://ntl.fyi/exit-code-1)
+12:32:03 PM: ​
+12:32:03 PM:   Error location
+12:32:03 PM:   In Build command from Netlify app:
+12:32:03 PM:   bun run build
+12:32:03 PM: ​
+12:32:03 PM:   Resolved config
+12:32:03 PM:   build:
+12:32:03 PM:     command: bun run build
+12:32:03 PM:     commandOrigin: ui
+12:32:03 PM:     environment:
+12:32:03 PM:       - NETLIFY_EMAILS_DIRECTORY
+12:32:03 PM:       - NETLIFY_EMAILS_PROVIDER
+12:32:03 PM:       - NETLIFY_EMAILS_PROVIDER_API_KEY
+12:32:03 PM:       - NETLIFY_EMAILS_SECRET
+12:32:03 PM:     publish: /opt/build/repo/dist
+12:32:03 PM:     publishOrigin: ui
+12:32:03 PM:   plugins:
+12:32:03 PM:     - inputs: {}
+12:32:03 PM:       origin: ui
+12:32:03 PM:       package: '@netlify/plugin-emails'
+12:32:03 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
+12:32:03 PM: Failing build: Failed to build site
+12:32:03 PM: Finished processing build request in 26.588s
