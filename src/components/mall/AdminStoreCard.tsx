@@ -81,3 +81,70 @@ export const AdminStoreCard = ({
     </Card>
   );
 };
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Store } from "@/types/store";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+interface AdminStoreCardProps {
+  store: Store & { promotions?: any[] };
+  onEdit: (storeId: string) => void;
+  onDelete: (storeId: string) => void;
+  onClick: (storeId: string) => void;
+}
+
+export function AdminStoreCard({ store, onEdit, onDelete, onClick }: AdminStoreCardProps) {
+  const { t } = useTranslation();
+  const activePromotionsCount = store.promotions?.filter(
+    (promo) => new Date(promo.end_date) >= new Date()
+  ).length || 0;
+
+  return (
+    <Card className="overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer"
+      onClick={() => onClick(store.id)}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-left truncate">{store.name}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {store.description && (
+          <p className="text-sm text-gray-600 text-left line-clamp-2">{store.description}</p>
+        )}
+        {store.location_in_mall && (
+          <p className="text-sm text-gray-500 text-left">
+            {t('locationInMall')}: {store.location_in_mall}
+          </p>
+        )}
+        <div className="pt-2">
+          <Badge variant={activePromotionsCount > 0 ? "secondary" : "outline"}>
+            {activePromotionsCount} {activePromotionsCount === 1 ? t('promotion') : t('promotions')}
+          </Badge>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-end gap-2 pt-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(store.id);
+          }}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="text-red-500 hover:text-red-700"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(store.id);
+          }}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
