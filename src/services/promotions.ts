@@ -47,7 +47,7 @@ export const getPromotions = async (userLocation: Location | null, calculateDist
       })
       .map(mall => mall.id);
 
-    console.log(`Centros comerciales cercanos encontrados: ${nearbyMallIds.length}`);
+    console.log(`Centros comerciales cercanos encontrados: ${nearbyMallIds.length}`)`);
 
     if (nearbyMallIds.length === 0) return [];
 
@@ -86,4 +86,10 @@ export const getPromotions = async (userLocation: Location | null, calculateDist
       ...promo,
       type: promo.type as ValidPromotionType
     }));
+    
+    return promotionsWithType;
+  } catch (error) {
+    console.error("Error al obtener promociones:", error);
+    return [];
+  }
 };
