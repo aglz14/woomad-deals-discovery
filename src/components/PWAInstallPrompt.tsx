@@ -117,8 +117,7 @@ export function PWAInstallPrompt() {
               console.error("Error updating service worker:", error);
               // Even if there's an error, reload the page to get a fresh state
               setTimeout(() => window.location.reload(true), 1000);
-            }r
-            }, 1000);
+            }
           }}
         >
           Actualizar
