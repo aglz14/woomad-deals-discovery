@@ -68,15 +68,22 @@ export function PWAInstallPrompt() {
   // showUpdatePrompt and hasAttemptedUpdate are already defined above
 
   useEffect(() => {
-    // Reset the flag when needRefresh changes
+    // Check if we have a stored update attempt in sessionStorage
+    const hasUpdatedBefore = sessionStorage.getItem('hasAttemptedUpdate') === 'true';
+    
+    // If we already attempted an update in this session, keep that state
+    if (hasUpdatedBefore) {
+      setHasAttemptedUpdate(true);
+    }
+    
+    // Reset the flag when needRefresh is false
     if (!needRefresh) {
-      setHasAttemptedUpdate(false);
       setShowUpdatePrompt(false);
       return;
     }
 
     // Only show the prompt if we haven't attempted to update yet
-    if (needRefresh && !hasAttemptedUpdate) {
+    if (needRefresh && !hasAttemptedUpdate && !hasUpdatedBefore) {
       // Add a delay before showing the update prompt
       const timer = setTimeout(() => {
         setShowUpdatePrompt(true);
@@ -97,6 +104,8 @@ export function PWAInstallPrompt() {
             setShowUpdatePrompt(false);
             // Mark that we've attempted this update
             setHasAttemptedUpdate(true);
+            // Store in sessionStorage to persist across page reloads
+            sessionStorage.setItem('hasAttemptedUpdate', 'true');
 
             // Update the service worker
             try {
