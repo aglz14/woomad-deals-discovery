@@ -12,6 +12,7 @@ import { AdminMallLoadingState } from "@/components/mall/AdminMallLoadingState";
 import { AdminMallNotFound } from "@/components/mall/AdminMallNotFound";
 import { AdminMallContent } from "@/components/mall/AdminMallContent";
 import { toast } from "sonner";
+import { Search, X } from "lucide-react";
 
 export default function AdminMallProfile() {
   const { id } = useParams();
@@ -90,13 +91,48 @@ export default function AdminMallProfile() {
     return <AdminMallNotFound />;
   }
 
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Filter stores based on search query
+  const filteredStores = (stores || []).filter(store => 
+    store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (store.description && store.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       <main className="flex-grow mt-16">
+        {/* Search Bar */}
+        <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-16 z-10 shadow-sm">
+          <div className="max-w-7xl mx-auto flex items-center">
+            <div className="relative w-full max-w-md">
+              <input
+                type="text"
+                placeholder="Buscar tiendas..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              {searchQuery && (
+                <button
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 hover:text-gray-600"
+                  onClick={() => setSearchQuery("")}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <div className="ml-auto text-sm text-gray-500">
+              {filteredStores.length} tiendas
+            </div>
+          </div>
+        </div>
+
         <AdminMallContent
           mall={mall}
-          stores={stores || []}
+          stores={filteredStores}
           onEditMall={() => setIsEditDialogOpen(true)}
           onAddStore={() => setIsAddStoreDialogOpen(true)}
           onEditStore={(storeId) => setStoreToEdit(storeId)}
