@@ -6,6 +6,10 @@ import App from "./App";
 import "./i18n/config"; // Import i18n configuration before rendering
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n/config";
+import { registerSW } from "./registerSW";
+
+// Register service worker
+registerSW();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

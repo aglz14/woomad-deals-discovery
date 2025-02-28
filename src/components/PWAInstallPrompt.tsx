@@ -142,3 +142,72 @@ export function PWAInstallPrompt() {
     </div>
   );
 }
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+export function PWAInstallPrompt() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Store the event so it can be triggered later
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      // Show the install prompt
+      setShowPrompt(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    // We've used the prompt, and can't use it again, so clear it
+    setDeferredPrompt(null);
+    
+    // Hide our UI regardless of the outcome
+    setShowPrompt(false);
+  };
+
+  const handleDismiss = () => {
+    setShowPrompt(false);
+  };
+
+  if (!showPrompt) return null;
+
+  return (
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-50 border border-gray-200 dark:border-gray-700">
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-medium">Instalar aplicación</h3>
+        <Button variant="ghost" size="icon" onClick={handleDismiss} className="-mt-1 -mr-1">
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Instala Woomad para acceder más fácilmente a ofertas y promociones cerca de ti.</p>
+      <div className="flex justify-end">
+        <Button size="sm" onClick={handleInstallClick}>
+          Instalar
+        </Button>
+      </div>
+    </div>
+  );
+}
