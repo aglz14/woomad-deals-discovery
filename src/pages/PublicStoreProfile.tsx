@@ -134,6 +134,9 @@ export default function PublicStoreProfile() {
                   {store.mall && <p className="text-sm text-gray-600 text-left">
                       Centro Comercial: {store.mall.name}
                     </p>}
+                  {store.contact_number && <p className="text-sm text-gray-600 text-left">
+                      Contacto: {store.contact_number}
+                    </p>}
                 </div>
               </div>
 
