@@ -36,13 +36,25 @@ export default function Index() {
   const sectionHeaderClasses = "flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4";
   const sectionTitleClasses = "text-2xl sm:text-3xl font-bold text-gray-900";
 
+  // Get malls with active promotions
   const { data: malls } = useQuery({
-    queryKey: ["shopping-malls"],
+    queryKey: ["malls-with-active-promotions", promotions],
     queryFn: async () => {
-      const { data, error } = await supabase.from("shopping_malls").select("*");
+      if (!promotions || promotions.length === 0) return [];
+      
+      // Extract unique mall IDs from active promotions
+      const mallIds = new Set(promotions.map(promo => promo.store.mall.id));
+      
+      // Get full mall data
+      const { data, error } = await supabase
+        .from("shopping_malls")
+        .select("*")
+        .in('id', Array.from(mallIds));
+        
       if (error) throw error;
       return data;
     },
+    enabled: !!promotions && promotions.length > 0,
   });
 
   const filterPromotions = (promotions: any[]) => {
