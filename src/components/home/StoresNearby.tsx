@@ -72,24 +72,41 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
 
         // Then get stores with active promotions from those malls
         const now = new Date().toISOString();
-        const { data, error } = await supabase
-          .from("stores")
-          .select(`
-            id, name, address, description, image_url, 
-            latitude, longitude, mall_id,
-            promotions!inner(
-              id, title, description, start_date, end_date, image_url, active
-            )
-          `)
-          .in('mall_id', nearbyMallIds)
-          .gte('promotions.end_date', now)
-          .eq('promotions.active', true);
+        console.log(`Buscando tiendas en malls con IDs: ${nearbyMallIds.join(', ')}`);
+        
+        try {
+          const { data, error } = await supabase
+            .from("stores")
+            .select(`
+              id, name, address, description, image_url, 
+              latitude, longitude, mall_id,
+              promotions!inner(
+                id, title, description, start_date, end_date, image_url, active
+              )
+            `)
+            .in('mall_id', nearbyMallIds)
+            .gte('promotions.end_date', now)
+            .eq('promotions.active', true);
 
-
-        if (error) {
-          toast.error("Error al cargar tiendas cercanas"); // Using toast for error handling
-          console.error(error);
+          if (error) {
+            toast.error("Error al cargar tiendas cercanas"); // Using toast for error handling
+            console.error("Error de Supabase al cargar tiendas:", error);
+            return [];
+          }
+          
+          console.log(`Tiendas encontradas con promociones activas: ${data?.length || 0}`);
+          
+          if (!data || data.length === 0) {
+            console.log("No se encontraron tiendas con promociones activas en los malls cercanos");
+            return [];
+          }
+          
+          return data;
+        } catch (queryError) {
+          toast.error("Error al procesar datos de tiendas");
+          console.error("Error al ejecutar la consulta de tiendas:", queryError);
           return [];
+        }
         }
 
         // Calculate distance for each store
