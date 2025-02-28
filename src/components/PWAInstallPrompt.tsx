@@ -85,7 +85,16 @@ export function PWAInstallPrompt() {
     return (
       <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
         <p className="mb-2">Nueva actualización disponible</p>
-        <Button onClick={() => updateServiceWorker(true)}>
+        <Button 
+          onClick={() => {
+            console.log("Updating service worker...");
+            updateServiceWorker(true);
+            // Force reload the page after a short delay to ensure the update is applied
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }}
+        >
           Actualizar
         </Button>
       </div>
