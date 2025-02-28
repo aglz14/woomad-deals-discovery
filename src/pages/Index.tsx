@@ -99,16 +99,19 @@ export default function Index() {
 
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-10 md:py-12 space-y-8 sm:space-y-12 md:space-y-16">
           {/* Banner for all promotions */}
-          <div className="w-full bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg shadow-lg overflow-hidden transition-transform hover:shadow-xl transform hover:-translate-y-1">
-            <Link to="/allpromos" className="block p-4 sm:p-6">
+          <div className="w-full bg-gradient-to-r from-purple-600 via-indigo-500 to-blue-600 rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1 border border-white/10">
+            <Link to="/allpromos" className="block p-5 sm:p-8">
               <div className="flex flex-col sm:flex-row justify-between items-center text-white">
-                <div className="mb-4 sm:mb-0">
-                  <h3 className="text-xl sm:text-2xl font-bold">Ver todas las promociones</h3>
-                  <p className="mt-1 text-white/80">Sin límite de distancia - Encuentra ofertas en cualquier parte</p>
+                <div className="mb-4 sm:mb-0 animate-fade-up">
+                  <div className="flex items-center">
+                    <div className="h-10 w-1.5 bg-yellow-400 rounded-full mr-3"></div>
+                    <h3 className="text-2xl sm:text-3xl font-bold">Ver todas las promociones</h3>
+                  </div>
+                  <p className="mt-3 text-white/90 text-lg ml-4">Sin límite de distancia - Encuentra ofertas en cualquier parte</p>
                 </div>
-                <div className="flex items-center">
-                  <span className="mr-2">Explorar</span>
-                  <ArrowRight className="h-5 w-5" />
+                <div className="flex items-center bg-white/20 backdrop-blur-sm py-3 px-6 rounded-full transition-all duration-300 hover:bg-white/30 group">
+                  <span className="mr-2 font-medium">Explorar</span>
+                  <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </div>
             </Link>

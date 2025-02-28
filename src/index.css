@@ -66,6 +66,23 @@
   animation: pulse-soft 2s infinite;
 }
 
+@keyframes banner-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-gradient-to-r[class*="from-purple-"][class*="to-blue-"] {
+  background-size: 200% 200%;
+  animation: banner-gradient 8s ease infinite;
+}
+
 /* Staggered animation delays for children */
 .stagger-animation > *:nth-child(1) { animation-delay: 0s; }
 .stagger-animation > *:nth-child(2) { animation-delay: 0.1s; }
