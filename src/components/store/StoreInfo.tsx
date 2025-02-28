@@ -4,6 +4,8 @@ import { MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { Phone, MapPin, Store } from 'lucide-react';
+
 interface StoreInfoProps {
   store: {
     name: string;
@@ -11,6 +13,7 @@ interface StoreInfoProps {
     logo_url?: string;
     description?: string;
     location_in_mall?: string;
+    contact_number?: string;
   };
 }
 
@@ -50,6 +53,12 @@ export function StoreInfo({ store }: StoreInfoProps) {
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm sm:text-base">{store.location_in_mall}</span>
+          </div>
+        )}
+        {store.contact_number && (
+          <div className="flex items-center gap-2 text-gray-600">
+            <Phone className="h-4 w-4 flex-shrink-0" />
+            <span className="text-sm sm:text-base">{store.contact_number}</span>
           </div>
         )}
       </CardContent>
