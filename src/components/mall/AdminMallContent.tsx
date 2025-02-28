@@ -1,5 +1,6 @@
+
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MallHeader } from "@/components/mall/MallHeader";
 import { MallStoresSection } from "@/components/mall/MallStoresSection";
@@ -38,7 +39,7 @@ export function AdminMallContent({
           Volver a Promociones
         </Link>
       </Button>
-
+      
       <div className="space-y-6 sm:space-y-8">
         <MallHeader
           name={mall.name}
