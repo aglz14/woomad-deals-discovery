@@ -1,16 +1,12 @@
-
-import { useQuery } from "@tanstack/react-query";
-import { MapPin, AlertCircle, Loader } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabaseClient";
 import { useLocation } from "@/hooks/use-location";
 import { StoresGrid } from "./StoresGrid";
 import { EmptyStateDisplay } from "@/components/EmptyStateDisplay";
 import { toast } from "@/components/ui/use-toast";
-
-const FIXED_RADIUS_KM = 50;
+import { StoresStateDisplay } from "./StoresStateDisplay";
 
 interface StoresNearbyProps {
   searchTerm: string;
@@ -22,6 +18,7 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
   const { userLocation, calculateDistance } = useLocation();
+  const FIXED_RADIUS_KM = 50;
 
   const { data: stores, isLoading, error: storesError } = useQuery({
     queryKey: ["stores-with-active-promotions", userLocation],
@@ -53,16 +50,16 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
               console.warn(`Mall sin coordenadas: ${mall.name} (${mall.id})`);
               return false;
             }
-            
+
             const distance = calculateDistance(
               userLocation.lat,
               userLocation.lng,
               mall.latitude,
               mall.longitude
             );
-            
+
             console.log(`${mall.name}: distancia ${distance.toFixed(2)}km, cercano: ${distance <= FIXED_RADIUS_KM}`);
-            
+
             return distance <= FIXED_RADIUS_KM;
           })
           .map(mall => mall.id);
@@ -78,62 +75,57 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
         const now = new Date().toISOString();
         console.log(`Buscando tiendas en malls con IDs: ${nearbyMallIds.join(', ')}`);
 
-        try {
-          const { data, error } = await supabase
-            .from("stores")
-            .select(`
-              *,
-              mall:shopping_malls (*),
-              promotions!inner (*)
-            `)
-            .in("mall_id", nearbyMallIds)
-            .gt("promotions.end_date", now)
-            .eq('promotions.active', true);
+        const { data, error } = await supabase
+          .from("stores")
+          .select(`
+            *,
+            mall:shopping_malls (*),
+            promotions!inner (*)
+          `)
+          .in("mall_id", nearbyMallIds)
+          .gt("promotions.end_date", now)
+          .eq('promotions.active', true);
 
-          if (error) {
-            toast.error("Error al cargar tiendas cercanas"); 
-            console.error("Error de Supabase al cargar tiendas:", error);
-            return [];
-          }
-
-          console.log(`Tiendas encontradas con promociones activas: ${data?.length || 0}`);
-
-          if (!data || data.length === 0) {
-            console.log("No se encontraron tiendas con promociones activas en los malls cercanos");
-            return [];
-          }
-
-          // Calculate distance for each store
-          const storesWithDistance = data.map(store => ({
-            ...store,
-            distance: calculateDistance(
-              userLocation.lat,
-              userLocation.lng,
-              store.mall.latitude,
-              store.mall.longitude
-            )
-          }));
-
-          // Remove duplicates (same store with multiple promotions)
-          const storeIds = new Set();
-          const uniqueStores = storesWithDistance.filter(store => {
-            if (storeIds.has(store.id)) {
-              return false;
-            }
-            storeIds.add(store.id);
-            return true;
-          });
-
-          // Sort stores by distance
-          const sortedStores = uniqueStores.sort((a, b) => a.distance - b.distance);
-          console.log("Stores with promotions found:", sortedStores.length, sortedStores);
-          return sortedStores;
-        } catch (error) {
-          console.error("Error fetching stores:", error);
+        if (error) {
+          toast.error("Error al cargar tiendas cercanas"); 
+          console.error("Error de Supabase al cargar tiendas:", error);
           return [];
         }
+
+        console.log(`Tiendas encontradas con promociones activas: ${data?.length || 0}`);
+
+        if (!data || data.length === 0) {
+          console.log("No se encontraron tiendas con promociones activas en los malls cercanos");
+          return [];
+        }
+
+        // Calculate distance for each store
+        const storesWithDistance = data.map(store => ({
+          ...store,
+          distance: calculateDistance(
+            userLocation.lat,
+            userLocation.lng,
+            store.mall.latitude,
+            store.mall.longitude
+          )
+        }));
+
+        // Remove duplicates (same store with multiple promotions)
+        const storeIds = new Set();
+        const uniqueStores = storesWithDistance.filter(store => {
+          if (storeIds.has(store.id)) {
+            return false;
+          }
+          storeIds.add(store.id);
+          return true;
+        });
+
+        // Sort stores by distance
+        const sortedStores = uniqueStores.sort((a, b) => a.distance - b.distance);
+        console.log("Stores with promotions found:", sortedStores.length, sortedStores);
+        return sortedStores;
       } catch (error) {
-        console.error("Error in stores query:", error);
+        console.error("Error fetching stores:", error);
         return [];
       }
     },
@@ -170,93 +162,45 @@ export function StoresNearby({ searchTerm, selectedMallId }: StoresNearbyProps) 
     currentPage * ITEMS_PER_PAGE
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-60">
-        <Loader className="h-8 w-8 animate-spin mb-2" />
-        <p>Cargando tiendas cercanas...</p>
-      </div>
-    );
-  }
-
-  if (storesError) {
-    return (
-      <div className="flex flex-col items-center justify-center h-60 text-destructive">
-        <AlertCircle className="h-8 w-8 mb-2" />
-        <p>Error al cargar tiendas</p>
-      </div>
-    );
-  }
-
-  if (!userLocation) {
-    return (
-      <div className="flex flex-col items-center justify-center h-60">
-        <MapPin className="h-8 w-8 mb-2" />
-        <p>Activando ubicación para encontrar tiendas cercanas...</p>
-      </div>
-    );
-  }
-
-  if (!filteredStores || filteredStores.length === 0) {
-    return (
-      <EmptyStateDisplay
-        title="No hay tiendas cercanas"
-        description="No se encontraron tiendas con promociones activas en un radio de 50 km"
-        icon={MapPin}
-      />
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      <StoresGrid
-        stores={paginatedStores}
-        onStoreClick={(storeId) => navigate(`/store/${storeId}`)}
-      />
-      
-      {totalPages > 1 && (
-        <Pagination className="justify-center">
-          <PaginationContent>
-            {currentPage > 1 && (
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage(page => Math.max(1, page - 1));
-                  }}
-                />
-              </PaginationItem>
-            )}
-            
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage(page);
-                  }}
-                  isActive={page === currentPage}
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            
-            {currentPage < totalPages && (
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setCurrentPage(page => Math.min(totalPages, page + 1));
-                  }}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
+    <div>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Tiendas con Promociones Activas</h2>
+
+      {isLoading ? (
+        <StoresStateDisplay isLoading={true} />
+      ) : storesError ? (
+        <div className="text-center py-10">
+          <p className="text-red-500">Error al cargar tiendas. Por favor intente nuevamente.</p>
+        </div>
+      ) : filteredStores.length === 0 ? (
+        <StoresStateDisplay isEmpty={true} searchRadius={FIXED_RADIUS_KM} hasLocation={!!userLocation} />
+      ) : (
+        <>
+          <StoresGrid 
+            stores={paginatedStores} 
+            onSelect={(id) => navigate(`/store/${id}`)}
+          />
+
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-6">
+              <nav className="flex items-center space-x-2">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`px-3 py-1 rounded ${
+                      currentPage === i + 1
+                        ? "bg-purple-600 text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </nav>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
