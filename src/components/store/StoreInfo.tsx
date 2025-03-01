@@ -2,7 +2,7 @@
 import { Store } from "@/types/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Store as StoreIcon } from "lucide-react";
+import { MapPin, Phone, Store as StoreIcon } from "lucide-react";
 
 interface StoreInfoProps {
   store: Store;
@@ -58,6 +58,16 @@ export function StoreInfo({ store }: StoreInfoProps) {
             </div>
           )}
         </div>
+        
+        {store.contact_number && (
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-gray-800">Contacto</h3>
+            <div className="flex items-start gap-2">
+              <Phone className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-600">{store.contact_number}</p>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
