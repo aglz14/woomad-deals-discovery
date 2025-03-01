@@ -120,7 +120,7 @@ export default function PublicStoreProfile() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => navigate('/')}
+                onClick={() => navigate(-1)}
                 className="h-8 px-2"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
