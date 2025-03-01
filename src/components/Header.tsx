@@ -53,14 +53,6 @@ export const Header = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => navigate('/profile')}>
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Mi Perfil</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/favorites')}>
-                          <Star className="mr-2 h-4 w-4" />
-                          <span>Mis Favoritos</span>
-                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate('/admin')}>
                           <Plus className="mr-2 h-4 w-4" />
                           <span>Administrar</span>
@@ -90,14 +82,6 @@ export const Header = () => {
                         <div className="px-2 py-1.5 text-sm font-medium text-gray-500 border-b">
                           {session.user?.email}
                         </div>
-                        <DropdownMenuItem onClick={() => navigate('/profile')}>
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Mi Perfil</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/favorites')}>
-                          <Star className="mr-2 h-4 w-4" />
-                          <span>Mis Favoritos</span>
-                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate('/admin')}>
                           <Plus className="mr-2 h-4 w-4" />
                           <span>Administrar</span>
