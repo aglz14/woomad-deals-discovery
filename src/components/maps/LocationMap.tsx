@@ -110,18 +110,25 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
         </div>
       `;
 
-      // Create popup
+      // Create popup with clickable link
       const popup = new mapboxgl.Popup({ offset: 25 })
         .setHTML(`
           <div class="p-2">
             <h3 class="font-bold text-gray-900">${mall.name}</h3>
             <p class="text-sm text-gray-600">${mall.address}</p>
             <p class="text-sm text-purple-600 mt-1">${storeCount} tiendas</p>
+            <a href="/mall/${mall.id}" class="text-sm text-blue-600 hover:text-blue-800 underline mt-2 block">Ver perfil completo</a>
           </div>
         `);
 
       // Add marker to map
       try {
+        // Make the marker element clickable
+        el.style.cursor = 'pointer';
+        el.onclick = () => {
+          window.location.href = `/mall/${mall.id}`;
+        };
+        
         const marker = new mapboxgl.Marker(el)
           .setLngLat([mall.longitude, mall.latitude])
           .setPopup(popup)
