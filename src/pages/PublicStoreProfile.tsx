@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { StoreInfo } from "@/components/StoreInfo"; // Import StoreInfo component
+import { StoreInfo } from "@/components/store/StoreInfo"; // Import StoreInfo component
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 
