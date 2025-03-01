@@ -20,7 +20,7 @@ localPort = 8082
 externalPort = 3000
 
 [workflows]
-runButton = "Run"
+runButton = "Run Mobile App"
 
 [[workflows.workflow]]
 name = "Run"
@@ -29,3 +29,11 @@ author = 38747565
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Run Mobile App"
+author = 38747565
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd mobile-app && npm start -- --web"
