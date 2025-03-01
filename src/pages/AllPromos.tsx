@@ -40,16 +40,13 @@ export default function AllPromos() {
     },
   });
 
-  // Get malls with active promotions
   const { data: malls } = useQuery({
     queryKey: ["malls-with-active-promotions", promotions],
     queryFn: async () => {
       if (!promotions || promotions.length === 0) return [];
       
-      // Extract unique mall IDs from active promotions
       const mallIds = new Set(promotions.map(promo => promo.store?.mall.id).filter(Boolean));
       
-      // Get full mall data
       const { data, error } = await supabase
         .from("shopping_malls")
         .select("*")
