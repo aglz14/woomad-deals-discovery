@@ -44,8 +44,8 @@ export function StoreInfo({ store }: StoreInfoProps) {
       <CardContent className="space-y-6 pt-4 px-6">
         {/* About */}
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-gray-800">Acerca de</h3>
-          <p className="text-gray-600">
+          <h3 className="text-lg font-semibold text-gray-800 text-left">Acerca de</h3>
+          <p className="text-gray-600 text-left">
             {store.description || "No hay descripción disponible para esta tienda."}
           </p>
         </div>
@@ -74,11 +74,11 @@ export function StoreInfo({ store }: StoreInfoProps) {
         
         {/* Location */}
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-800">Ubicación</h3>
+          <h3 className="text-lg font-semibold text-gray-800 text-left">Ubicación</h3>
           {store.location_in_mall && (
             <div className="flex items-start gap-2">
               <MapPin className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
-              <p className="text-gray-600">{store.location_in_mall}</p>
+              <p className="text-gray-600 text-left">{store.location_in_mall}</p>
             </div>
           )}
         </div>
@@ -86,10 +86,10 @@ export function StoreInfo({ store }: StoreInfoProps) {
         {/* Contact */}
         {store.contact_number && (
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800">Contacto</h3>
+            <h3 className="text-lg font-semibold text-gray-800 text-left">Contacto</h3>
             <div className="flex items-start gap-2">
               <Phone className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
-              <p className="text-gray-600">{store.contact_number}</p>
+              <p className="text-gray-600 text-left">{store.contact_number}</p>
             </div>
           </div>
         )}
