@@ -34,35 +34,84 @@ export const Header = () => {
   }
   return <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-7xl px-4"> {/* Added max-width container */}
-          <div className="flex items-center justify-between h-16 px-[40px]">
+        <div className="mx-auto max-w-7xl px-2 sm:px-4"> {/* Responsive padding */}
+          <div className="flex items-center justify-between h-16 px-2 sm:px-[40px]">
             <Link to="/" className="flex items-center">
               <img src="/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png" alt="Woomad Commerce" className="h-8" />
             </Link>
 
-            <div className="flex items-center gap-4">
-              {session?.user ? <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-2 px-4 py-2 text-white hover:text-white/90 transition-colors rounded-md">
-                    <User className="h-4 w-4" />
-                    <span>{session.user.email}</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 bg-white shadow-lg z-50" align="end">
-                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/allpromos")}>
-                      <Star className="mr-2 h-4 w-4" />
-                      <span>Promociones</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/admin/promotions")}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      <span>Crear Promoción</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Cerrar Sesión</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu> : 
+            <div className="flex items-center">
+              {session ? (
+                <>
+                  {/* Desktop dropdown */}
+                  <div className="hidden md:block">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="text-white py-2 px-4 flex items-center gap-1 hover:bg-white/20">
+                          <span className="flex-shrink truncate max-w-[200px]">{session.user?.email}</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => navigate('/profile')}>
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Mi Perfil</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/favorites')}>
+                          <Star className="mr-2 h-4 w-4" />
+                          <span>Mis Favoritos</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                          <Plus className="mr-2 h-4 w-4" />
+                          <span>Administrar</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleLogout}>
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Cerrar Sesión</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Mobile hamburger menu */}
+                  <div className="md:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="text-white p-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="4" x2="20" y1="12" y2="12"/>
+                            <line x1="4" x2="20" y1="6" y2="6"/>
+                            <line x1="4" x2="20" y1="18" y2="18"/>
+                          </svg>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56 bg-white/90 backdrop-blur-sm">
+                        <div className="px-2 py-1.5 text-sm font-medium text-gray-500 border-b">
+                          {session.user?.email}
+                        </div>
+                        <DropdownMenuItem onClick={() => navigate('/profile')}>
+                          <User className="mr-2 h-4 w-4" />
+                          <span>Mi Perfil</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/favorites')}>
+                          <Star className="mr-2 h-4 w-4" />
+                          <span>Mis Favoritos</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                          <Plus className="mr-2 h-4 w-4" />
+                          <span>Administrar</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleLogout}>
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span>Cerrar Sesión</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </>
+              ) : (
                 <>
                   {/* Desktop buttons */}
                   <div className="hidden md:flex items-center gap-4">
@@ -99,7 +148,8 @@ export const Header = () => {
                     </DropdownMenu>
                   </div>
                   <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} mode="login" />
-                </>}
+                </>
+              )}
             </div>
           </div>
         </div>
