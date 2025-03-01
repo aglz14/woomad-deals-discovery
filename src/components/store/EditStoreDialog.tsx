@@ -1,13 +1,14 @@
-
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Store } from "@/types/store";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useCategories } from "@/hooks/useCategories";
 
 interface EditStoreDialogProps {
   store: Store;
@@ -17,20 +18,23 @@ interface EditStoreDialogProps {
 }
 
 export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStoreDialogProps) {
-  const [formData, setFormData] = useState({
-    name: store.name,
-    category: store.category,
+  const [isLoading, setIsLoading] = useState(false);
+  const [storeData, setStoreData] = useState({
+    name: store.name || "",
+    category: store.category || "",
     description: store.description || "",
-    location_in_mall: store.location_in_mall || "",
-    contact_number: store.contact_number || "",
+    logo_url: store.logo_url || "",
+    location: store.location || "",
   });
+
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const { error } = await supabase
         .from("stores")
-        .update(formData)
+        .update({...storeData, id: store.id})
         .eq("id", store.id);
 
       if (error) throw error;
@@ -54,42 +58,43 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
             <Label htmlFor="name">Nombre de la tienda</Label>
             <Input
               id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={storeData.name}
+              onChange={(e) => setStoreData({ ...storeData, name: e.target.value })}
               required
             />
           </div>
           <div>
             <Label htmlFor="category">Categoría</Label>
-            <Input
-              id="category"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              required
-            />
+            <Select
+              value={storeData.category}
+              onValueChange={(value) => setStoreData({ ...storeData, category: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona una categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                {categoriesData?.map((category) => (
+                  <SelectItem key={category.name} value={category.name}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              value={storeData.description}
+              onChange={(e) => setStoreData({ ...storeData, description: e.target.value })}
             />
           </div>
           <div>
             <Label htmlFor="location">Ubicación en el centro comercial</Label>
             <Input
               id="location"
-              value={formData.location_in_mall}
-              onChange={(e) => setFormData({ ...formData, location_in_mall: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label htmlFor="contact">Número de contacto</Label>
-            <Input
-              id="contact"
-              value={formData.contact_number}
-              onChange={(e) => setFormData({ ...formData, contact_number: e.target.value })}
+              value={storeData.location}
+              onChange={(e) => setStoreData({ ...storeData, location: e.target.value })}
             />
           </div>
           <div className="flex justify-end gap-2">

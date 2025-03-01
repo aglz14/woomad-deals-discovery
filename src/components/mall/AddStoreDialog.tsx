@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers/SessionProvider";
+import { useCategories } from "@/hooks/useCategories";
+
 
 interface AddStoreDialogProps {
   mallId: string;
@@ -37,35 +38,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
     location_in_mall: "",
     contact_number: "",
   });
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setLoadingCategories(true);
-      try {
-        const { data, error } = await supabase
-          .from("categories")
-          .select("id, name");
-
-        if (error) {
-          console.error("Error fetching categories:", error);
-          toast.error("Error al cargar categorías");
-        } else {
-          setCategories(data || []);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        toast.error("Error al cargar categorías");
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
-    if (isOpen) {
-      fetchCategories();
-    }
-  }, [isOpen]);
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,18 +94,18 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
           </div>
           <div>
             <Label htmlFor="category">Categoría</Label>
-            <Select 
-              value={store.category} 
-              onValueChange={(value) => setStore({...store, category: value})}
+            <Select
+              value={store.category}
+              onValueChange={(value) => setStore({ ...store, category: value })}
             >
               <SelectTrigger id="category" className="w-full">
                 <SelectValue placeholder="Seleccionar categoría" />
               </SelectTrigger>
               <SelectContent>
-                {loadingCategories ? (
+                {isCategoriesLoading ? (
                   <SelectItem value="loading" disabled>Cargando categorías...</SelectItem>
-                ) : categories.length > 0 ? (
-                  categories.map((cat) => (
+                ) : categoriesData?.length > 0 ? (
+                  categoriesData.map((cat) => (
                     <SelectItem key={cat.id} value={cat.name}>
                       {cat.name}
                     </SelectItem>
