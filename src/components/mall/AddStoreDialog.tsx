@@ -1,12 +1,16 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { useSession } from "@/components/providers/SessionProvider";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -14,7 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import { toast } from "sonner";
+import { useSession } from "@/components/providers/SessionProvider";
 
 interface AddStoreDialogProps {
   mallId: string;
@@ -45,13 +50,13 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
 
         if (error) {
           console.error("Error fetching categories:", error);
-          toast.error("Failed to load categories");
+          toast.error("Error al cargar categorías");
         } else {
           setCategories(data || []);
         }
       } catch (error) {
         console.error("Error fetching categories:", error);
-        toast.error("Failed to load categories");
+        toast.error("Error al cargar categorías");
       } finally {
         setLoadingCategories(false);
       }
@@ -70,21 +75,19 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
         return;
       }
 
-      const { error } = await supabase
-        .from("stores")
-        .insert([
-          {
-            ...store,
-            mall_id: mallId,
-            user_id: session.user.id,
-          },
-        ]);
+      const { error } = await supabase.from("stores").insert({
+        name: store.name,
+        category: store.category,
+        description: store.description,
+        location_in_mall: store.location_in_mall,
+        contact_number: store.contact_number,
+        mall_id: mallId,
+        user_id: session.user.id,
+      });
 
       if (error) throw error;
 
       toast.success("Tienda agregada exitosamente");
-      onSuccess();
-      onClose();
       setStore({
         name: "",
         category: "",
@@ -92,9 +95,11 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
         location_in_mall: "",
         contact_number: "",
       });
+      onSuccess();
+      onClose();
     } catch (error) {
-      console.error("Error al agregar tienda:", error);
-      toast.error("Error al agregar tienda");
+      console.error("Error adding store:", error);
+      toast.error("Error al agregar la tienda");
     }
   };
 
@@ -116,13 +121,16 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
           </div>
           <div>
             <Label htmlFor="category">Categoría</Label>
-            <Select value={store.category} onValueChange={(value) => setStore({...store, category: value})}>
-              <SelectTrigger id="category" className="w-full" disabled={loadingCategories}>
+            <Select 
+              value={store.category} 
+              onValueChange={(value) => setStore({...store, category: value})}
+            >
+              <SelectTrigger id="category" className="w-full">
                 <SelectValue placeholder="Seleccionar categoría" />
               </SelectTrigger>
               <SelectContent>
                 {loadingCategories ? (
-                  <SelectItem value="" disabled>Cargando categorías...</SelectItem>
+                  <SelectItem value="loading" disabled>Cargando categorías...</SelectItem>
                 ) : categories.length > 0 ? (
                   categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.name}>
@@ -130,7 +138,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
                     </SelectItem>
                   ))
                 ) : (
-                  <SelectItem value="" disabled>No hay categorías disponibles</SelectItem>
+                  <SelectItem value="none" disabled>No hay categorías disponibles</SelectItem>
                 )}
               </SelectContent>
             </Select>
