@@ -53,22 +53,22 @@ export function StoreInfo({ store }: StoreInfoProps) {
         {/* Mall Information */}
         {store.mall && (
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800">Centro Comercial</h3>
-            <div className="flex items-start gap-2">
-              <Building2 className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
-              <div>
+            <h3 className="text-lg font-semibold text-gray-800 text-center">Centro Comercial</h3>
+            <div className="flex flex-col items-center text-center">
+              <Building2 className="h-6 w-6 text-purple-500 mb-2" />
+              <div className="text-center">
                 <p className="text-gray-800 font-medium">{store.mall.name}</p>
                 {store.mall.address && (
                   <p className="text-gray-600 text-sm mt-1">{store.mall.address}</p>
                 )}
               </div>
+              {store.floor && (
+                <div className="flex items-center gap-2 mt-3">
+                  <MapPin className="h-5 w-5 text-purple-500 flex-shrink-0" />
+                  <p className="text-gray-600">Piso: {store.floor}</p>
+                </div>
+              )}
             </div>
-            {store.floor && (
-              <div className="flex items-start gap-2 mt-2">
-                <MapPin className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
-                <p className="text-gray-600">Piso: {store.floor}</p>
-              </div>
-            )}
           </div>
         )}
         
