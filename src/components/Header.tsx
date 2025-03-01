@@ -34,8 +34,8 @@ export const Header = () => {
   }
   return <header className="fixed top-0 left-0 right-0 z-50">
       <nav className="bg-gradient-to-r from-purple-500/80 to-blue-500/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-7xl px-2 sm:px-4"> {/* Added max-width container with responsive padding */}
-          <div className="flex items-center justify-between h-16 px-2 sm:px-[40px]">
+        <div className="mx-auto max-w-7xl px-4"> {/* Added max-width container */}
+          <div className="flex items-center justify-between h-16 px-[40px]">
             <Link to="/" className="flex items-center">
               <img src="/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png" alt="Woomad Commerce" className="h-8" />
             </Link>
@@ -62,11 +62,11 @@ export const Header = () => {
                       <span>Cerrar Sesión</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu> : <div className="flex flex-col sm:flex-row gap-2">
-                  <Button variant="ghost" onClick={() => setIsAuthModalOpen(true)} className="text-white hover:text-sky-500/90 text-sm sm:text-base">
+                </DropdownMenu> : <div className="flex items-center gap-4">
+                  <Button variant="ghost" onClick={() => setIsAuthModalOpen(true)} className="text-white hover:text-sky-500/90">
                     Iniciar Sesión
                   </Button>
-                  <Button variant="outline" onClick={() => navigate("/signup")} className="text-white bg-transparent border-white hover:bg-white hover:text-purple-500 text-sm sm:text-base">
+                  <Button variant="outline" onClick={() => navigate("/signup")} className="text-white bg-transparent border-white hover:bg-white hover:text-purple-500">
                     Registrarse
                   </Button>
                   <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} mode="login" />
