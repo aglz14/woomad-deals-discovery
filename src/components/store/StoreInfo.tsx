@@ -97,18 +97,7 @@ export function StoreInfo({ store }: StoreInfoProps) {
           )}
         </div>
         
-        {store.contact_number && (
-          <div className="pt-2">
-            <Button 
-              variant="outline" 
-              className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200 hover:border-purple-300 transition-all"
-              onClick={() => window.location.href = `tel:${store.contact_number}`}
-            >
-              <Phone className="h-4 w-4 mr-2" />
-              Llamar ahora
-            </Button>
-          </div>
-        )}
+        {/* Call button removed */}
       </CardContent>
     </Card>
   );
