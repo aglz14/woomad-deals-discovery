@@ -111,7 +111,11 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       `;
 
       // Create popup with clickable link and rich details
-      const popup = new mapboxgl.Popup({ offset: 25, maxWidth: '300px' })
+      const popup = new mapboxgl.Popup({ 
+        offset: 25, 
+        maxWidth: '300px',
+        className: 'mall-popup-container' // Custom class for styling
+      })
         .setHTML(`
           <div class="p-3 border-b border-purple-100">
             <h3 class="font-bold text-gray-900 text-lg mb-1">${mall.name}</h3>
@@ -137,6 +141,22 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
         el.onclick = (e) => {
           // First show popup when clicking on marker
           marker.togglePopup();
+          
+          // Fly to the marker position with slight offset for popup visibility
+          if (map.current) {
+            // Get popup height to calculate proper offset
+            const popupHeight = document.querySelector('.mapboxgl-popup-content')?.clientHeight || 200;
+            
+            // Center on marker with vertical offset to ensure popup is visible
+            map.current.flyTo({
+              center: [mall.longitude, mall.latitude],
+              offset: [0, -popupHeight/2],
+              zoom: Math.max(map.current.getZoom(), 13), // Ensure we're zoomed in enough
+              duration: 800,
+              essential: true
+            });
+          }
+          
           // Prevent immediate navigation to allow users to read popup details
           e.stopPropagation();
           e.preventDefault();
