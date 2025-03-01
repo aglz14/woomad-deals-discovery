@@ -110,23 +110,36 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
         </div>
       `;
 
-      // Create popup with clickable link
-      const popup = new mapboxgl.Popup({ offset: 25 })
+      // Create popup with clickable link and rich details
+      const popup = new mapboxgl.Popup({ offset: 25, maxWidth: '300px' })
         .setHTML(`
-          <div class="p-2">
-            <h3 class="font-bold text-gray-900">${mall.name}</h3>
-            <p class="text-sm text-gray-600">${mall.address}</p>
-            <p class="text-sm text-purple-600 mt-1">${storeCount} tiendas</p>
-            <a href="/mall/${mall.id}" class="text-sm text-blue-600 hover:text-blue-800 underline mt-2 block">Ver perfil completo</a>
+          <div class="p-3 border-b border-purple-100">
+            <h3 class="font-bold text-gray-900 text-lg mb-1">${mall.name}</h3>
+            <div class="flex items-start gap-2 mb-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <p class="text-sm text-gray-600">${mall.address}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01M9 9h.01"/></svg>
+              <p class="text-sm text-purple-600 font-medium">${storeCount} tiendas</p>
+            </div>
+            ${mall.description ? `<p class="text-sm text-gray-500 mt-2 italic line-clamp-2">${mall.description}</p>` : ''}
+          </div>
+          <div class="p-3">
+            <a href="/mall/${mall.id}" class="block w-full py-2 px-3 bg-purple-600 hover:bg-purple-700 text-white text-center rounded-md font-medium text-sm transition-colors">Ver perfil completo</a>
           </div>
         `);
 
       // Add marker to map
       try {
-        // Make the marker element clickable
+        // Make the marker element clickable with improved interaction
         el.style.cursor = 'pointer';
-        el.onclick = () => {
-          window.location.href = `/mall/${mall.id}`;
+        el.onclick = (e) => {
+          // First show popup when clicking on marker
+          marker.togglePopup();
+          // Prevent immediate navigation to allow users to read popup details
+          e.stopPropagation();
+          e.preventDefault();
         };
         
         const marker = new mapboxgl.Marker(el)
