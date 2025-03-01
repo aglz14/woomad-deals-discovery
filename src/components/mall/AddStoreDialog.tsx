@@ -1,11 +1,23 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers/SessionProvider";
 
@@ -25,6 +37,33 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
     location_in_mall: "",
     contact_number: "",
   });
+  const [categories, setCategories] = useState<{name: string}[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch categories from database when component mounts
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("categories")
+          .select("name")
+          .order("name");
+        
+        if (error) throw error;
+        setCategories(data || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error("No se pudieron cargar las categorías");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchCategories();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,9 +101,13 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
     }
   };
 
+  const handleCategoryChange = (value: string) => {
+    setStore({ ...store, category: value });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Agregar Nueva Tienda</DialogTitle>
         </DialogHeader>
@@ -80,12 +123,32 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
           </div>
           <div>
             <Label htmlFor="category">Categoría</Label>
-            <Input
-              id="category"
+            <Select
               value={store.category}
-              onChange={(e) => setStore({ ...store, category: e.target.value })}
+              onValueChange={handleCategoryChange}
               required
-            />
+            >
+              <SelectTrigger id="category" className="w-full">
+                <SelectValue placeholder="Selecciona una categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                {isLoading ? (
+                  <SelectItem value="loading" disabled>
+                    Cargando categorías...
+                  </SelectItem>
+                ) : categories.length > 0 ? (
+                  categories.map((category) => (
+                    <SelectItem key={category.name} value={category.name}>
+                      {category.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="none" disabled>
+                    No hay categorías disponibles
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label htmlFor="description">Descripción</Label>
