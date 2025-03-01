@@ -9,7 +9,8 @@
     "build:dev": "node scripts/generate-pwa-icons.js && vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-pwa-icons": "node scripts/generate-pwa-icons.js"
+    "generate-pwa-icons": "node scripts/generate-pwa-icons.js",
+    "mobile": "cd mobile-app && npm start"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
