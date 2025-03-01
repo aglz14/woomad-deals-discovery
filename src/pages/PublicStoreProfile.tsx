@@ -1,19 +1,22 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Store, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { StoreInfo } from "@/components/StoreInfo"; // Import StoreInfo component
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+
 
 export default function PublicStoreProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   const {
     data: store,
     isLoading: isStoreLoading,
@@ -39,7 +42,7 @@ export default function PublicStoreProfile() {
     retry: false,
     enabled: !!id
   });
-  
+
   const {
     data: promotions,
     isLoading: isPromotionsLoading
@@ -61,19 +64,19 @@ export default function PublicStoreProfile() {
     },
     enabled: !!id && !!store
   });
-  
+
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
     promotion: 'bg-purple-100 text-purple-800',
     sale: 'bg-red-100 text-red-800'
   };
-  
+
   const typeLabels = {
-    coupon: 'Cupón',
     promotion: 'Promoción',
+    coupon: 'Cupón',
     sale: 'Oferta'
   };
-  
+
   if (isStoreLoading || isPromotionsLoading) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -87,7 +90,7 @@ export default function PublicStoreProfile() {
         <Footer />
       </div>;
   }
-  
+
   if (storeError || !store) {
     return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
         <Header />
@@ -106,40 +109,28 @@ export default function PublicStoreProfile() {
         <Footer />
       </div>;
   }
-  
+
   return <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
-          <button onClick={() => navigate('/')} className="mb-6 text-purple-600 hover:text-purple-700 flex items-center gap-2">
-            ← Volver
-          </button>
+          <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Back Button */}
+            <div className="lg:col-span-3 flex justify-start mb-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate(-1)}
+                className="h-8 px-2"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                <span className="text-sm">Volver</span>
+              </Button>
+            </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-3 space-y-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold mb-4">Información de la Tienda</h2>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    {store.logo_url ? <img src={store.logo_url} alt={store.name} className="w-16 h-16 object-contain rounded-lg" /> : <Store className="w-16 h-16 text-purple-500" />}
-                    <div>
-                      <h3 className="text-xl font-semibold">{store.name}</h3>
-                      <p className="text-gray-600 text-left">{store.category}</p>
-                    </div>
-                  </div>
-                  {store.description && <p className="text-gray-600 text-left">{store.description}</p>}
-                  {store.location_in_mall && <p className="text-sm text-gray-600 text-left">
-                      Ubicación: {store.location_in_mall}
-                    </p>}
-                  {store.mall && <p className="text-sm text-gray-600 text-left">
-                      Centro Comercial: {store.mall.name}
-                    </p>}
-                  {store.contact_number && <p className="text-sm text-gray-600 text-left">
-                      Contacto: {store.contact_number}
-                    </p>}
-                </div>
-              </div>
-
+            {/* Store Info Component */}
+            <StoreInfo store={store} />
+            <div className="lg:col-span-3"> {/*Ensuring promotions are displayed below the StoreInfo component */}
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-2xl font-bold mb-4">Promociones Actuales</h2>
                 {promotions && promotions.length > 0 ? <div className="space-y-4">
