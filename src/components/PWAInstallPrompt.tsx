@@ -39,6 +39,12 @@ export function PWAInstallPrompt() {
       return;
     }
 
+    // Check if we've already attempted update in this session
+    const hasAttemptedUpdateInSession = sessionStorage.getItem('hasAttemptedUpdate') === 'true';
+    if (hasAttemptedUpdateInSession) {
+      setHasAttemptedUpdate(true);
+    }
+
     // Store the install prompt event for later use
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -48,8 +54,8 @@ export function PWAInstallPrompt() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Check for updates
-    if (needRefresh && !hasAttemptedUpdate) {
+    // Check for updates - only show if we haven't already attempted
+    if (needRefresh && !hasAttemptedUpdate && !hasAttemptedUpdateInSession) {
       setShowUpdatePrompt(true);
     }
 
@@ -77,7 +83,8 @@ export function PWAInstallPrompt() {
     setShowPrompt(false);
   };
 
-  if (showUpdatePrompt) {
+  // Don't show update prompt if we've already tried updating
+  if (showUpdatePrompt && !hasAttemptedUpdate) {
     return (
       <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
         <p className="mb-2">Nueva actualización disponible</p>
@@ -89,7 +96,7 @@ export function PWAInstallPrompt() {
             // Mark that we've attempted this update
             setHasAttemptedUpdate(true);
             // Store in sessionStorage to persist across page reloads
-            sessionStorage.setItem('hasAttemptedUpdate', 'true');
+            sessionStorage.setItem('hasAttemptedUpdate', 'true');;
 
             // Update the service worker
             try {
