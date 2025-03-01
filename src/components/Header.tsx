@@ -53,7 +53,11 @@ export const Header = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                        <DropdownMenuItem onClick={() => navigate('/allpromos')}>
+                          <Star className="mr-2 h-4 w-4" />
+                          <span>Promociones</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/promotions')}>
                           <Plus className="mr-2 h-4 w-4" />
                           <span>Administrar</span>
                         </DropdownMenuItem>
@@ -82,7 +86,11 @@ export const Header = () => {
                         <div className="px-2 py-1.5 text-sm font-medium text-gray-500 border-b">
                           {session.user?.email}
                         </div>
-                        <DropdownMenuItem onClick={() => navigate('/admin')}>
+                        <DropdownMenuItem onClick={() => navigate('/allpromos')}>
+                          <Star className="mr-2 h-4 w-4" />
+                          <span>Promociones</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/admin/promotions')}>
                           <Plus className="mr-2 h-4 w-4" />
                           <span>Administrar</span>
                         </DropdownMenuItem>
