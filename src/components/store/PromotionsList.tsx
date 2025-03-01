@@ -7,15 +7,46 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useSession } from "@/components/providers/SessionProvider";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PromotionsListProps {
-  promotions: DatabasePromotion[];
-  onEdit: (promotion: DatabasePromotion) => void;
-  onDelete: (id: string) => void;
+  promotions?: DatabasePromotion[];
+  onEdit?: (promotion: DatabasePromotion) => void;
+  onDelete?: (id: string) => void;
+  storeId?: string;
 }
 
-export function PromotionsList({ promotions, onEdit, onDelete }: PromotionsListProps) {
+export function PromotionsList({ promotions: externalPromotions, onEdit, onDelete, storeId }: PromotionsListProps) {
   const { session } = useSession();
+  const [promotions, setPromotions] = useState<DatabasePromotion[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch promotions if storeId is provided and no external promotions
+  useEffect(() => {
+    if (storeId && !externalPromotions?.length) {
+      const fetchPromotions = async () => {
+        setLoading(true);
+        try {
+          const { data, error } = await supabase
+            .from('promotions')
+            .select('*')
+            .eq('store_id', storeId);
+          
+          if (error) throw error;
+          setPromotions(data || []);
+        } catch (error) {
+          console.error("Error fetching promotions:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      fetchPromotions();
+    } else if (externalPromotions) {
+      setPromotions(externalPromotions);
+    }
+  }, [storeId, externalPromotions]);
 
   const typeColors = {
     coupon: 'bg-blue-100 text-blue-800',
@@ -28,6 +59,23 @@ export function PromotionsList({ promotions, onEdit, onDelete }: PromotionsListP
     coupon: 'Cupón',
     sale: 'Oferta'
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Cargando promociones...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-20 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!promotions?.length) {
     return (
@@ -48,16 +96,17 @@ export function PromotionsList({ promotions, onEdit, onDelete }: PromotionsListP
     <div className="space-y-6">
       {promotions.map(promo => {
         const isOwner = session?.user?.id === promo.user_id;
+        const promoType = promo.type as keyof typeof typeColors;
 
         return (
           <Card key={promo.id} className="overflow-hidden hover:shadow-lg transition-shadow relative group">
             <CardHeader>
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
-                  <Badge className={`${typeColors[promo.type]} capitalize`}>
-                    {typeLabels[promo.type]}
+                  <Badge className={`${typeColors[promoType] || ''} capitalize`}>
+                    {typeLabels[promoType] || promo.type}
                   </Badge>
-                  {isOwner && (
+                  {isOwner && onEdit && onDelete && (
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
@@ -105,13 +154,15 @@ export function PromotionsList({ promotions, onEdit, onDelete }: PromotionsListP
               <p className="text-gray-600 whitespace-pre-wrap text-left">
                 {promo.description}
               </p>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar className="h-4 w-4 flex-shrink-0" />
-                <span>
-                  {format(new Date(promo.start_date), 'd MMM')} -{' '}
-                  {format(new Date(promo.end_date), 'd MMM, yyyy')}
-                </span>
-              </div>
+              {promo.start_date && promo.end_date && (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Calendar className="h-4 w-4 flex-shrink-0" />
+                  <span>
+                    {format(new Date(promo.start_date), 'd MMM')} -{' '}
+                    {format(new Date(promo.end_date), 'd MMM, yyyy')}
+                  </span>
+                </div>
+              )}
             </CardContent>
           </Card>
         );
