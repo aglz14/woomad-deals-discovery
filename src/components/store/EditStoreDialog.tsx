@@ -19,18 +19,21 @@ interface EditStoreDialogProps {
 
 export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStoreDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false); // Added missing state
   const [storeData, setStoreData] = useState({
     name: store.name || "",
     category: store.category || "",
     description: store.description || "",
     logo_url: store.logo_url || "",
-    location_in_mall: store.location_in_mall || "", //This line was added
+    location_in_mall: store.location_in_mall || "",
   });
 
   const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+
     try {
       const { error } = await supabase
         .from("stores")
@@ -39,17 +42,21 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
           description: storeData.description,
           category: storeData.category,
           logo_url: storeData.logo_url,
-          location_in_mall: storeData.location_in_mall, //This line was added
+          location_in_mall: storeData.location_in_mall,
+          mall_id: store.mall_id // Ensure mall_id is included in the update
         })
         .eq("id", store.id);
 
       if (error) throw error;
 
-      toast.success("Tienda actualizada exitosamente");
+      toast.success("Tienda actualizada correctamente");
       onSuccess();
+      onClose(); //Close the dialog after success
     } catch (error) {
       console.error("Error updating store:", error);
-      toast.error("Error al actualizar la tienda");
+      toast.error(`Error al actualizar la tienda: ${error instanceof Error ? error.message : 'Desconocido'}`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -98,16 +105,18 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
           <div>
             <Label htmlFor="location">Ubicación en el centro comercial</Label>
             <Input
-              id="location_in_mall" //This line was changed
-              value={storeData.location_in_mall} //This line was changed
-              onChange={(e) => setStoreData({ ...storeData, location_in_mall: e.target.value })} //This line was changed
+              id="location_in_mall"
+              value={storeData.location_in_mall}
+              onChange={(e) => setStoreData({ ...storeData, location_in_mall: e.target.value })}
             />
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit">Guardar</Button>
+            <Button type="submit" disabled={submitting}> {/* Disable button while submitting */}
+              Guardar
+            </Button>
           </div>
         </form>
       </DialogContent>
