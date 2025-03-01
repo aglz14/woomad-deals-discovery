@@ -114,9 +114,9 @@ export default function PublicStoreProfile() {
       <Header />
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="mb-8 grid grid-cols-1 gap-8"> {/* Changed to grid-cols-1 */}
             {/* Back Button */}
-            <div className="lg:col-span-3 flex justify-start mb-2">
+            <div className="flex justify-start mb-2">
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -130,7 +130,7 @@ export default function PublicStoreProfile() {
 
             {/* Store Info Component */}
             <StoreInfo store={store} />
-            <div className="lg:col-span-3"> {/*Ensuring promotions are displayed below the StoreInfo component */}
+            <div> {/*Ensuring promotions are displayed below the StoreInfo component */}
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h2 className="text-2xl font-bold mb-4">Promociones Actuales</h2>
                 {promotions && promotions.length > 0 ? <div className="space-y-4">
