@@ -93,9 +93,14 @@ export function PWAInstallPrompt() {
 
             // Update the service worker
             try {
-              // Call updateServiceWorker without expecting a Promise return
-              updateServiceWorker(true);
-              console.log("Service worker update triggered");
+              if (typeof updateServiceWorker === 'function') {
+                updateServiceWorker(true);
+                console.log("Service worker update triggered");
+              } else {
+                console.warn("updateServiceWorker is not a function");
+                // Force reload as fallback
+                window.location.reload();
+              };
 
               // Force reload after a short delay
               setTimeout(() => {

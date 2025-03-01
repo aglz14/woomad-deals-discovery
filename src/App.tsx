@@ -43,6 +43,8 @@ function App() {
             <ErrorBoundary fallback={<div>Algo ha ido mal</div>}>
               <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Cargando...</div>}>
                 <Routes>
+                  {/* Add error boundary for each route */}
+                  <Route path="/" errorElement={<div>Error loading page</div>}>
                   <Route path="/" element={<Index />} />
                   <Route path="/signup" element={<Signup />} />
                   <Route path="/password-reset" element={<PasswordReset />} />
@@ -58,6 +60,7 @@ function App() {
                   <Route path="/mall-management/:mallId" element={<MallManagement />} />
                   <Route path="/allpromos" element={<AllPromos />} />
                   <Route path="*" element={<NotFound />} />
+                  </Route>
                 </Routes>
               </Suspense>
             </ErrorBoundary>

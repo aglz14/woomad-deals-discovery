@@ -1,19 +1,27 @@
 
+import { registerSW as registerVitePWA } from 'virtual:pwa-register';
+
 export function registerSW() {
   if ('serviceWorker' in navigator) {
     // Use a flag to prevent double registration
     if (window.__SW_REGISTERED) return;
     
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('SW registered successfully: ', registration);
+    try {
+      // Register the Vite PWA service worker
+      const updateSW = registerVitePWA({
+        onRegistered(registration) {
+          console.log('Service worker registered successfully:', registration);
           window.__SW_REGISTERED = true;
-        })
-        .catch(error => {
-          console.error('SW registration failed: ', error);
-        });
-    });
+        },
+        onRegisterError(error) {
+          console.error('Service worker registration failed:', error);
+        }
+      });
+      
+      return updateSW;
+    } catch (error) {
+      console.error('Error registering service worker:', error);
+    }
   }
 }
 
