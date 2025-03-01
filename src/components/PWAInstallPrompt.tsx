@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 
 // PWA installation event interface
 interface BeforeInstallPromptEvent extends Event {
@@ -15,6 +15,22 @@ export function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
   const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
+
+  // Register and set up the service worker
+  const {
+    needRefresh,
+    updateServiceWorker,
+  } = useRegisterSW({
+    onRegistered(r) {
+      console.log('Service worker registered:', r);
+    },
+    onRegisterError(error) {
+      console.error('Service worker registration error:', error);
+    },
+    immediate: true,
+    // This parameter will help avoid unnecessary update prompts
+    skipWaiting: false
+  });
 
   useEffect(() => {
     // Check if already installed
@@ -38,10 +54,15 @@ export function PWAInstallPrompt() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
+    // Check for updates - only show if we haven't already attempted
+    if (needRefresh && !hasAttemptedUpdate && !hasAttemptedUpdateInSession) {
+      setShowUpdatePrompt(true);
+    }
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, []);
+  }, [needRefresh, hasAttemptedUpdate]);
 
   const handleInstallClick = async () => {
     if (!installPrompt) return;
@@ -62,22 +83,42 @@ export function PWAInstallPrompt() {
     setShowPrompt(false);
   };
 
+  // Don't show update prompt if we've already tried updating
   if (showUpdatePrompt && !hasAttemptedUpdate) {
     return (
       <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
         <p className="mb-2">Nueva actualización disponible</p>
         <Button 
           onClick={() => {
-            console.log("Updating application...");
+            console.log("Updating service worker...");
             // First hide the prompt to avoid confusion
             setShowUpdatePrompt(false);
             // Mark that we've attempted this update
             setHasAttemptedUpdate(true);
             // Store in sessionStorage to persist across page reloads
-            sessionStorage.setItem('hasAttemptedUpdate', 'true');
+            sessionStorage.setItem('hasAttemptedUpdate', 'true');;
 
-            // Force reload as fallback
-            window.location.reload();
+            // Update the service worker
+            try {
+              if (typeof updateServiceWorker === 'function') {
+                updateServiceWorker(true);
+                console.log("Service worker update triggered");
+              } else {
+                console.warn("updateServiceWorker is not a function");
+                // Force reload as fallback
+                window.location.reload();
+              };
+
+              // Force reload after a short delay
+              setTimeout(() => {
+                console.log("Reloading page after service worker update attempt...");
+                window.location.reload(true); // Force reload from server
+              }, 1000);
+            } catch (error) {
+              console.error("Error updating service worker:", error);
+              // Even if there's an error, reload the page to get a fresh state
+              setTimeout(() => window.location.reload(true), 1000);
+            }
           }}
         >
           Actualizar

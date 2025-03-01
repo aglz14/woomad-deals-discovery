@@ -12,10 +12,9 @@ interface StoreInfoProps {
     location_in_mall?: string;
     contact_number?: string;
   };
-  categories?: string[];
 }
 
-export function StoreInfo({ store, categories }: StoreInfoProps) {
+export function StoreInfo({ store }: StoreInfoProps) {
   return (
     <Card className="lg:col-span-1 h-fit">
       <CardHeader className="space-y-4 sm:space-y-6">

@@ -1,4 +1,3 @@
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -8,16 +7,10 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n/config";
 import { registerSW } from "./registerSW";
 
-// Add global window property before using it
-if (!window.hasOwnProperty('__SW_REGISTERED')) {
-  window.__SW_REGISTERED = false;
-}
-
 // Only register service worker once
 if (!window.__SW_REGISTERED) {
   // Register service worker
   registerSW();
-  window.__SW_REGISTERED = true;
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

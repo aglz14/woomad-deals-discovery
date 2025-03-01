@@ -7,8 +7,9 @@ import { Toaster as UIToaster } from '@/components/ui/toaster'
 import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'; // Added import
 
+// Lazy imports for code splitting and better performance
 const Index = lazy(() => import('./pages/Index'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const PasswordReset = lazy(() => import('./pages/PasswordReset'))
@@ -42,22 +43,23 @@ function App() {
             <ErrorBoundary fallback={<div>Algo ha ido mal</div>}>
               <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Cargando...</div>}>
                 <Routes>
+                  {/* Add error boundary for each route */}
                   <Route path="/" errorElement={<div>Error loading page</div>}>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/password-reset" element={<PasswordReset />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/nosotros" element={<Nosotros />} />
-                    <Route path="/contacto" element={<Contacto />} />
-                    <Route path="/admin/promotions" element={<Promotions />} />
-                    <Route path="/admin/mall/:id" element={<AdminMallProfile />} />
-                    <Route path="/admin/store/:id" element={<StoreProfile />} />
-                    <Route path="/mall/:id" element={<PublicMallProfile />} />
-                    <Route path="/store/:id" element={<PublicStoreProfile />} />
-                    <Route path="/mall-details/:id" element={<MallDetails />} />
-                    <Route path="/mall-management/:mallId" element={<MallManagement />} />
-                    <Route path="/allpromos" element={<AllPromos />} />
-                    <Route path="*" element={<NotFound />} />
+                  <Route path="/" element={<Index />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/password-reset" element={<PasswordReset />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/nosotros" element={<Nosotros />} />
+                  <Route path="/contacto" element={<Contacto />} />
+                  <Route path="/admin/promotions" element={<Promotions />} />
+                  <Route path="/admin/mall/:id" element={<AdminMallProfile />} />
+                  <Route path="/admin/store/:id" element={<StoreProfile />} />
+                  <Route path="/mall/:id" element={<PublicMallProfile />} />
+                  <Route path="/store/:id" element={<PublicStoreProfile />} />
+                  <Route path="/mall-details/:id" element={<MallDetails />} />
+                  <Route path="/mall-management/:mallId" element={<MallManagement />} />
+                  <Route path="/allpromos" element={<AllPromos />} />
+                  <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>
               </Suspense>

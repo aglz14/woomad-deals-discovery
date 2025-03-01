@@ -27,114 +27,42 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
-        Row: {
-          email: string
-          favorites: number
-          id: string
-          locationenabled: boolean
-          name: string
-          notificationsenabled: boolean
-          profileimage: string | null
-          reviews: number
-          visits: number
-        }
-        Insert: {
-          email: string
-          favorites?: number
-          id: string
-          locationenabled?: boolean
-          name: string
-          notificationsenabled?: boolean
-          profileimage?: string | null
-          reviews?: number
-          visits?: number
-        }
-        Update: {
-          email?: string
-          favorites?: number
-          id?: string
-          locationenabled?: boolean
-          name?: string
-          notificationsenabled?: boolean
-          profileimage?: string | null
-          reviews?: number
-          visits?: number
-        }
-        Relationships: []
-      }
       promotions: {
         Row: {
-          categories: string[] | null
-          category_types: string[] | null
           created_at: string
           description: string
-          discount: string | null
-          email: string | null
           end_date: string
-          favorites: number | null
           id: string
-          image: string | null
-          latitude: number | null
-          locationenabled: boolean | null
-          longitude: number | null
-          name: string | null
-          notificationsenabled: boolean | null
-          reviews: number | null
-          start_date: string | null
+          image_url: string | null
+          start_date: string
           store_id: string | null
           title: string
-          type: string | null
+          type: string
           user_id: string | null
-          visits: number | null
         }
         Insert: {
-          categories?: string[] | null
-          category_types?: string[] | null
           created_at?: string
           description: string
-          discount?: string | null
-          email?: string | null
           end_date: string
-          favorites?: number | null
           id?: string
-          image?: string | null
-          latitude?: number | null
-          locationenabled?: boolean | null
-          longitude?: number | null
-          name?: string | null
-          notificationsenabled?: boolean | null
-          reviews?: number | null
-          start_date?: string | null
+          image_url?: string | null
+          start_date: string
           store_id?: string | null
           title: string
-          type?: string | null
+          type: string
           user_id?: string | null
-          visits?: number | null
         }
         Update: {
-          categories?: string[] | null
-          category_types?: string[] | null
           created_at?: string
           description?: string
-          discount?: string | null
-          email?: string | null
           end_date?: string
-          favorites?: number | null
           id?: string
-          image?: string | null
-          latitude?: number | null
-          locationenabled?: boolean | null
-          longitude?: number | null
-          name?: string | null
-          notificationsenabled?: boolean | null
-          reviews?: number | null
-          start_date?: string | null
+          image_url?: string | null
+          start_date?: string
           store_id?: string | null
           title?: string
-          type?: string | null
+          type?: string
           user_id?: string | null
-          visits?: number | null
         }
         Relationships: [
           {
@@ -170,108 +98,78 @@ export type Database = {
       shopping_malls: {
         Row: {
           address: string
-          categories: string[] | null
           created_at: string
           description: string | null
-          distance: string | null
-          hours: string | null
           id: string
-          image: string | null
+          image_url: string | null
           latitude: number
           longitude: number
           name: string
-          rating: number | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           address: string
-          categories?: string[] | null
           created_at?: string
           description?: string | null
-          distance?: string | null
-          hours?: string | null
           id?: string
-          image?: string | null
+          image_url?: string | null
           latitude: number
           longitude: number
           name: string
-          rating?: number | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           address?: string
-          categories?: string[] | null
           created_at?: string
           description?: string | null
-          distance?: string | null
-          hours?: string | null
           id?: string
-          image?: string | null
+          image_url?: string | null
           latitude?: number
           longitude?: number
           name?: string
-          rating?: number | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
       stores: {
         Row: {
-          categories: string[] | null
           category: string
           contact_number: string | null
           created_at: string
           description: string | null
           floor: string | null
-          has_promotions: boolean | null
-          hours: string | null
           id: string
-          image: string | null
           index: number
-          latitude: number | null
-          location: string | null
           location_in_mall: string | null
-          longitude: number | null
+          logo_url: string | null
           mall_id: string | null
           name: string
           user_id: string | null
         }
         Insert: {
-          categories?: string[] | null
           category: string
           contact_number?: string | null
           created_at?: string
           description?: string | null
           floor?: string | null
-          has_promotions?: boolean | null
-          hours?: string | null
           id?: string
-          image?: string | null
           index?: number
-          latitude?: number | null
-          location?: string | null
           location_in_mall?: string | null
-          longitude?: number | null
+          logo_url?: string | null
           mall_id?: string | null
           name: string
           user_id?: string | null
         }
         Update: {
-          categories?: string[] | null
           category?: string
           contact_number?: string | null
           created_at?: string
           description?: string | null
           floor?: string | null
-          has_promotions?: boolean | null
-          hours?: string | null
           id?: string
-          image?: string | null
           index?: number
-          latitude?: number | null
-          location?: string | null
           location_in_mall?: string | null
-          longitude?: number | null
+          logo_url?: string | null
           mall_id?: string | null
           name?: string
           user_id?: string | null
