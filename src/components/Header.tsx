@@ -62,15 +62,44 @@ export const Header = () => {
                       <span>Cerrar Sesión</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu> : <div className="flex items-center gap-4">
-                  <Button variant="ghost" onClick={() => setIsAuthModalOpen(true)} className="text-white hover:text-sky-500/90">
-                    Iniciar Sesión
-                  </Button>
-                  <Button variant="outline" onClick={() => navigate("/signup")} className="text-white bg-transparent border-white hover:bg-white hover:text-purple-500">
-                    Registrarse
-                  </Button>
+                </DropdownMenu> : 
+                <>
+                  {/* Desktop buttons */}
+                  <div className="hidden md:flex items-center gap-4">
+                    <Button variant="ghost" onClick={() => setIsAuthModalOpen(true)} className="text-white hover:text-sky-500/90">
+                      Iniciar Sesión
+                    </Button>
+                    <Button variant="outline" onClick={() => navigate("/signup")} className="text-white bg-transparent border-white hover:bg-white hover:text-purple-500">
+                      Registrarse
+                    </Button>
+                  </div>
+
+                  {/* Mobile hamburger menu */}
+                  <div className="md:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="text-white p-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="4" x2="20" y1="12" y2="12"/>
+                            <line x1="4" x2="20" y1="6" y2="6"/>
+                            <line x1="4" x2="20" y1="18" y2="18"/>
+                          </svg>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48 bg-white/90 backdrop-blur-sm">
+                        <DropdownMenuItem onClick={() => {
+                          setIsAuthModalOpen(true);
+                        }} className="cursor-pointer">
+                          Iniciar Sesión
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate("/signup")} className="cursor-pointer">
+                          Registrarse
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                   <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} mode="login" />
-                </div>}
+                </>}
             </div>
           </div>
         </div>
