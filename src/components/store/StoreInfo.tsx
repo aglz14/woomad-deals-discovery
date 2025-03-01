@@ -42,6 +42,7 @@ export function StoreInfo({ store }: StoreInfoProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-6 pt-4 px-6">
+        {/* About */}
         <div className="space-y-2">
           <h3 className="text-lg font-semibold text-gray-800">Acerca de</h3>
           <p className="text-gray-600">
@@ -49,30 +50,10 @@ export function StoreInfo({ store }: StoreInfoProps) {
           </p>
         </div>
         
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-800">Ubicación</h3>
-          {store.location_in_mall && (
-            <div className="flex items-start gap-2">
-              <MapPin className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
-              <p className="text-gray-600">{store.location_in_mall}</p>
-            </div>
-          )}
-        </div>
-        
-        {store.contact_number && (
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800">Contacto</h3>
-            <div className="flex items-start gap-2">
-              <Phone className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
-              <p className="text-gray-600">{store.contact_number}</p>
-            </div>
-          </div>
-        )}
-        
         {/* Mall Information */}
         {store.mall && (
-          <div className="space-y-3 pt-2 border-t border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-800 pt-2">Centro Comercial</h3>
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-gray-800">Centro Comercial</h3>
             <div className="flex items-start gap-2">
               <Building2 className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
               <div>
@@ -88,6 +69,28 @@ export function StoreInfo({ store }: StoreInfoProps) {
                 <p className="text-gray-600">Piso: {store.floor}</p>
               </div>
             )}
+          </div>
+        )}
+        
+        {/* Location */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-gray-800">Ubicación</h3>
+          {store.location_in_mall && (
+            <div className="flex items-start gap-2">
+              <MapPin className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-600">{store.location_in_mall}</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Contact */}
+        {store.contact_number && (
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-gray-800">Contacto</h3>
+            <div className="flex items-start gap-2">
+              <Phone className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+              <p className="text-gray-600">{store.contact_number}</p>
+            </div>
           </div>
         )}
       </CardContent>
