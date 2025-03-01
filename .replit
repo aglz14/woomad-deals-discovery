@@ -36,4 +36,4 @@ author = 38747565
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd mobile-app && npm start -- --web"
+args = "cd mobile-app && npm start"
