@@ -24,7 +24,7 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
     category: store.category || "",
     description: store.description || "",
     logo_url: store.logo_url || "",
-    location: store.location || "",
+    location_in_mall: store.location_in_mall || "", //This line was added
   });
 
   const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
@@ -34,7 +34,13 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
     try {
       const { error } = await supabase
         .from("stores")
-        .update({...storeData, id: store.id})
+        .update({
+          name: storeData.name,
+          description: storeData.description,
+          category: storeData.category,
+          logo_url: storeData.logo_url,
+          location_in_mall: storeData.location_in_mall, //This line was added
+        })
         .eq("id", store.id);
 
       if (error) throw error;
@@ -92,9 +98,9 @@ export function EditStoreDialog({ store, isOpen, onClose, onSuccess }: EditStore
           <div>
             <Label htmlFor="location">Ubicación en el centro comercial</Label>
             <Input
-              id="location"
-              value={storeData.location}
-              onChange={(e) => setStoreData({ ...storeData, location: e.target.value })}
+              id="location_in_mall" //This line was changed
+              value={storeData.location_in_mall} //This line was changed
+              onChange={(e) => setStoreData({ ...storeData, location_in_mall: e.target.value })} //This line was changed
             />
           </div>
           <div className="flex justify-end gap-2">
