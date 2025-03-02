@@ -72,7 +72,7 @@ export const Header = () => {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                             <LogOut className="mr-2 h-4 w-4" />
-                            <span>{t("logOut")}</span>
+                            <span>Cerrar Sesión</span>
                           </DropdownMenuItem>
                         </>
                       )}
@@ -115,7 +115,7 @@ export const Header = () => {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                             <LogOut className="mr-2 h-4 w-4" />
-                            <span>{t("logOut")}</span>
+                            <span>Cerrar Sesión</span>
                           </DropdownMenuItem>
                         </>
                       )}
