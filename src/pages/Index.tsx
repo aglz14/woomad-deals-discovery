@@ -32,9 +32,9 @@ export default function Index() {
   });
   
   // Animation classes for content sections
-  const sectionClasses = "px-4 py-8 sm:py-12 md:py-16 transition-all duration-300 hover:bg-gray-50/50";
-  const sectionHeaderClasses = "flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4";
-  const sectionTitleClasses = "text-2xl sm:text-3xl font-bold text-gray-900";
+  const sectionClasses = "px-3 py-6 sm:px-4 sm:py-8 md:py-12 transition-all duration-300 hover:bg-gray-50/50";
+  const sectionHeaderClasses = "flex flex-col sm:flex-row items-center justify-between mb-4 sm:mb-6 gap-3";
+  const sectionTitleClasses = "text-xl sm:text-2xl md:text-3xl font-bold text-gray-900";
 
   // Get malls with active promotions
   const { data: malls } = useQuery({
@@ -104,7 +104,7 @@ export default function Index() {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 via-white to-purple-50">
       <Header />
       
-      <main className="flex-grow pt-16">
+      <main className="flex-grow pt-14 sm:pt-16">
         <HomeHero 
           userLocation={userLocation}
         />

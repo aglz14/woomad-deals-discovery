@@ -1,4 +1,3 @@
-
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Instagram, Linkedin } from "lucide-react";
@@ -6,10 +5,10 @@ import { Instagram, Linkedin } from "lucide-react";
 export const Footer = () => {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
-  
+
   return (
-    <footer className="bg-gradient-to-b from-white to-gray-50">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="bg-gray-100 text-gray-600 py-8 pb-20 md:pb-12 md:py-12">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           {/* Brand Column */}
           <div className="space-y-6">
@@ -29,7 +28,7 @@ export const Footer = () => {
               </p>
             </div>
           </div>
-          
+
           {/* Quick Links Column */}
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -54,7 +53,7 @@ export const Footer = () => {
               </li>
             </ul>
           </div>
-          
+
           {/* Social Links Column */}
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -86,7 +85,7 @@ export const Footer = () => {
             </ul>
           </div>
         </div>
-        
+
         {/* Copyright Section */}
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-center text-gray-500 text-sm">

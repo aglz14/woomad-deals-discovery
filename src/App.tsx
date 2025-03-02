@@ -7,7 +7,8 @@ import { Toaster as UIToaster } from '@/components/ui/toaster'
 import { ThemeProvider } from 'next-themes'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'; // Added import
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 
 // Lazy imports for code splitting and better performance
 const Index = lazy(() => import('./pages/Index'))
@@ -67,6 +68,7 @@ function App() {
             <Toaster />
             <UIToaster />
             <PWAInstallPrompt />
+            <MobileBottomNav />
           </SessionProvider>
         </QueryClientProvider>
       </ThemeProvider>

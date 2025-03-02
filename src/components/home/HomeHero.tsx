@@ -14,17 +14,17 @@ export const HomeHero = ({ userLocation }: HomeHeroProps) => {
     <div className="relative bg-gradient-to-r from-purple-600 to-blue-600 text-white overflow-hidden">
       <div className="absolute inset-0 bg-[url('/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png')] opacity-10 bg-center bg-no-repeat bg-cover mix-blend-overlay"></div>
       <div className="absolute inset-0 bg-black/20"></div>
-      <div className="relative py-8 sm:py-10 pt-20 sm:pt-24 md:pt-28 lg:pt-32">
+      <div className="relative py-6 px-4 pt-16 sm:pt-20 md:pt-24 lg:pt-28">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto text-center space-y-6 sm:space-y-8">
-            <div className="space-y-4 sm:space-y-6 animate-fade-in">
-              <div className="inline-flex items-center justify-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-2 sm:mb-4">
-                <span className="text-sm font-medium text-white">✨ Descubre ofertas exclusivas cerca de ti</span>
+          <div className="max-w-5xl mx-auto text-center space-y-4 sm:space-y-6">
+            <div className="space-y-3 sm:space-y-4 animate-fade-in">
+              <div className="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 bg-white/20 backdrop-blur-sm rounded-full mb-2">
+                <span className="text-xs sm:text-sm font-medium text-white">✨ Descubre ofertas exclusivas cerca de ti</span>
               </div>
-              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
                 {userLocation ? t("nearMe") : t("deals")}
               </h1>
-              <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto px-4 leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mx-auto px-2 leading-relaxed">
                 {t("searchPlaceholder")}
               </p>
               {userLocation && (
