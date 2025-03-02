@@ -15,6 +15,8 @@ import { User, Save, UserCog, MapPin, Bell } from "lucide-react";
 import { GeofenceSettings } from "@/components/GeofenceSettings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider"; // Import Slider component
+import { Switch } from "@/components/ui/switch";
 
 
 export default function Profile() {
@@ -26,6 +28,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationRadius, setNotificationRadius] = useState(500); // Add state for notification radius
 
 
   // Redirect if not logged in
@@ -59,7 +62,7 @@ export default function Profile() {
       // Fetch notification preferences separately
       const { data: prefsData, error: prefsError } = await supabase
         .from('user_preferences')
-        .select('notifications_enabled')
+        .select('notifications_enabled, notification_radius') //Added notification_radius
         .eq('user_id', session.user.id)
         .single();
 
@@ -69,6 +72,7 @@ export default function Profile() {
 
       if (prefsData) {
         setNotificationsEnabled(prefsData.notifications_enabled || false);
+        setNotificationRadius(prefsData.notification_radius || 500); // Set initial radius
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -97,6 +101,7 @@ export default function Profile() {
         .upsert({
           user_id: session.user.id,
           notifications_enabled: notificationsEnabled,
+          notification_radius: notificationRadius, // Added notification radius
           updated_at: new Date().toISOString()
         });
 
@@ -201,15 +206,29 @@ export default function Profile() {
                       <CardTitle>Notificaciones</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
-                        <div>
-                          <Checkbox
-                            id="notifications"
+                      <div className="space-y-6">
+                        <div className="flex items-center space-x-2">
+                          <Switch
                             checked={notificationsEnabled}
+                            id="notifications"
                             onCheckedChange={setNotificationsEnabled}
-                          >
-                            Habilitar notificaciones
-                          </Checkbox>
+                          />
+                          <Label htmlFor="notifications">Habilitar notificaciones</Label>
+                        </div>
+
+                        <div className="space-y-3">
+                          <Label>Radio de detección: {notificationRadius} metros</Label>
+                          <Slider
+                            disabled={!notificationsEnabled}
+                            value={[notificationRadius]}
+                            min={100}
+                            max={2000}
+                            step={100}
+                            onValueChange={(value) => setNotificationRadius(value[0])}
+                          />
+                          <p className="text-xs text-gray-500">
+                            Define a qué distancia de un centro comercial deseas recibir notificaciones
+                          </p>
                         </div>
                       </div>
                     </CardContent>
