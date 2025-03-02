@@ -5,12 +5,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/providers/SessionProvider";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AddMallForm } from "@/components/mall/AddMallForm";
-import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 import { MallCard } from "@/components/mall/MallCard";
 import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { useTranslation } from "react-i18next";
@@ -51,7 +56,9 @@ export default function Promotions() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         navigate("/");
         toast.error(t("errorTitle"));
@@ -68,9 +75,9 @@ export default function Promotions() {
   const handleDeleteMall = async (mallId: string) => {
     try {
       const { error } = await supabase
-        .from('shopping_malls')
+        .from("shopping_malls")
         .delete()
-        .eq('id', mallId);
+        .eq("id", mallId);
 
       if (error) throw error;
 
@@ -82,10 +89,11 @@ export default function Promotions() {
     setMallToDelete(null);
   };
 
-  const filteredMalls = malls?.filter(mall =>
-    mall.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mall.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mall.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMalls = malls?.filter(
+    (mall) =>
+      mall.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mall.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mall.description?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const isOwner = (mallUserId: string) => {
@@ -100,7 +108,9 @@ export default function Promotions() {
         <div className="container mx-auto px-4 py-8">
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h1 className="text-2xl font-bold text-gray-900">{t('managePromotions')}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {t("managePromotions")}
+              </h1>
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                 {/* Add Promotion button removed - this functionality is now in store profiles */}
 
@@ -108,12 +118,12 @@ export default function Promotions() {
                   <DialogTrigger asChild>
                     <Button className="w-full sm:w-auto">
                       <Plus className="h-4 w-4 mr-2" />
-                      {t('addShoppingMall')}
+                      {t("addShoppingMall")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>{t('addShoppingMall')}</DialogTitle>
+                      <DialogTitle>{t("addShoppingMall")}</DialogTitle>
                     </DialogHeader>
                     <AddMallForm
                       onSuccess={() => {
@@ -135,7 +145,7 @@ export default function Promotions() {
                     <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       type="text"
-                      placeholder={t('searchMalls')}
+                      placeholder={t("searchMalls")}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pl-10 bg-gray-50 border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 h-10"
@@ -145,7 +155,6 @@ export default function Promotions() {
                 {/* Placeholder for future filter -  No filter data available in original code */}
               </div>
             </div>
-
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredMalls?.map((mall) => (
@@ -163,7 +172,10 @@ export default function Promotions() {
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <AlertDialog open={mallToDelete === mall.id} onOpenChange={(open) => !open && setMallToDelete(null)}>
+                      <AlertDialog
+                        open={mallToDelete === mall.id}
+                        onOpenChange={(open) => !open && setMallToDelete(null)}
+                      >
                         <AlertDialogTrigger asChild>
                           <Button
                             variant="destructive"
@@ -179,13 +191,15 @@ export default function Promotions() {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>{t('deleteMallTitle')}</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              {t("deleteMallTitle")}
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              {t('deleteMallDescription')}
+                              {t("deleteMallDescription")}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -193,7 +207,7 @@ export default function Promotions() {
                               }}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              {t('delete')}
+                              {t("delete")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -211,20 +225,22 @@ export default function Promotions() {
         </div>
       </main>
 
-      {malls?.map((mall) => (
-        mallToEdit === mall.id && isOwner(mall.user_id) && (
-          <EditMallDialog
-            key={mall.id}
-            mall={mall}
-            isOpen={true}
-            onClose={() => setMallToEdit(null)}
-            onSuccess={() => {
-              refetchMalls();
-              setMallToEdit(null);
-            }}
-          />
-        )
-      ))}
+      {malls?.map(
+        (mall) =>
+          mallToEdit === mall.id &&
+          isOwner(mall.user_id) && (
+            <EditMallDialog
+              key={mall.id}
+              mall={mall}
+              isOpen={true}
+              onClose={() => setMallToEdit(null)}
+              onSuccess={() => {
+                refetchMalls();
+                setMallToEdit(null);
+              }}
+            />
+          ),
+      )}
 
       <Footer />
     </div>
