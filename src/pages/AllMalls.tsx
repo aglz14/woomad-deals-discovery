@@ -44,19 +44,7 @@ export default function AllMalls() {
       );
     }
 
-    // Filter by distance if user location is available
-    if (userLocation) {
-      filtered = filtered.filter(mall => {
-        const distance = calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          mall.latitude,
-          mall.longitude
-        );
-        return distance <= MAX_DISTANCE_KM;
-      });
-    }
-
+    // Show all malls regardless of distance
     return filtered;
   };
 
@@ -92,7 +80,7 @@ export default function AllMalls() {
           </Link>
         </Button>
         
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">{t("allMalls")}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Todos los Centros Comerciales</h1>
         
         <div className="w-full mb-6">
           <SearchBar 
