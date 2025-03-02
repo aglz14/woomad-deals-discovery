@@ -140,15 +140,27 @@ export default function AllMalls() {
                         className="group block bg-white rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
                       >
                         <div 
-                          className="aspect-[16/9] w-full overflow-hidden rounded-t-lg relative"
-                          style={{
-                            backgroundImage: mall.image ? `url(${mall.image})` : 'none',
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center'
-                          }}
+                          className="aspect-[16/9] w-full overflow-hidden rounded-t-lg relative bg-gray-100"
                         >
-                          {!mall.image && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                          {mall.image ? (
+                            <img 
+                              src={mall.image}
+                              alt={mall.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                // Replace with fallback icon if image fails to load
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.parentElement.innerHTML = `
+                                  <div class="absolute inset-0 flex items-center justify-center bg-gray-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 text-gray-400">
+                                      <path d="M6 8h12"></path><path d="M6 16h12"></path><path d="M6 12h12"></path><path d="M3 5v14"></path><path d="M21 5v14"></path>
+                                    </svg>
+                                  </div>
+                                `;
+                              }}
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
                               <Building2 className="w-12 h-12 text-gray-400" />
                             </div>
                           )}
