@@ -128,6 +128,25 @@ export default function Index() {
               </div>
             </Link>
           </div>
+          
+          {/* Banner for all shopping malls */}
+          <div className="w-full bg-gradient-to-r from-blue-600 via-teal-500 to-green-600 rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1 border border-white/10">
+            <Link to="/allmalls" className="block p-5 sm:p-8">
+              <div className="flex flex-col sm:flex-row justify-between items-center text-white">
+                <div className="mb-4 sm:mb-0 animate-fade-up">
+                  <div className="flex items-center">
+                    <div className="h-10 w-1.5 bg-yellow-400 rounded-full mr-3"></div>
+                    <h3 className="text-2xl sm:text-3xl font-bold">Ver todos los centros comerciales</h3>
+                  </div>
+                  <p className="mt-3 text-white/90 text-lg ml-4">Sin límite de distancia - Encuentra plazas en cualquier parte</p>
+                </div>
+                <div className="flex items-center bg-white/20 backdrop-blur-sm py-3 px-6 rounded-full transition-all duration-300 hover:bg-white/30 group">
+                  <span className="mr-2 font-medium">Explorar</span>
+                  <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </div>
+              </div>
+            </Link>
+          </div>
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 sm:mb-6">
             <div className="w-full md:w-1/2 lg:w-2/3 mb-4 md:mb-0">
