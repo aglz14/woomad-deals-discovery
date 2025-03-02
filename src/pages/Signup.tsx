@@ -18,17 +18,49 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // Log the signup attempt (without password)
+      console.log("Attempting signup with email:", email);
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          // Add any additional data needed for user profiles
+          // data: { firstName: firstName, lastName: lastName }
+        }
       });
       
       if (error) throw error;
       
-      toast.success("¡Revisa tu correo para confirmar tu cuenta!");
-      navigate("/");
+      console.log("Signup response:", data);
+      
+      // Check if user was created
+      if (data.user) {
+        // Create initial user preference record if needed
+        try {
+          const { error: prefError } = await supabase
+            .from('user_preferences')
+            .insert([
+              { 
+                user_id: data.user.id,
+                notifications_enabled: false
+              }
+            ]);
+            
+          if (prefError) console.error("Error creating user preferences:", prefError);
+        } catch (prefErr) {
+          console.error("Failed to create user preferences:", prefErr);
+        }
+        
+        toast.success("¡Revisa tu correo para confirmar tu cuenta!");
+        navigate("/");
+      } else {
+        // In some cases, user might be null even though there's no error
+        toast.error("No se pudo crear el usuario. Intenta nuevamente.");
+      }
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Signup error:", error);
+      toast.error(error.message || "Error al crear la cuenta. Intenta nuevamente.");
     } finally {
       setLoading(false);
     }
