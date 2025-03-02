@@ -1,4 +1,3 @@
-
 import { MallCard } from "@/components/mall/MallCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +33,7 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
   const filteredMalls = malls?.filter(mall => {
     // First filter by mall ID if selected
     if (selectedMallId !== 'all' && mall.id !== selectedMallId) return false;
-    
+
     // Then filter by search term
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
