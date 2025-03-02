@@ -94,15 +94,38 @@ export default function Profile() {
 
       if (profileError) throw profileError;
 
-      // Update notification preferences
-      const { error: prefsError } = await supabase
+      // Check if preference already exists
+      const { data: existingPrefs } = await supabase
         .from('user_preferences')
-        .upsert({
-          user_id: session.user.id,
-          notifications_enabled: notificationsEnabled,
-          notification_radius: notificationRadius,
-          updated_at: new Date().toISOString()
-        });
+        .select('*')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      // Update or insert notification preferences
+      let prefsError;
+      if (existingPrefs) {
+        // Update existing record
+        const { error } = await supabase
+          .from('user_preferences')
+          .update({
+            notifications_enabled: notificationsEnabled,
+            notification_radius: notificationRadius,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', session.user.id);
+        prefsError = error;
+      } else {
+        // Insert new record
+        const { error } = await supabase
+          .from('user_preferences')
+          .insert({
+            user_id: session.user.id,
+            notifications_enabled: notificationsEnabled,
+            notification_radius: notificationRadius,
+            updated_at: new Date().toISOString()
+          });
+        prefsError = error;
+      }
 
       if (prefsError) throw prefsError;
 
