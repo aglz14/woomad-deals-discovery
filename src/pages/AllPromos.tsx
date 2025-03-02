@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { SearchBar } from "@/components/search/SearchBar";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { PromotionsList } from "@/components/home/PromotionsList";
 import { Button } from "@/components/ui/button";
 import { DatabasePromotion } from "@/types/promotion";
 

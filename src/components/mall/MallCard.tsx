@@ -3,6 +3,9 @@ import { Button } from "../ui/button";
 import { Building2, MapPin } from "lucide-react";
 import { Mall } from "@/types/mall";
 import { Card, CardContent } from "../ui/card";
+// Added import to fix ReferenceError
+//import { PromotionsList } from "./PromotionsList";
+
 
 interface MallCardProps {
   mall: Mall;
@@ -46,7 +49,7 @@ export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true
             <span className="line-clamp-2">{mall.address}</span>
           </div>
         )}
-        {showDistance && mall.distance !== undefined && mall.distance !== null && (
+        {showDistance && mall.distance !== undefined && ( //Simplified null check
           <p className="text-sm text-gray-500">
             {mall.distance < 1
               ? `${Math.round(mall.distance * 1000)} m`
