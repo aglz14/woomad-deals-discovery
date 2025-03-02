@@ -1,233 +1,167 @@
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import React from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
-import { Upload } from "@/components/ui/upload"; // Assuming this component exists
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateMall, Mall } from "@/services/mallService";
+import { Upload } from "@/components/ui/upload";
+import { Camera } from "lucide-react";
+import { uploadImage } from "@/services/imageService";
 
+const formSchema = z.object({
+  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
+  address: z.string().min(5, "La dirección debe tener al menos 5 caracteres"),
+  description: z.string().optional(),
+  image: z.string().optional(),
+  latitude: z.number(),
+  longitude: z.number(),
+});
 
-interface AddMallFormProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
+interface EditMallDialogProps {
+  mall: Mall;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function AddMallForm({ isOpen, onClose, onSuccess }: AddMallFormProps) {
-  const { t } = useTranslation();
-  const [mallData, setMallData] = useState({
-    name: "",
-    address: "",
-    description: "",
-    latitude: "",
-    longitude: "",
-    image: ""
+export function EditMallDialog({ mall, open, onOpenChange }: EditMallDialogProps) {
+  const queryClient = useQueryClient();
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: mall.name,
+      address: mall.address,
+      description: mall.description || "",
+      image: mall.image || "",
+      latitude: mall.latitude,
+      longitude: mall.longitude,
+    },
   });
-  const [loading, setLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) => {
+      return updateMall(mall.id, values);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mall", mall.id] });
+      queryClient.invalidateQueries({ queryKey: ["malls"] });
+      toast.success("Centro comercial actualizado correctamente");
+      onOpenChange(false);
+    },
+    onError: () => {
+      toast.error("Error al actualizar el centro comercial");
+    },
+  });
 
-  const uploadImage = async (file: File): Promise<string | null> => {
-    if (!file) return null;
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `/${fileName}`;
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    mutation.mutate(values);
+  }
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
     try {
-      setUploadProgress(0);
-      const { data, error } = await supabase.storage
-        .from("logos")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: true,
-          onUploadProgress: (progress) => {
-            const percent = Math.round((progress.loaded / progress.total) * 100);
-            setUploadProgress(percent);
-          },
-        });
-      if (error) throw error;
-      const { data: urlData } = await supabase.storage.from("logos").getPublicUrl(filePath);
-      return urlData.publicUrl;
+      const url = await uploadImage(file, "mall-images");
+      form.setValue("image", url);
+      toast.success("Imagen cargada correctamente");
     } catch (error) {
-      console.error("Error uploading image:", error);
-      toast.error(t("mall.imageUploadError"));
-      return null;
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      let imageUrl = "";
-      if (imageFile) {
-        const newImageUrl = await uploadImage(imageFile);
-        if (newImageUrl) {
-          imageUrl = newImageUrl;
-        }
-      }
-
-      const { error } = await supabase
-        .from("shopping_malls")
-        .insert({
-          name: mallData.name,
-          address: mallData.address,
-          description: mallData.description,
-          latitude: parseFloat(mallData.latitude),
-          longitude: parseFloat(mallData.longitude),
-          image: imageUrl,
-        });
-
-      if (error) throw error;
-
-      toast.success(t("mallAddedSuccess"));
-      onSuccess();
-      onClose();
-    } catch (error) {
-      console.error("Error adding mall:", error);
-      toast.error(t("errorTitle"));
-    } finally {
-      setLoading(false);
-      setUploadProgress(0);
+      toast.error("Error al cargar la imagen");
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t("addMall")}</DialogTitle>
+          <DialogTitle>Editar Centro Comercial</DialogTitle>
+          <DialogDescription>
+            Actualiza la información del centro comercial
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="add-mall-image">{t("mall.image") || "Imagen"}</Label>
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-center">
-                  <div className="relative mb-2">
-                    {imagePreview ? (
-                      <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="Vista previa"
-                          className="w-32 h-32 object-cover rounded-md border border-gray-200"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
-                          onClick={() => {
-                            setImageFile(null);
-                            setImagePreview(null);
-                            setMallData({ ...mallData, image: "" });
-                          }}
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="w-32 h-32 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center">
-                        <Upload className="text-gray-400" />
-                      </div>
-                    )}
-                    {uploadProgress > 0 && uploadProgress < 100 && (
-                      <div className="absolute bottom-0 left-0 w-full bg-gray-200 h-1">
-                        <div className="bg-primary h-1" style={{ width: `${uploadProgress}%` }} />
-                      </div>
-                    )}
-                  </div>
-                  <label htmlFor="add-mall-image" className="cursor-pointer">
-                    <div className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-md">
-                      {imagePreview ? "Cambiar imagen" : "Subir imagen"}
-                    </div>
-                    <input
-                      id="add-mall-image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nombre del centro comercial" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dirección</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Dirección del centro comercial" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descripción</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Descripción del centro comercial"
+                      {...field}
                     />
-                  </label>
-                </div>
-              </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Imagen</FormLabel>
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Input placeholder="URL de la imagen" {...field} />
+                    </FormControl>
+                    <Upload
+                      icon={<Camera className="w-5 h-5" />}
+                      className="h-10 w-10 border rounded-md flex items-center justify-center bg-gray-50"
+                      onChange={handleImageUpload}
+                    />
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? "Guardando..." : "Guardar cambios"}
+              </Button>
             </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="add-mall-name">{t("mall.name")}</Label>
-              <Input
-                id="add-mall-name"
-                value={mallData.name}
-                onChange={(e) => setMallData({ ...mallData, name: e.target.value })}
-                placeholder={t("mall.namePlaceholder")}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="add-mall-address">{t("address")}</Label>
-              <Input
-                id="add-mall-address"
-                value={mallData.address}
-                onChange={(e) => setMallData({ ...mallData, address: e.target.value })}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="add-mall-description">{t("description")}</Label>
-              <Textarea
-                id="add-mall-description"
-                value={mallData.description}
-                onChange={(e) => setMallData({ ...mallData, description: e.target.value })}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="add-mall-latitude">{t("latitude")}</Label>
-              <Input
-                id="add-mall-latitude"
-                type="number"
-                step="any"
-                value={mallData.latitude}
-                onChange={(e) => setMallData({ ...mallData, latitude: e.target.value })}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="add-mall-longitude">{t("longitude")}</Label>
-              <Input
-                id="add-mall-longitude"
-                type="number"
-                step="any"
-                value={mallData.longitude}
-                onChange={(e) => setMallData({ ...mallData, longitude: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
-              {t("cancel")}
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? t("loading") : t("add")}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
