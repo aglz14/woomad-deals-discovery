@@ -71,8 +71,8 @@ export default function AllMalls() {
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-6">
-        <div className="mb-4 pt-4 sm:pt-6">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-20">
+        <div className="mb-4">
           <Button variant="ghost" asChild>
             <Link to="/" className="inline-flex items-center">
               <ArrowLeft className="mr-2 h-4 w-4" />
