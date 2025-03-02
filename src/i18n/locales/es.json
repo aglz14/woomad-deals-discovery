@@ -1,0 +1,19 @@
+
+
+    "mall": {
+      "name": "Nombre",
+      "namePlaceholder": "Ingrese el nombre del centro comercial",
+      "address": "Dirección",
+      "addressPlaceholder": "Ingrese la dirección del centro comercial",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ingrese una descripción del centro comercial",
+      "location": "Ubicación",
+      "latitude": "Latitud",
+      "longitude": "Longitud",
+      "image": "Imagen de perfil",
+      "imageUploadError": "Error al subir la imagen",
+      "addSuccess": "Centro comercial agregado con éxito",
+      "addError": "Error al agregar el centro comercial",
+      "editSuccess": "Centro comercial actualizado con éxito",
+      "editError": "Error al actualizar el centro comercial"
+    },
