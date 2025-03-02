@@ -24,9 +24,8 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
   const { userLocation, calculateDistance } = useLocation();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-
-  const { isMonitoring, startMonitoring, stopMonitoring } = useGeofencing(null); // Placeholder - needs actual malls data
+  // Notifications functionality moved to Profile page only
+  const { isMonitoring } = useGeofencing(null); // Placeholder - needs actual malls data
 
 
   const { data: malls, isLoading } = useQuery({
@@ -132,14 +131,7 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
         )}
       </div>
 
-      <div className="flex items-center space-x-2 mb-4 bg-gray-50 p-3 rounded-lg">
-        <Switch 
-          id="geofence-notifications" 
-          checked={notificationsEnabled}
-          onCheckedChange={handleToggleNotifications}
-        />
-        <Label htmlFor="geofence-notifications">Notificarme cuando esté cerca de un centro comercial</Label>
-      </div>
+      {/* Notification toggle removed - now only in Profile page */}v>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((mall) => (
