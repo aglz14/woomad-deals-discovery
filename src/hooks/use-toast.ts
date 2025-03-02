@@ -102,17 +102,13 @@ export const reducer = (state: State, action: Action): State => {
 
       return {
         ...state,
-        toasts: state.toasts.map((t, index) =>
+        toasts: state.toasts.map((t) =>
           t.id === toastId || toastId === undefined
             ? {
                 ...t,
                 open: false,
               }
-            : {
-                ...t,
-                // Add additional bottom margin to separate toasts
-                className: `${t.className || ''} mb-${index + 1}`,
-              }
+            : t
         ),
       }
     }
