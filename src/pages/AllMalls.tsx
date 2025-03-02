@@ -11,7 +11,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/use-location";
-import { MapPinIcon } from "@heroicons/react/24/solid";
+import { MapPin } from "lucide-react";
 
 
 export default function AllMalls() {
@@ -137,7 +137,7 @@ export default function AllMalls() {
                           </p>
                           {userLocation && (
                             <div className="mt-2 flex items-center text-sm text-purple-600">
-                              <MapPinIcon className="mr-1 h-4 w-4" />
+                              <MapPin className="mr-1 h-4 w-4" />
                               <span>
                                 {calculateDistance(
                                   userLocation.lat,
