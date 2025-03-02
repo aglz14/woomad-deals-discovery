@@ -48,7 +48,9 @@ export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true
         )}
         {showDistance && mall.distance !== undefined && (
           <p className="text-sm text-gray-500">
-            {mall.distance.toFixed(2)} km
+            {mall.distance < 1
+              ? `${Math.round(mall.distance * 1000)} m`
+              : `${mall.distance.toFixed(1)} km`}
           </p>
         )}
       </CardContent>
