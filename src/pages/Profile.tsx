@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/components/providers/SessionProvider";
@@ -15,16 +14,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Save, UserCog, MapPin, Bell } from "lucide-react";
 import { GeofenceSettings } from "@/components/GeofenceSettings";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 export default function Profile() {
   const { t } = useTranslation();
   const { session } = useSession();
   const navigate = useNavigate();
-  
+
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState<any>(null);
-  
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+
   // Redirect if not logged in
   useEffect(() => {
     if (!session) {
@@ -34,43 +37,45 @@ export default function Profile() {
       fetchProfileData();
     }
   }, [session, navigate]);
-  
+
   const fetchProfileData = async () => {
     if (!session?.user?.id) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
-      
+
       if (error) throw error;
-      
+
       if (data) {
         setProfileData(data);
         setName(data.full_name || "");
+        setNotificationsEnabled(data.notifications_enabled || false);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
   };
-  
+
   const updateProfile = async () => {
     if (!session?.user?.id) return;
-    
+
     setLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .update({
           full_name: name,
+          notifications_enabled: notificationsEnabled,
           updated_at: new Date()
         })
         .eq('id', session.user.id);
-      
+
       if (error) throw error;
-      
+
       toast.success("Perfil actualizado con éxito");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -79,14 +84,14 @@ export default function Profile() {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
+
       <main className="flex-grow pt-24 pb-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
         <h1 className="text-3xl font-bold mb-8">Mi Perfil</h1>
-        
+
         {session && (
           <div className="flex flex-col md:flex-row gap-8">
             <Card className="w-full md:w-1/3">
@@ -109,7 +114,7 @@ export default function Profile() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="flex-1">
               <Tabs defaultValue="account">
                 <TabsList className="mb-6">
@@ -122,7 +127,7 @@ export default function Profile() {
                     <span>Notificaciones</span>
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="account">
                   <Card>
                     <CardHeader>
@@ -160,16 +165,33 @@ export default function Profile() {
                     </CardFooter>
                   </Card>
                 </TabsContent>
-                
+
                 <TabsContent value="notifications">
-                  <GeofenceSettings className="w-full" />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Notificaciones</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div>
+                          <Checkbox
+                            id="notifications"
+                            checked={notificationsEnabled}
+                            onCheckedChange={setNotificationsEnabled}
+                          >
+                            Habilitar notificaciones
+                          </Checkbox>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </TabsContent>
               </Tabs>
             </div>
           </div>
         )}
       </main>
-      
+
       <Footer />
     </div>
   );
