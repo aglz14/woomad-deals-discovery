@@ -1,0 +1,346 @@
+[plugin:vite:react-swc] × the name `Toast` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:3:1]
+  1 │ import { useToast } from "@/hooks/use-toast"
+  2 │ import {
+  3 │   Toast,
+    ·   ──┬──
+    ·     ╰── previous definition of `Toast` here
+  4 │   ToastClose,
+  5 │   ToastDescription,
+  6 │   ToastProvider,
+  7 │   ToastTitle,
+  8 │   ToastViewport,
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+    ·          ──┬──
+    ·            ╰── `Toast` redefined here
+ 35 │ import { useToast } from "@/hooks/use-toast"
+ 36 │ 
+ 37 │ export function Toaster() {
+    ╰────
+  × the name `ToastClose` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:4:1]
+  1 │ import { useToast } from "@/hooks/use-toast"
+  2 │ import {
+  3 │   Toast,
+  4 │   ToastClose,
+    ·   ─────┬────
+    ·        ╰── previous definition of `ToastClose` here
+  5 │   ToastDescription,
+  6 │   ToastProvider,
+  7 │   ToastTitle,
+  8 │   ToastViewport,
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+    ·                 ─────┬────
+    ·                      ╰── `ToastClose` redefined here
+ 35 │ import { useToast } from "@/hooks/use-toast"
+ 36 │ 
+ 37 │ export function Toaster() {
+    ╰────
+  × the name `ToastDescription` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:5:1]
+  2 │ import {
+  3 │   Toast,
+  4 │   ToastClose,
+  5 │   ToastDescription,
+    ·   ────────┬───────
+    ·           ╰── previous definition of `ToastDescription` here
+  6 │   ToastProvider,
+  7 │   ToastTitle,
+  8 │   ToastViewport,
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+    ·                             ────────┬───────
+    ·                                     ╰── `ToastDescription` redefined here
+ 35 │ import { useToast } from "@/hooks/use-toast"
+ 36 │ 
+ 37 │ export function Toaster() {
+    ╰────
+  × the name `ToastProvider` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:6:1]
+  3 │   Toast,
+  4 │   ToastClose,
+  5 │   ToastDescription,
+  6 │   ToastProvider,
+    ·   ──────┬──────
+    ·         ╰── previous definition of `ToastProvider` here
+  7 │   ToastTitle,
+  8 │   ToastViewport,
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+    ·                                               ──────┬──────
+    ·                                                     ╰── `ToastProvider` redefined here
+ 35 │ import { useToast } from "@/hooks/use-toast"
+ 36 │ 
+ 37 │ export function Toaster() {
+    ╰────
+  × the name `ToastTitle` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:7:1]
+  4 │   ToastClose,
+  5 │   ToastDescription,
+  6 │   ToastProvider,
+  7 │   ToastTitle,
+    ·   ─────┬────
+    ·        ╰── previous definition of `ToastTitle` here
+  8 │   ToastViewport,
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+    ·                                                              ─────┬────
+    ·                                                                   ╰── `ToastTitle` redefined here
+ 35 │ import { useToast } from "@/hooks/use-toast"
+ 36 │ 
+ 37 │ export function Toaster() {
+    ╰────
+  × the name `ToastViewport` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:8:1]
+  5 │   ToastDescription,
+  6 │   ToastProvider,
+  7 │   ToastTitle,
+  8 │   ToastViewport,
+    ·   ──────┬──────
+    ·         ╰── previous definition of `ToastViewport` here
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+    ·                                                                          ──────┬──────
+    ·                                                                                ╰── `ToastViewport` redefined here
+ 35 │ import { useToast } from "@/hooks/use-toast"
+ 36 │ 
+ 37 │ export function Toaster() {
+    ╰────
+  × the name `useToast` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:1:1]
+  1 │ import { useToast } from "@/hooks/use-toast"
+    ·          ────┬───
+    ·              ╰── previous definition of `useToast` here
+  2 │ import {
+  3 │   Toast,
+  4 │   ToastClose,
+  5 │   ToastDescription,
+  6 │   ToastProvider,
+  7 │   ToastTitle,
+  8 │   ToastViewport,
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+ 35 │ import { useToast } from "@/hooks/use-toast"
+    ·          ────┬───
+    ·              ╰── `useToast` redefined here
+ 36 │ 
+ 37 │ export function Toaster() {
+ 38 │   const { toasts } = useToast()
+    ╰────
+  × the name `Toaster` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/ui/toaster.tsx:11:1]
+  8 │   ToastViewport,
+  9 │ } from "@/components/ui/toast"
+ 10 │ 
+ 11 │ export function Toaster() {
+    ·                 ───┬───
+    ·                    ╰── previous definition of `Toaster` here
+ 12 │   const { toasts } = useToast()
+ 13 │ 
+ 14 │   return (
+ 15 │     <ToastProvider>
+ 16 │       {toasts.map(function ({ id, title, description, action, ...props }) {
+ 17 │         return (
+ 18 │           <Toast key={id} {...props}>
+ 19 │             <div className="grid gap-1">
+ 20 │               {title && <ToastTitle>{title}</ToastTitle>}
+ 21 │               {description && (
+ 22 │                 <ToastDescription>{description}</ToastDescription>
+ 23 │               )}
+ 24 │             </div>
+ 25 │             {action}
+ 26 │             <ToastClose />
+ 27 │           </Toast>
+ 28 │         )
+ 29 │       })}
+ 30 │       <ToastViewport />
+ 31 │     </ToastProvider>
+ 32 │   )
+ 33 │ }
+ 34 │ import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast"
+ 35 │ import { useToast } from "@/hooks/use-toast"
+ 36 │ 
+ 37 │ export function Toaster() {
+    ·                 ───┬───
+    ·                    ╰── `Toaster` redefined here
+ 38 │   const { toasts } = useToast()
+ 39 │ 
+ 40 │   return (
+    ╰────
+/home/runner/workspace/src/components/ui/toaster.tsx:3:1
+20 |                {title && <ToastTitle>{title}</ToastTitle>}
+21 |                {description && (
+22 |                  <ToastDescription>{description}</ToastDescription>
+   |            ^
+23 |                )}
+24 |              </div>
