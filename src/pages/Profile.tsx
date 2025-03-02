@@ -84,7 +84,7 @@ export default function Profile() {
 
     setLoading(true);
     try {
-      // Update profile data
+      // Update profile data (name only)
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -94,12 +94,15 @@ export default function Profile() {
 
       if (profileError) throw profileError;
 
-      // Check if preference already exists
-      const { data: existingPrefs } = await supabase
+      // Handle notification preferences separately
+      // Check if preference record exists first
+      const { data: existingPrefs, error: checkError } = await supabase
         .from('user_preferences')
-        .select('*')
+        .select('id')
         .eq('user_id', session.user.id)
         .maybeSingle();
+      
+      if (checkError && checkError.code !== 'PGRST116') throw checkError;
 
       // Update or insert notification preferences
       let prefsError;
