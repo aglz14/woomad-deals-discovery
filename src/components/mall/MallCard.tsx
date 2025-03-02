@@ -2,7 +2,7 @@ import { FC } from "react";
 import { Button } from "../ui/button";
 import { Building2, MapPin } from "lucide-react";
 import { Mall } from "@/types/mall";
-import { Card, CardContent, CardFooter } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 
 interface MallCardProps {
   mall: Mall;
@@ -12,7 +12,10 @@ interface MallCardProps {
 
 export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true }) => {
   return (
-    <Card className="overflow-hidden border border-gray-200 hover:border-gray-300 transition-all hover:shadow-md">
+    <Card 
+      className="overflow-hidden border border-gray-200 hover:border-gray-300 transition-all hover:shadow-md cursor-pointer"
+      onClick={onClick}
+    >
       <div className="aspect-[16/9] bg-gray-100 flex items-center justify-center relative overflow-hidden">
         {mall.image ? (
           <img 
@@ -35,7 +38,7 @@ export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true
           <Building2 className="w-12 h-12 text-gray-400" />
         )}
       </div>
-      <CardContent className="p-4">
+      <CardContent className="p-4 pb-5">
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{mall.name}</h3>
         {mall.address && (
           <div className="flex items-start gap-1.5 text-sm text-gray-500 mb-2">
@@ -51,11 +54,6 @@ export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true
           </p>
         )}
       </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <Button variant="outline" className="w-full" onClick={onClick}>
-          Ver detalles
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
