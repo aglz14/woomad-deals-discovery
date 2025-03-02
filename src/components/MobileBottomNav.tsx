@@ -32,9 +32,9 @@ export const MobileBottomNav = () => {
         </Link>
 
         <Link 
-          to="/all-malls" // Updated route
+          to="/allmalls" 
           className={`flex flex-col items-center justify-center w-1/4 h-full ${
-            isActive("/all-malls") ? "text-purple-600" : "text-gray-500"
+            isActive("/allmalls") ? "text-purple-600" : "text-gray-500"
           }`}
         >
           <MapPinIcon className="w-5 h-5 mb-1" />
