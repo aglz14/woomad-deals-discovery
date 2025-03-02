@@ -129,7 +129,6 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
                   onClick={(e) => {
                     e.preventDefault();
                     setCurrentPage(Math.max(1, currentPage - 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 />
               </PaginationItem>
@@ -142,7 +141,6 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
                     onClick={(e) => {
                       e.preventDefault();
                       setCurrentPage(page);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                   >
                     {page}
@@ -156,7 +154,6 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
                   onClick={(e) => {
                     e.preventDefault();
                     setCurrentPage(Math.min(totalPages, currentPage + 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 />
               </PaginationItem>
