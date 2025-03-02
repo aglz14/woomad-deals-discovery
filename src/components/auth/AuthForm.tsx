@@ -93,16 +93,13 @@ export const AuthForm = ({
       </form>
 
       <div className="text-center space-y-2">
-        {mode === "login" ? <>
+        {mode === "login" ? (
             <Button variant="link" className="text-sm" onClick={() => onModeChange("reset")}>¿Olvidaste tu contraseña? Iniciar Sesión</Button>
-            <div>
-              <Button variant="link" className="text-sm" onClick={() => onModeChange("signup")}>
-                ¿No tienes una cuenta? Regístrate
-              </Button>
-            </div>
-          </> : <Button variant="link" className="text-sm" onClick={() => onModeChange("login")}>
-            ¿Ya tienes una cuenta? Inicia sesión
-          </Button>}
+          ) : (
+            <Button variant="link" className="text-sm" onClick={() => onModeChange("login")}>
+              ¿Ya tienes una cuenta? Inicia sesión
+            </Button>
+          )}
       </div>
     </div>;
 };
