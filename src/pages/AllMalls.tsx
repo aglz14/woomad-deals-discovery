@@ -72,12 +72,14 @@ export default function AllMalls() {
       <Header />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-6">
-        <Button variant="ghost" className="mb-4 pt-4 sm:pt-6" asChild> {/* Added padding here */}
-          <Link to="/" className="inline-flex items-center">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("backToHome")}
-          </Link>
-        </Button>
+        <div className="mb-4 pt-4 sm:pt-6">
+          <Button variant="ghost" asChild>
+            <Link to="/" className="inline-flex items-center">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("backToHome")}
+            </Link>
+          </Button>
+        </div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Todos los Centros Comerciales</h1>
 
