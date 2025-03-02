@@ -149,3 +149,36 @@ export function Upload({
     </div>
   );
 }
+import React, { forwardRef } from "react";
+import { cn } from "@/lib/utils";
+
+export interface UploadProps extends React.HTMLAttributes<HTMLDivElement> {
+  icon?: React.ReactNode;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const Upload = forwardRef<HTMLDivElement, UploadProps>(
+  ({ className, icon, onChange, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "relative flex items-center justify-center cursor-pointer",
+          className
+        )}
+        {...props}
+      >
+        {icon}
+        <input
+          type="file"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          onChange={onChange}
+        />
+      </div>
+    );
+  }
+);
+
+Upload.displayName = "Upload";
+
+export { Upload };
