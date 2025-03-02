@@ -42,7 +42,7 @@ export default function Promotions() {
     queryFn: async () => {
       const { data, error } = await supabase.from("shopping_malls").select("*");
       if (error) {
-        toast.error(t("errorTitle"));
+        toast.error("Error al cargar centros comerciales");
         throw error;
       }
       return data;
@@ -74,10 +74,10 @@ export default function Promotions() {
 
       if (error) throw error;
 
-      toast.success(t("mallDeletedSuccess"));
+      toast.success("Centro comercial eliminado exitosamente");
       refetchMalls();
     } catch (error) {
-      toast.error(t("errorDeletingMall"));
+      toast.error("Error al eliminar el centro comercial");
     }
     setMallToDelete(null);
   };

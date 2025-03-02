@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useSession } from "@/components/providers/SessionProvider";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,27 +26,27 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate the form data
     if (!newMall.name || !newMall.address) {
       toast.error("Name and address are required");
       return;
     }
-    
+
     // Parse and validate coordinates
     const lat = parseFloat(newMall.latitude);
     const lng = parseFloat(newMall.longitude);
-    
+
     if (isNaN(lat) || lat < -90 || lat > 90) {
       toast.error("Latitude must be a valid number between -90 and 90");
       return;
     }
-    
+
     if (isNaN(lng) || lng < -180 || lng > 180) {
       toast.error("Longitude must be a valid number between -180 and 180");
       return;
     }
-    
+
     try {
       const { error } = await supabase.from("shopping_malls").insert([
         {
@@ -65,11 +64,11 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
         throw error;
       }
 
-      toast.success("Shopping mall added successfully");
+      toast.success("Centro comercial añadido exitosamente");
       onSuccess();
     } catch (error) {
       console.error("Error adding mall:", error);
-      toast.error("Failed to add shopping mall");
+      toast.error("Error al añadir el centro comercial");
     }
   };
 

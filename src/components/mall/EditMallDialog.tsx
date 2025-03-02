@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,21 +39,21 @@ export function EditMallDialog({ mall, isOpen, onClose, onSuccess }: EditMallDia
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate coordinates
     const lat = parseFloat(String(editedMall.latitude));
     const lng = parseFloat(String(editedMall.longitude));
-    
+
     if (isNaN(lat) || lat < -90 || lat > 90) {
       toast.error("Latitude must be a valid number between -90 and 90");
       return;
     }
-    
+
     if (isNaN(lng) || lng < -180 || lng > 180) {
       toast.error("Longitude must be a valid number between -180 and 180");
       return;
     }
-    
+
     try {
       const { error } = await supabase
         .from("shopping_malls")
@@ -74,7 +73,7 @@ export function EditMallDialog({ mall, isOpen, onClose, onSuccess }: EditMallDia
       onClose();
     } catch (error) {
       console.error("Error updating mall:", error);
-      toast.error(t("errorTitle"));
+      toast.error("Error al actualizar el centro comercial"); //This line is changed.
     }
   };
 
