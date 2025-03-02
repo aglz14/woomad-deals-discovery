@@ -14,6 +14,13 @@ interface MallCardProps {
 }
 
 export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true }) => {
+  const formatDistance = (distance: number | undefined): string => {
+    if (distance === undefined || distance < 0) return "N/A"; // Handle undefined or invalid distances
+    return distance < 1
+      ? `${Math.round(distance * 1000)} m`
+      : `${distance.toFixed(1)} km`;
+  };
+
   return (
     <Card 
       className="overflow-hidden border border-gray-200 hover:border-gray-300 transition-all hover:shadow-md cursor-pointer"
@@ -49,11 +56,9 @@ export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true
             <span className="line-clamp-2">{mall.address}</span>
           </div>
         )}
-        {showDistance && mall.distance !== undefined && ( //Simplified null check
+        {showDistance && (
           <p className="text-sm text-gray-500">
-            {mall.distance < 1
-              ? `${Math.round(mall.distance * 1000)} m`
-              : `${mall.distance.toFixed(1)} km`}
+            {formatDistance(mall.distance)}
           </p>
         )}
       </CardContent>

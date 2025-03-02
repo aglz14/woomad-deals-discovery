@@ -30,7 +30,19 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
     },
   });
 
-  const filteredMalls = malls?.filter(mall => {
+  const filteredMalls = malls?.map(mall => {
+    // Calculate distance if user location is available
+    if (userLocation) {
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        mall.latitude,
+        mall.longitude
+      );
+      return { ...mall, distance };
+    }
+    return mall;
+  }).filter(mall => {
     // First filter by mall ID if selected
     if (selectedMallId !== 'all' && mall.id !== selectedMallId) return false;
 
@@ -44,14 +56,8 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
     }
 
     // Finally, filter by distance if user location is available
-    if (userLocation) {
-      const distance = calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        mall.latitude,
-        mall.longitude
-      );
-      return distance <= MAX_DISTANCE_KM;
+    if (userLocation && mall.distance !== undefined) {
+      return mall.distance <= MAX_DISTANCE_KM;
     }
 
     return true; // Include all malls if user location is not available
