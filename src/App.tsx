@@ -27,6 +27,7 @@ const MallDetails = lazy(() => import('./pages/MallDetails'))
 const MallManagement = lazy(() => import('./pages/MallManagement'))
 const AllPromos = lazy(() => import('./pages/AllPromos'))
 const AllMalls = lazy(() => import('./pages/AllMalls'))
+const Profile = lazy(() => import('./pages/Profile')) // Added Profile component import
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +63,7 @@ function App() {
                     <Route path="/mall-management/:mallId" element={<MallManagement />} />
                     <Route path="/allpromos" element={<AllPromos />} />
                     <Route path="/allmalls" element={<AllMalls />} />
+                    <Route path="/profile" element={<Profile />} /> {/* Added Profile route */}
                     <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>

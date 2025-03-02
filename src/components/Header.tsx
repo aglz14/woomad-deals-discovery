@@ -61,11 +61,21 @@ export const Header = () => {
                           <Plus className="mr-2 h-4 w-4" />
                           <span>Administrar</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Cerrar Sesión</span>
-                        </DropdownMenuItem>
+                        {session && (
+                        <>
+                          <DropdownMenuItem asChild>
+                            <Link to="/profile" className="flex items-center">
+                              <User className="mr-2 h-4 w-4" />
+                              <span>Mi Perfil</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>{t("logOut")}</span>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -94,11 +104,21 @@ export const Header = () => {
                           <Plus className="mr-2 h-4 w-4" />
                           <span>Administrar</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Cerrar Sesión</span>
-                        </DropdownMenuItem>
+                        {session && (
+                        <>
+                          <DropdownMenuItem asChild>
+                            <Link to="/profile" className="flex items-center">
+                              <User className="mr-2 h-4 w-4" />
+                              <span>Mi Perfil</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>{t("logOut")}</span>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
