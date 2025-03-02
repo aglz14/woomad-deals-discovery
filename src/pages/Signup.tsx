@@ -38,6 +38,21 @@ export default function Signup() {
       if (data.user) {
         // Create initial user preference record if needed
         try {
+          console.log("Attempting to create user preferences for user ID:", data.user.id);
+          
+          // Check if user_preferences table exists
+          const { error: checkError } = await supabase
+            .from('user_preferences')
+            .select('*')
+            .limit(1);
+          
+          if (checkError) {
+            console.error("Error checking user_preferences table:", checkError);
+            // If the table doesn't exist, we might need to create it
+            // This is likely the source of your database error
+          }
+          
+          // Attempt to create the user preferences
           const { error: prefError } = await supabase
             .from('user_preferences')
             .insert([
@@ -47,9 +62,18 @@ export default function Signup() {
               }
             ]);
             
-          if (prefError) console.error("Error creating user preferences:", prefError);
+          if (prefError) {
+            console.error("Error creating user preferences:", prefError);
+            console.error("Error details:", prefError.details, prefError.hint, prefError.code);
+            
+            // Don't let this error block the signup flow
+            // Still proceed with the signup process
+          } else {
+            console.log("User preferences created successfully");
+          }
         } catch (prefErr) {
           console.error("Failed to create user preferences:", prefErr);
+          // Continue with signup even if preferences creation fails
         }
         
         toast.success("¡Revisa tu correo para confirmar tu cuenta!");
@@ -60,7 +84,22 @@ export default function Signup() {
       }
     } catch (error: any) {
       console.error("Signup error:", error);
-      toast.error(error.message || "Error al crear la cuenta. Intenta nuevamente.");
+      
+      // Log detailed Supabase error information if available
+      if (error.code) {
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        console.error("Error details:", error.details);
+      }
+      
+      // Show a more specific error message if possible
+      if (error.code === '23505') {
+        toast.error("Este correo electrónico ya está registrado. Intenta iniciar sesión.");
+      } else if (error.code === 'PGRST116') {
+        toast.error("Error en la base de datos. La tabla user_preferences podría no existir.");
+      } else {
+        toast.error(error.message || "Error al crear la cuenta. Intenta nuevamente.");
+      }
     } finally {
       setLoading(false);
     }
