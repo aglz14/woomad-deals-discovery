@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -34,7 +33,7 @@ export default function AllMalls() {
   const filterMalls = (malls: any[]) => {
     if (!malls) return [];
     let filtered = malls;
-    
+
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(mall => 
@@ -71,17 +70,17 @@ export default function AllMalls() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
-      
+
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-6">
-        <Button variant="ghost" className="mb-4" asChild>
+        <Button variant="ghost" className="mb-4 pt-4 sm:pt-6" asChild> {/* Added padding here */}
           <Link to="/" className="inline-flex items-center">
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t("backToHome")}
           </Link>
         </Button>
-        
+
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Todos los Centros Comerciales</h1>
-        
+
         <div className="w-full mb-6">
           <SearchBar 
             onSearch={handleSearch} 
@@ -89,7 +88,7 @@ export default function AllMalls() {
             className="w-full"
           />
         </div>
-        
+
         <ErrorBoundary>
           <div className="space-y-6 animate-fade-in">
             {isLoading ? (
