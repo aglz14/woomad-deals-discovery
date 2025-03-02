@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/use-location";
 import { MapPin } from "lucide-react";
+import { Building2 } from "lucide-react";
 
 
 export default function AllMalls() {
@@ -133,16 +134,17 @@ export default function AllMalls() {
                         key={mall.id}
                         className="group block bg-white rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
                       >
-                        <div className="aspect-[16/9] w-full overflow-hidden rounded-t-lg bg-gray-100">
-                          {mall.cover_image ? (
-                            <img
-                              src={mall.cover_image}
-                              alt={mall.name}
-                              className="h-full w-full object-cover transition-all group-hover:scale-105"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gray-200">
-                              {/* <BuildingStorefront className="h-12 w-12 text-gray-400" /> */}
+                        <div 
+                          className="aspect-[16/9] w-full overflow-hidden rounded-t-lg relative"
+                          style={{
+                            backgroundImage: mall.image ? `url(${mall.image})` : 'none',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                          }}
+                        >
+                          {!mall.image && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Building2 className="w-12 h-12 text-gray-400" />
                             </div>
                           )}
                         </div>
