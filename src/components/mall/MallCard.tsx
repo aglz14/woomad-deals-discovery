@@ -46,7 +46,7 @@ export const MallCard: FC<MallCardProps> = ({ mall, onClick, showDistance = true
             <span className="line-clamp-2">{mall.address}</span>
           </div>
         )}
-        {showDistance && mall.distance !== undefined && (
+        {showDistance && mall.distance !== undefined && mall.distance !== null && (
           <p className="text-sm text-gray-500">
             {mall.distance < 1
               ? `${Math.round(mall.distance * 1000)} m`
