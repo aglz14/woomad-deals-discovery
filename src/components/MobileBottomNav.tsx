@@ -38,7 +38,7 @@ export const MobileBottomNav = () => {
           }`}
         >
           <MapPinIcon className="w-5 h-5 mb-1" />
-          <span className="text-xs">Centros</span>
+          <span className="text-xs">Plazas</span>
         </Link>
       </div>
     </div>
