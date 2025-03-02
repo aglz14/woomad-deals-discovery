@@ -42,18 +42,33 @@ export default function Profile() {
     if (!session?.user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
 
-      if (error) throw error;
+      if (profileError && profileError.code !== 'PGRST116') throw profileError;
 
-      if (data) {
-        setProfileData(data);
-        setName(data.full_name || "");
-        setNotificationsEnabled(data.notifications_enabled || false);
+      if (profileData) {
+        setProfileData(profileData);
+        setName(profileData.full_name || "");
+      }
+
+      // Fetch notification preferences separately
+      const { data: prefsData, error: prefsError } = await supabase
+        .from('user_preferences')
+        .select('notifications_enabled')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (prefsError && prefsError.code !== 'PGRST116') {
+        console.error("Error fetching notification preferences:", prefsError);
+      }
+
+      if (prefsData) {
+        setNotificationsEnabled(prefsData.notifications_enabled || false);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -65,16 +80,27 @@ export default function Profile() {
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      // Update profile data
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({
           full_name: name,
-          notifications_enabled: notificationsEnabled,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         })
         .eq('id', session.user.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Update notification preferences
+      const { error: prefsError } = await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: session.user.id,
+          notifications_enabled: notificationsEnabled,
+          updated_at: new Date().toISOString()
+        });
+
+      if (prefsError) throw prefsError;
 
       toast.success("Perfil actualizado con éxito");
     } catch (error) {
