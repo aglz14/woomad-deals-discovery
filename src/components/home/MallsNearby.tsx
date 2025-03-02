@@ -131,7 +131,7 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
         )}
       </div>
 
-      {/* Notification toggle removed - now only in Profile page */}v>
+      {/* Notification toggle removed - now only in Profile page */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentItems.map((mall) => (
