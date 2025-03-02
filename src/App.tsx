@@ -26,6 +26,7 @@ const StoreProfile = lazy(() => import('./pages/StoreProfile'))
 const MallDetails = lazy(() => import('./pages/MallDetails'))
 const MallManagement = lazy(() => import('./pages/MallManagement'))
 const AllPromos = lazy(() => import('./pages/AllPromos'))
+const AllMalls = lazy(() => import('./pages/AllMalls'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,21 +47,22 @@ function App() {
                 <Routes>
                   {/* Add error boundary for each route */}
                   <Route path="/" errorElement={<div>Error loading page</div>}>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/password-reset" element={<PasswordReset />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/nosotros" element={<Nosotros />} />
-                  <Route path="/contacto" element={<Contacto />} />
-                  <Route path="/admin/promotions" element={<Promotions />} />
-                  <Route path="/admin/mall/:id" element={<AdminMallProfile />} />
-                  <Route path="/admin/store/:id" element={<StoreProfile />} />
-                  <Route path="/mall/:id" element={<PublicMallProfile />} />
-                  <Route path="/store/:id" element={<PublicStoreProfile />} />
-                  <Route path="/mall-details/:id" element={<MallDetails />} />
-                  <Route path="/mall-management/:mallId" element={<MallManagement />} />
-                  <Route path="/allpromos" element={<AllPromos />} />
-                  <Route path="*" element={<NotFound />} />
+                    <Route path="/" element={<Index />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/password-reset" element={<PasswordReset />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/nosotros" element={<Nosotros />} />
+                    <Route path="/contacto" element={<Contacto />} />
+                    <Route path="/admin/promotions" element={<Promotions />} />
+                    <Route path="/admin/mall/:id" element={<AdminMallProfile />} />
+                    <Route path="/admin/store/:id" element={<StoreProfile />} />
+                    <Route path="/mall/:id" element={<PublicMallProfile />} />
+                    <Route path="/store/:id" element={<PublicStoreProfile />} />
+                    <Route path="/mall-details/:id" element={<MallDetails />} />
+                    <Route path="/mall-management/:mallId" element={<MallManagement />} />
+                    <Route path="/allpromos" element={<AllPromos />} />
+                    <Route path="/allmalls" element={<AllMalls />} />
+                    <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>
               </Suspense>

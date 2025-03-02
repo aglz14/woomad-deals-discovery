@@ -1,0 +1,9 @@
+// Assuming this is a JSON file or similar structure for i18n
+{
+  "allMalls": "All Shopping Malls",
+  "searchMalls": "Search shopping malls...",
+  "noMallsFound": "No shopping malls found",
+  "tryAdjustingSearch": "Try adjusting your search or filters",
+  "malls": "Malls"
+  // ... other existing translations
+}
