@@ -11,6 +11,8 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "@/hooks/use-location";
+import { MapPinIcon } from "@heroicons/react/24/solid";
+
 
 export default function AllMalls() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,24 +113,43 @@ export default function AllMalls() {
                       <Link
                         to={`/mall/${mall.id}`}
                         key={mall.id}
-                        className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4 flex flex-col"
+                        className="group block bg-white rounded-lg border border-gray-200 shadow-sm transition-all hover:shadow-md"
                       >
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">{mall.name}</h3>
-                        <p className="text-sm text-gray-600 mb-2">{mall.address}</p>
-                        {mall.description && (
-                          <p className="text-sm text-gray-500 line-clamp-2 mb-2">{mall.description}</p>
-                        )}
-                        {userLocation && (
-                          <p className="text-sm text-purple-600 mt-auto">
-                            {calculateDistance(
-                              userLocation.lat,
-                              userLocation.lng,
-                              mall.latitude,
-                              mall.longitude
-                            ).toFixed(1)}{" "}
-                            km
+                        <div className="aspect-[16/9] w-full overflow-hidden rounded-t-lg bg-gray-100">
+                          {mall.cover_image ? (
+                            <img
+                              src={mall.cover_image}
+                              alt={mall.name}
+                              className="h-full w-full object-cover transition-all group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gray-200">
+                              {/* <BuildingStorefront className="h-12 w-12 text-gray-400" /> */}
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <h3 className="text-lg font-medium text-gray-900 group-hover:text-purple-600">
+                            {mall.name}
+                          </h3>
+                          <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                            {mall.address}
                           </p>
-                        )}
+                          {userLocation && (
+                            <div className="mt-2 flex items-center text-sm text-purple-600">
+                              <MapPinIcon className="mr-1 h-4 w-4" />
+                              <span>
+                                {calculateDistance(
+                                  userLocation.lat,
+                                  userLocation.lng,
+                                  mall.latitude,
+                                  mall.longitude
+                                ).toFixed(1)}{" "}
+                                km
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </Link>
                     ))}
                   </div>
