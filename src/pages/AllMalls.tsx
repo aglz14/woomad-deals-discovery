@@ -45,7 +45,25 @@ export default function AllMalls() {
       );
     }
 
-    // Show all malls regardless of distance
+    // Sort malls by distance if user location is available
+    if (userLocation) {
+      filtered = [...filtered].sort((a, b) => {
+        const distanceA = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          a.latitude,
+          a.longitude
+        );
+        const distanceB = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          b.latitude,
+          b.longitude
+        );
+        return distanceA - distanceB; // Sort from closest to farthest
+      });
+    }
+
     return filtered;
   };
 
