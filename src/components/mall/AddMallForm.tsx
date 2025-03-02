@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { Upload } from "@/components/ui/upload"; // Assuming this component exists
+import { Upload } from "@/components/ui/upload";
 
 interface AddMallFormProps {
   onSuccess: () => void;
@@ -149,7 +149,7 @@ export function AddMallForm({ onSuccess, onCancel }: AddMallFormProps) {
                   </div>
                 ) : (
                   <div className="w-32 h-32 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center">
-                    <Upload className="text-gray-400" />
+                    <Upload className="text-gray-400" onChange={handleImageChange}/> {/* Added onChange */}
                   </div>
                 )}
                 {uploadProgress > 0 && uploadProgress < 100 && (
