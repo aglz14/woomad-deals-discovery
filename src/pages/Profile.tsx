@@ -88,8 +88,7 @@ export default function Profile() {
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          full_name: name,
-          updated_at: new Date().toISOString()
+          full_name: name
         })
         .eq('id', session.user.id);
 
@@ -101,7 +100,7 @@ export default function Profile() {
         .upsert({
           user_id: session.user.id,
           notifications_enabled: notificationsEnabled,
-          notification_radius: notificationRadius, // Added notification radius
+          notification_radius: notificationRadius,
           updated_at: new Date().toISOString()
         });
 
@@ -109,8 +108,9 @@ export default function Profile() {
 
       toast.success("Perfil actualizado con éxito");
 
-      // Refresh any cached data
+      // Update localStorage for geofence settings
       localStorage.setItem("geofenceNotificationsEnabled", notificationsEnabled.toString());
+      localStorage.setItem("geofenceNotificationRadius", notificationRadius.toString());
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Error al actualizar el perfil");
