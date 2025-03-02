@@ -109,7 +109,7 @@ export default function Promotions() {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h1 className="text-2xl font-bold text-gray-900">
-                {t("managePromotions")}
+                Gestionar Centros Comerciales
               </h1>
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                 {/* Add Promotion button removed - this functionality is now in store profiles */}
