@@ -32,7 +32,7 @@ export default function Promotions() {
   const { session } = useSession();
   const navigate = useNavigate();
   const [isAddingMall, setIsAddingMall] = useState(false);
-  const [isAddingPromotion, setIsAddingPromotion] = useState(false);
+  // State for adding promotions removed - now handled in store profiles
   const [mallToDelete, setMallToDelete] = useState<string | null>(null);
   const [mallToEdit, setMallToEdit] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,23 +102,7 @@ export default function Promotions() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <h1 className="text-2xl font-bold text-gray-900">{t('managePromotions')}</h1>
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                <Dialog open={isAddingPromotion} onOpenChange={setIsAddingPromotion}>
-                  <DialogTrigger asChild>
-                    <Button variant="default" className="w-full sm:w-auto">
-                      <Plus className="h-4 w-4 mr-2" />
-                      {t('addPromotion')}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>{t('addPromotion')}</DialogTitle>
-                    </DialogHeader>
-                    <AddPromotionForm
-                      onSuccess={() => setIsAddingPromotion(false)}
-                      onCancel={() => setIsAddingPromotion(false)}
-                    />
-                  </DialogContent>
-                </Dialog>
+                {/* Add Promotion button removed - this functionality is now in store profiles */}
 
                 <Dialog open={isAddingMall} onOpenChange={setIsAddingMall}>
                   <DialogTrigger asChild>
