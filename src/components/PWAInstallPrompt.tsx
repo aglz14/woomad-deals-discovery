@@ -86,7 +86,7 @@ export function PWAInstallPrompt() {
   // Don't show update prompt if we've already tried updating
   if (showUpdatePrompt && !hasAttemptedUpdate) {
     return (
-      <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+      <div className="fixed bottom-20 right-4 z-[60] bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
         <p className="mb-2">Nueva actualización disponible</p>
         <Button 
           onClick={() => {
@@ -130,7 +130,7 @@ export function PWAInstallPrompt() {
   if (!showPrompt || isInstalled) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+    <div className="fixed bottom-20 right-4 z-[60] bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
       <div className="flex justify-between items-start mb-2">
         <h3 className="font-medium">Instala Woomad</h3>
         <Button variant="ghost" size="icon" onClick={handleDismiss} className="-mt-1 -mr-1">
