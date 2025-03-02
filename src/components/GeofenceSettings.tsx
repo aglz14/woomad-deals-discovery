@@ -65,7 +65,7 @@ export const GeofenceSettings = ({ className }: GeofenceSettingsProps) => {
 
       // Save to Supabase for persistence
       const { error } = await supabase
-        .from('user_preferences')
+        .from('profiles')
         .upsert({
           user_id: session.user.id,
           notifications_enabled: notificationsEnabled,
@@ -94,7 +94,7 @@ export const GeofenceSettings = ({ className }: GeofenceSettingsProps) => {
       const loadSettings = async () => {
         try {
           const { data, error } = await supabase
-            .from('user_preferences')
+            .from('profiles')
             .select('notifications_enabled, notification_radius')
             .eq('user_id', session.user.id)
             .single();
