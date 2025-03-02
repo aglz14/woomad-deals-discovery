@@ -31,7 +31,7 @@ export default function AllMalls() {
         .from("shopping_malls")
         .select("*");
       if (error) throw error;
-      
+
       // Log data to verify image field
       console.log("Mall data sample:", data && data.length > 0 ? data[0] : "No malls found");
       return data;
@@ -90,7 +90,6 @@ export default function AllMalls() {
 
   const handlePageChange = (pageNum: number) => {
     setCurrentPage(pageNum);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { SearchBar } from "@/components/search/SearchBar";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { PromotionsList } from "@/components/home/PromotionsList";
 import { Button } from "@/components/ui/button";
 import { DatabasePromotion } from "@/types/promotion";
 
@@ -34,7 +33,7 @@ export default function AllPromos() {
         `)
         .gte("end_date", new Date().toISOString())
         .order("start_date", { ascending: true });
-      
+
       if (error) throw error;
       return data as DatabasePromotion[];
     },
@@ -45,16 +44,16 @@ export default function AllPromos() {
     queryKey: ["malls-with-active-promotions", promotions],
     queryFn: async () => {
       if (!promotions || promotions.length === 0) return [];
-      
+
       // Extract unique mall IDs from active promotions
       const mallIds = new Set(promotions.map(promo => promo.store?.mall.id).filter(Boolean));
-      
+
       // Get full mall data
       const { data, error } = await supabase
         .from("shopping_malls")
         .select("*")
         .in('id', Array.from(mallIds));
-        
+
       if (error) throw error;
       return data;
     },
@@ -64,7 +63,7 @@ export default function AllPromos() {
   const filterPromotions = (promotions: DatabasePromotion[]) => {
     if (!promotions) return [];
     let filtered = promotions;
-    
+
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(promotion => 
@@ -107,7 +106,7 @@ export default function AllPromos() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 via-white to-purple-50">
       <Header />
-      
+
       <main className="flex-grow pt-20 pb-16">
         <div className="container mx-auto px-4 sm:px-6 py-8">
           <div className="mb-8">
@@ -143,7 +142,7 @@ export default function AllPromos() {
               </Select>
             </div>
           </div>
-          
+
           <ErrorBoundary>
             <div className="bg-white rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg">
               <PromotionsList
