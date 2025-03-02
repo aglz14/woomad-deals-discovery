@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { HomeHero } from "@/components/home/HomeHero";
@@ -16,6 +15,10 @@ import { useTranslation } from "react-i18next";
 import { SearchBar } from "@/components/search/SearchBar";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { GeofenceSettings } from "@/components/GeofenceSettings"; // Added import for GeofenceSettings
+
 
 export default function Index() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +33,7 @@ export default function Index() {
     queryKey: ["promotions", userLocation],
     queryFn: () => getPromotions(userLocation, calculateDistance),
   });
-  
+
   // Animation classes for content sections
   const sectionClasses = "px-3 py-6 sm:px-4 sm:py-8 md:py-12 transition-all duration-300 hover:bg-gray-50/50";
   const sectionHeaderClasses = "flex flex-col sm:flex-row items-center justify-between mb-4 sm:mb-6 gap-3";
@@ -41,16 +44,16 @@ export default function Index() {
     queryKey: ["malls-with-active-promotions", promotions],
     queryFn: async () => {
       if (!promotions || promotions.length === 0) return [];
-      
+
       // Extract unique mall IDs from active promotions
       const mallIds = new Set(promotions.map(promo => promo.store.mall.id));
-      
+
       // Get full mall data
       const { data, error } = await supabase
         .from("shopping_malls")
         .select("*")
         .in('id', Array.from(mallIds));
-        
+
       if (error) throw error;
       return data;
     },
@@ -60,7 +63,7 @@ export default function Index() {
   const filterPromotions = (promotions: any[]) => {
     if (!promotions) return [];
     let filtered = promotions;
-    
+
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(promotion => 
@@ -103,7 +106,7 @@ export default function Index() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 via-white to-purple-50">
       <Header />
-      
+
       <main className="flex-grow pt-14 sm:pt-16">
         <HomeHero 
           userLocation={userLocation}
@@ -128,7 +131,7 @@ export default function Index() {
               </div>
             </Link>
           </div>
-          
+
           {/* Banner for all shopping malls */}
           <div className="w-full bg-gradient-to-r from-blue-600 via-teal-500 to-green-600 rounded-xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl transform hover:-translate-y-1 border border-white/10">
             <Link to="/allmalls" className="block p-5 sm:p-8">
@@ -174,7 +177,7 @@ export default function Index() {
               </Select>
             </div>
           </div>
-          
+
           <ErrorBoundary>
             <div className="space-y-8 sm:space-y-12 md:space-y-16 animate-fade-in">
               <section className="rounded-2xl bg-white p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">

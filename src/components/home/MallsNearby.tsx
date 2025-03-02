@@ -3,10 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Building2, MapPin, AlertCircle, Loader } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useLocation } from "@/hooks/use-location";
 import { EmptyStateDisplay } from "@/components/EmptyStateDisplay";
+import { useGeofencing } from "@/hooks/use-geofencing"; // Placeholder for the missing hook
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+
 
 interface MallsNearbyProps {
   searchTerm: string;
@@ -20,6 +24,10 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
   const { userLocation, calculateDistance } = useLocation();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  const { isMonitoring, startMonitoring, stopMonitoring } = useGeofencing(null); // Placeholder - needs actual malls data
+
 
   const { data: malls, isLoading } = useQuery({
     queryKey: ["shopping-malls"],
@@ -77,6 +85,15 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
     navigate(`/mall/${mallId}`);
   };
 
+  const handleToggleNotifications = (enabled: boolean) => {
+    setNotificationsEnabled(enabled);
+    if (enabled) {
+      startMonitoring();
+    } else {
+      stopMonitoring();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
@@ -113,6 +130,15 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
             Radio de {MAX_DISTANCE_KM}km
           </span>
         )}
+      </div>
+
+      <div className="flex items-center space-x-2 mb-4 bg-gray-50 p-3 rounded-lg">
+        <Switch 
+          id="geofence-notifications" 
+          checked={notificationsEnabled}
+          onCheckedChange={handleToggleNotifications}
+        />
+        <Label htmlFor="geofence-notifications">Notificarme cuando esté cerca de un centro comercial</Label>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
