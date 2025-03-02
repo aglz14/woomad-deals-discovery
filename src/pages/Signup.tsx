@@ -36,45 +36,11 @@ export default function Signup() {
       
       // Check if user was created
       if (data.user) {
-        // Create initial user preference record if needed
-        try {
-          console.log("Attempting to create user preferences for user ID:", data.user.id);
-          
-          // Check if user_preferences table exists
-          const { error: checkError } = await supabase
-            .from('user_preferences')
-            .select('*')
-            .limit(1);
-          
-          if (checkError) {
-            console.error("Error checking user_preferences table:", checkError);
-            // If the table doesn't exist, we might need to create it
-            // This is likely the source of your database error
-          }
-          
-          // Attempt to create the user preferences
-          const { error: prefError } = await supabase
-            .from('user_preferences')
-            .insert([
-              { 
-                user_id: data.user.id,
-                notifications_enabled: false
-              }
-            ]);
-            
-          if (prefError) {
-            console.error("Error creating user preferences:", prefError);
-            console.error("Error details:", prefError.details, prefError.hint, prefError.code);
-            
-            // Don't let this error block the signup flow
-            // Still proceed with the signup process
-          } else {
-            console.log("User preferences created successfully");
-          }
-        } catch (prefErr) {
-          console.error("Failed to create user preferences:", prefErr);
-          // Continue with signup even if preferences creation fails
-        }
+        // The database tables user_preferences and profiles will be created 
+        // automatically by a Supabase database trigger
+        console.log("User created successfully with ID:", data.user.id);
+        
+        // No need to manually create user_preferences - this should be handled by a database trigger
         
         toast.success("¡Revisa tu correo para confirmar tu cuenta!");
         navigate("/");
