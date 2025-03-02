@@ -27,8 +27,13 @@ export default function AllMalls() {
   const { data: malls, isLoading } = useQuery({
     queryKey: ["all-shopping-malls"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("shopping_malls").select("*");
+      const { data, error } = await supabase
+        .from("shopping_malls")
+        .select("*");
       if (error) throw error;
+      
+      // Log data to verify image field
+      console.log("Mall data sample:", data && data.length > 0 ? data[0] : "No malls found");
       return data;
     },
   });
@@ -143,7 +148,7 @@ export default function AllMalls() {
                           }}
                         >
                           {!mall.image && (
-                            <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                               <Building2 className="w-12 h-12 text-gray-400" />
                             </div>
                           )}
