@@ -76,7 +76,7 @@ export default function Profile() {
   };
 
   const updateProfile = async () => {
-    if (!session?.user?.id) return;
+    if (!session?.user) return;
 
     setLoading(true);
     try {
@@ -103,6 +103,9 @@ export default function Profile() {
       if (prefsError) throw prefsError;
 
       toast.success("Perfil actualizado con éxito");
+
+      // Refresh any cached data
+      localStorage.setItem("geofenceNotificationsEnabled", notificationsEnabled.toString());
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Error al actualizar el perfil");
