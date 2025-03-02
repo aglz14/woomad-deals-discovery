@@ -42,7 +42,7 @@ export default function Signup() {
         
         // No need to manually create user_preferences - this should be handled by a database trigger
         
-        toast.success("¡Revisa tu correo para confirmar tu cuenta!");
+        toast.success("¡Cuenta creada exitosamente!");
         navigate("/");
       } else {
         // In some cases, user might be null even though there's no error
