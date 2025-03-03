@@ -22,10 +22,10 @@ export const HomeHero = ({ userLocation }: HomeHeroProps) => {
                 <span className="text-xs sm:text-sm font-medium text-white">✨ Descubre ofertas exclusivas cerca de ti</span>
               </div>
               <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-100">
-                {userLocation ? t("nearMe") : t("deals")}
+                Ofertas Cerca de Ti
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mx-auto px-2 leading-relaxed">
-                Ofertas Cerca de Ti
+                Encuentra las mejores promociones en tu ciudad
               </p>
               {userLocation && (
                 <div className="inline-flex items-center justify-center gap-2 py-1 px-3 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/90">
