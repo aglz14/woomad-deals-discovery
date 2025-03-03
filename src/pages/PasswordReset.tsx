@@ -21,6 +21,7 @@ export default function PasswordReset() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log("Starting auth callback handling");
         // Check both hash and search parameters
         const fragment = location.hash;
         const search = location.search;
@@ -57,32 +58,39 @@ export default function PasswordReset() {
 
         // If no token found, show the email form
         if (!accessToken) {
-          console.log('No access token found in URL');
+          console.log('No access token found in URL, showing email form');
           setShowResetForm(true);
           return;
         }
 
         console.log('Token found, type:', type);
-        setHasToken(true);
-
+        
         // Clear any existing session first to avoid conflicts
         await supabase.auth.signOut();
+        
+        // Mark as having token before verification to keep UI consistent
+        setHasToken(true);
 
         // First check the token type before proceeding
         if (type === 'recovery') {
           try {
+            console.log("Verifying recovery token");
             // For recovery tokens, we validate the token and establish a session
             // This is crucial for password update to work later
             const { data, error } = await supabase.auth.verifyOtp({
               type: 'recovery',
               token: accessToken,
+              options: {
+                // When verifying, make sure to capture the session by redirecting here
+                redirectTo: `${window.location.origin}/password-reset`
+              }
             });
 
             if (error) throw error;
             
             // If token is valid, show the reset form
+            console.log("Recovery token valid, showing reset form");
             setShowResetForm(true);
-            console.log("Password reset form should display now");
           } catch (tokenError) {
             console.error("Invalid recovery token:", tokenError);
             toast.error("Token de recuperación inválido o expirado");
@@ -107,6 +115,7 @@ export default function PasswordReset() {
         } else {
           console.error('Unknown auth callback type:', type);
           toast.error("Tipo de autenticación no válido");
+          setHasToken(false);
           setShowResetForm(true);
         }
       } catch (error: any) {
@@ -160,24 +169,26 @@ export default function PasswordReset() {
 
     setLoading(true);
     try {
-      // Check if we have a valid session first
+      // Get current session - don't immediately reject if no session
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session) {
-        // If no session, show a more helpful error
-        toast.error("Tu sesión de recuperación ha expirado. Por favor, solicita un nuevo enlace.");
-        // Reset the form to request a new link
-        setHasToken(false);
-        setShowResetForm(true);
-        return;
-      }
-      
-      // Now try to update the password with the active session
+      // Try to update the password regardless of session state
+      // The auth API might still have the token in context even if getSession doesn't show it
       const { error } = await supabase.auth.updateUser({ 
         password: password 
       });
 
-      if (error) throw error;
+      if (error) {
+        // If error contains "JWT" or "token", it's likely a token issue
+        if (error.message.includes("JWT") || error.message.includes("token") || error.message.includes("session")) {
+          toast.error("Tu sesión de recuperación ha expirado. Por favor, solicita un nuevo enlace.");
+          // Reset the form to request a new link
+          setHasToken(false);
+          setShowResetForm(true);
+          return;
+        }
+        throw error;
+      }
 
       // Password was updated successfully
       toast.success("Contraseña actualizada con éxito");
