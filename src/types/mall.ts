@@ -2,16 +2,19 @@
 export interface Mall {
   id: string;
   name: string;
-  description?: string;
   address: string;
+  description?: string;
   latitude: number;
   longitude: number;
+  stores?: any[];
+  distance?: number;
   image_url?: string;
   website?: string;
   phone?: string;
-  status?: string;
+  email?: string;
+  business_hours?: string;
+  category?: string;
+  featured?: boolean;
   created_at?: string;
   updated_at?: string;
-  stores_count?: number;
-  distance?: number; // Added for distance calculations
 }

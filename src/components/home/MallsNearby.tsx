@@ -24,7 +24,7 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
   const { userLocation, calculateDistance } = useLocation();
-  // Passing the actual malls data to the useGeofencing hook
+  // Set up geofencing with the malls data
   const { isMonitoring } = useGeofencing(malls || []);
 
 
