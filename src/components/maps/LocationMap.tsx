@@ -122,17 +122,61 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
 
       mallsToShow.forEach(mall => {
         if (mall.latitude && mall.longitude) {
-          const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-            `<strong>${mall.name}</strong><p>${mall.address}</p>`
-          );
+          // Create a custom popup with a button to view mall details
+          const popupHtml = `
+            <div>
+              <strong>${mall.name}</strong>
+              <p>${mall.address}</p>
+              <button class="mapbox-popup-button" data-mall-id="${mall.id}" style="
+                background-color: #3FB1CE; 
+                color: white; 
+                border: none; 
+                padding: 5px 10px; 
+                margin-top: 5px; 
+                border-radius: 4px; 
+                cursor: pointer;
+                font-size: 12px;
+              ">Ver detalles</button>
+            </div>
+          `;
+          
+          const popup = new mapboxgl.Popup({ offset: 25 })
+            .setHTML(popupHtml);
 
           const marker = new mapboxgl.Marker({ color: '#3FB1CE' })
             .setLngLat([mall.longitude, mall.latitude])
             .setPopup(popup)
             .addTo(map.current!);
+          
+          // Add the mall ID to the marker element for reference
+          const markerElement = marker.getElement();
+          markerElement.setAttribute('data-mall-id', mall.id);
+          markerElement.style.cursor = 'pointer';
+          
+          // Also handle clicking directly on the marker
+          markerElement.addEventListener('click', () => {
+            // Open the popup
+            marker.togglePopup();
+          });
 
           markersRef.current.push(marker);
         }
+      });
+      
+      // Add a global click listener to handle popup button clicks
+      map.current.on('click', (e) => {
+        // Check if clicked on a popup button
+        const popupButtons = document.querySelectorAll('.mapbox-popup-button');
+        popupButtons.forEach(button => {
+          button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const mallId = button.getAttribute('data-mall-id');
+            if (mallId) {
+              window.location.href = `/mall/${mallId}`;
+            }
+          });
+        });
       });
     }
   }, [malls, mallLocations, mapReady, userLocation]);
