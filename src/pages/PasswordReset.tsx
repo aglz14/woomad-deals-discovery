@@ -61,6 +61,18 @@ export default function PasswordReset() {
           if (token) {
             console.log("Found token in search params with length:", token.length);
             accessToken = token;
+            // Store token in sessionStorage to persist it through re-renders
+            sessionStorage.setItem('password_reset_token', token);
+          }
+        }
+        
+        // Check if token is stored in sessionStorage from previous attempt
+        if (!accessToken) {
+          const storedToken = sessionStorage.getItem('password_reset_token');
+          if (storedToken) {
+            console.log("Retrieved token from sessionStorage");
+            accessToken = storedToken;
+            type = 'recovery';
           }
         }
         
@@ -113,19 +125,29 @@ export default function PasswordReset() {
           try {
             console.log("Verifying recovery token:", accessToken.substring(0, 5) + "...", "Length:", accessToken.length);
             
-            // Store the token temporarily in localStorage to ensure persistence during redirects
-            localStorage.setItem('pending_reset_token', accessToken);
+            // Store the token in sessionStorage to persist through page refreshes
+            sessionStorage.setItem('password_reset_token', accessToken);
             
-            // For recovery tokens, we validate the token and establish a session
-            // This is crucial for password update to work later
-            const { data, error } = await supabase.auth.verifyOtp({
-              type: 'recovery',
-              token: accessToken,
-              options: {
-                // When verifying, make sure to capture the session by redirecting here
-                redirectTo: `${window.location.origin}/password-reset`
+            // Check if we've already verified this token to prevent loops
+            const isTokenVerified = sessionStorage.getItem('token_verified') === 'true';
+            
+            if (!isTokenVerified) {
+              console.log("Token not yet verified, verifying now");
+              // For recovery tokens, we validate the token and establish a session
+              // This is crucial for password update to work later
+              const { data, error } = await supabase.auth.verifyOtp({
+                type: 'recovery',
+                token: accessToken,
+                options: {
+                  // Avoid redirects which might cause loops
+                  redirectTo: undefined
+                }
+              });
+              
+              // Mark this token as verified
+              if (!error) {
+                sessionStorage.setItem('token_verified', 'true');
               }
-            });
 
             if (error) {
               console.error("Token verification error:", error.message);
@@ -133,8 +155,11 @@ export default function PasswordReset() {
             }
             
             // Log the session state
-            const { data: sessionData } = await supabase.auth.getSession();
-            console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
+              const { data: sessionData } = await supabase.auth.getSession();
+              console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
+            } else {
+              console.log("Token already verified, using existing session");
+            }
             
             // If token is valid, show the reset form
             console.log("Recovery token valid, showing reset form");
@@ -215,6 +240,9 @@ export default function PasswordReset() {
       return;
     }
 
+    // Prevent accidental navigation away
+    window.onbeforeunload = () => "Por favor, espera mientras actualizamos tu contraseña.";
+    
     setLoading(true);
     try {
       // First check if we have a valid session
@@ -352,12 +380,20 @@ export default function PasswordReset() {
       // Password was updated successfully
       toast.success("Contraseña actualizada con éxito");
       
+      // Clean up all stored tokens and session data
+      sessionStorage.removeItem('password_reset_token');
+      sessionStorage.removeItem('token_verified');
+      localStorage.removeItem('pending_reset_token');
+      
       // Sign out and clean up the session
       await supabase.auth.signOut();
       
       // Show a message and provide a link instead of automatic redirect
       setShowResetForm(false);
-      setShowSuccess(true); 
+      setShowSuccess(true);
+      
+      // Remove navigation warning
+      window.onbeforeunload = null; 
     } catch (error: any) {
       console.error("Error updating password:", error);
       toast.error(error.message || "Error al actualizar la contraseña");
