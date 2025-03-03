@@ -190,6 +190,8 @@ export default function PasswordReset() {
             sessionStorage.removeItem('token_verified');
             setHasToken(false);
             setShowResetForm(true);
+          } finally {
+            // Empty finally block to properly close the try-catch statement
           }
         } else if (type === 'signup' || type === 'magiclink') {
           // For other types, we complete the authentication flow
