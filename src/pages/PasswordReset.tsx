@@ -8,20 +8,19 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 export default function PasswordReset() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Clear any existing session first to avoid conflicts
-        await supabase.auth.signOut();
-
         // Check both hash and search parameters
         const fragment = location.hash;
         const search = location.search;
@@ -43,13 +42,17 @@ export default function PasswordReset() {
           type = searchParams.get('type');
         }
 
-        // If no token found in either location, show error
+        // If no token found, show the email form
         if (!accessToken) {
-          console.error('No access token found in URL');
-          toast.error("Token no válido o expirado");
-          navigate("/");
+          console.log('No access token found in URL, showing email form');
+          setShowResetForm(true);
           return;
         }
+
+        setHasToken(true);
+
+        // Clear any existing session first to avoid conflicts
+        await supabase.auth.signOut();
 
         // First check the token type before proceeding
         if (type === 'recovery') {
@@ -68,7 +71,7 @@ export default function PasswordReset() {
           } catch (tokenError) {
             console.error("Invalid recovery token:", tokenError);
             toast.error("Token de recuperación inválido");
-            navigate("/");
+            setShowResetForm(true);
           }
         } else if (type === 'signup' || type === 'magiclink') {
           // For other types, we complete the authentication flow
@@ -88,19 +91,44 @@ export default function PasswordReset() {
         } else {
           console.error('Unknown auth callback type:', type);
           toast.error("Tipo de autenticación no válido");
-          navigate("/");
+          setShowResetForm(true);
         }
       } catch (error: any) {
         console.error('Error handling auth callback:', error);
         toast.error(error.message || "Error procesando la autenticación");
-        navigate("/");
+        setShowResetForm(true);
       }
     };
 
     handleAuthCallback();
   }, [location, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendResetLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast.error("Por favor, ingresa tu correo electrónico");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/password-reset`
+      });
+
+      if (error) throw error;
+
+      toast.success("Se ha enviado un enlace a tu correo electrónico");
+      setEmail("");
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -135,12 +163,8 @@ export default function PasswordReset() {
     }
   };
 
-  useEffect(() => {
-    console.log("ShowResetForm state:", showResetForm);
-  }, [showResetForm]);
-
-  // Only show loading if we're still processing the token
-  if (!showResetForm) {
+  // Only show loading if we're still processing the token and haven't determined what to show yet
+  if (!showResetForm && !showSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -179,51 +203,83 @@ export default function PasswordReset() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Restablecer contraseña
+            {hasToken ? "Restablecer contraseña" : "Recuperar cuenta"}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Ingresa tu nueva contraseña
+            {hasToken ? "Ingresa tu nueva contraseña" : "Ingresa tu correo electrónico para recibir un enlace de recuperación"}
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <Label htmlFor="password">Nueva contraseña</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="mt-1"
-                placeholder="••••••••"
-                autoComplete="new-password"
-              />
+        {hasToken ? (
+          <form className="mt-8 space-y-6" onSubmit={handleResetPassword}>
+            <div className="rounded-md shadow-sm space-y-4">
+              <div>
+                <Label htmlFor="password">Nueva contraseña</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="mt-1"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirm-password">Confirmar contraseña</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="mt-1"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="confirm-password">Confirmar contraseña</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="mt-1"
-                placeholder="••••••••"
-                autoComplete="new-password"
-              />
-            </div>
-          </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? "Actualizando..." : "Actualizar contraseña"}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? "Actualizando..." : "Actualizar contraseña"}
+            </Button>
+          </form>
+        ) : (
+          <form className="mt-8 space-y-6" onSubmit={handleSendResetLink}>
+            <div>
+              <Label htmlFor="email">Correo electrónico</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="mt-1"
+                placeholder="tu@email.com"
+                autoComplete="email"
+              />
+            </div>
+            
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? "Enviando..." : "Enviar enlace de recuperación"}
+            </Button>
+            
+            <div className="text-center">
+              <Button variant="link" onClick={() => navigate("/")}>
+                Volver al inicio
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
