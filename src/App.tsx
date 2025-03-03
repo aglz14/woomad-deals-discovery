@@ -9,6 +9,7 @@ import { SessionProvider } from '@/components/providers/SessionProvider'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
+import { LocationProvider } from '@/contexts/LocationContext';
 
 // Lazy imports for code splitting and better performance
 const Index = lazy(() => import('./pages/Index'))
@@ -42,7 +43,8 @@ function App() {
     <BrowserRouter>
       <ThemeProvider attribute="class" defaultTheme="light" storageKey="promocerca-theme">
         <QueryClientProvider client={queryClient}>
-          <SessionProvider>
+          <LocationProvider>
+            <SessionProvider>
             <ErrorBoundary fallback={<div>Algo ha ido mal</div>}>
               <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Cargando...</div>}>
                 <Routes>
@@ -74,6 +76,7 @@ function App() {
             <PWAInstallPrompt />
             <MobileBottomNav />
           </SessionProvider>
+          </LocationProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </BrowserRouter>

@@ -84,14 +84,16 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
     navigate(`/mall/${mallId}`);
   };
 
-  const handleToggleNotifications = (enabled: boolean) => {
-    setNotificationsEnabled(enabled);
-    if (enabled) {
-      startMonitoring();
-    } else {
-      stopMonitoring();
-    }
-  };
+  // Notifications functionality moved to Profile page only
+  // This function is no longer needed as mentioned in the comment above
+  // const handleToggleNotifications = (enabled: boolean) => {
+  //   setNotificationsEnabled(enabled);
+  //   if (enabled) {
+  //     startMonitoring();
+  //   } else {
+  //     stopMonitoring();
+  //   }
+  // };
 
   if (isLoading) {
     return (
