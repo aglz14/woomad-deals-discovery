@@ -24,10 +24,7 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
   const { userLocation, calculateDistance } = useLocation();
-  // Set up geofencing with the malls data
-  const { isMonitoring } = useGeofencing(malls || []);
-
-
+  
   const { data: malls, isLoading } = useQuery({
     queryKey: ["shopping-malls"],
     queryFn: async () => {
@@ -69,6 +66,9 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
 
     return true; // Include all malls if user location is not available
   });
+
+  // Set up geofencing with the malls data
+  const { isMonitoring } = useGeofencing(malls || []);
 
   const getCurrentPageItems = () => {
     if (!filteredMalls) return [];
