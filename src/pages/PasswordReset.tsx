@@ -176,12 +176,12 @@ export default function PasswordReset() {
             // Log the session state
               const { data: sessionData } = await supabase.auth.getSession();
               console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
-              
-              // If token is valid, show the reset form
-              console.log("Recovery token valid, showing reset form");
-              setHasToken(true); // Make sure we set hasToken explicitly to true
-              setShowResetForm(true);
             }
+            
+            // If token is valid, show the reset form
+            console.log("Recovery token valid, showing reset form");
+            setHasToken(true); // Make sure we set hasToken explicitly to true
+            setShowResetForm(true);
           } catch (tokenError) {
             console.error("Invalid recovery token:", tokenError);
             toast.error("Token de recuperación inválido o expirado");
@@ -190,9 +190,6 @@ export default function PasswordReset() {
             sessionStorage.removeItem('token_verified');
             setHasToken(false);
             setShowResetForm(true);
-          } finally {
-            // Clean up any resources or state used during token verification
-            console.log("Token verification process completed");
           }
         } else if (type === 'signup' || type === 'magiclink') {
           // For other types, we complete the authentication flow
