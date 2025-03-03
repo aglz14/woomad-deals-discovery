@@ -52,6 +52,7 @@ function App() {
                   <Route path="/" errorElement={<div>Error loading page</div>}>
                     <Route path="/" element={<Index />} />
                     <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<React.lazy(() => import('./pages/Login'))()} />
                     <Route path="/password-reset" element={<PasswordReset />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/nosotros" element={<Nosotros />} />

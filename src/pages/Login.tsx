@@ -7,38 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, ArrowLeft, UserPlus } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, LogIn } from "lucide-react";
 
-export default function Signup() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      toast.error("Las contraseñas no coinciden");
-      return;
-    }
-
-    if (password.length < 6) {
-      toast.error("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
-    
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
       });
 
       if (error) {
@@ -46,17 +31,14 @@ export default function Signup() {
       }
 
       if (data?.user) {
-        // No need to manually create user_preferences - this should be handled by a database trigger
-        
-        toast.success("¡Cuenta creada exitosamente!");
+        toast.success("¡Inicio de sesión exitoso!");
         navigate("/");
       } else {
-        // In some cases, user might be null even though there's no error
-        toast.error("No se pudo crear la cuenta");
+        toast.error("No se pudo iniciar sesión");
       }
     } catch (error: any) {
-      console.error("Error signing up:", error);
-      toast.error(error.message || "Error al crear la cuenta");
+      console.error("Error signing in:", error);
+      toast.error(error.message || "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -79,10 +61,10 @@ export default function Signup() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <CardTitle className="text-2xl font-bold text-center w-full">Crear una cuenta nueva</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center w-full">Iniciar sesión</CardTitle>
           </div>
           <CardDescription className="text-center">
-            Ingresa tus datos para registrarte en Woomad
+            Ingresa tus credenciales para acceder a tu cuenta
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -103,43 +85,26 @@ export default function Signup() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Contraseña</Label>
+                <Button
+                  type="button"
+                  variant="link"
+                  className="p-0 h-auto text-sm font-medium text-purple-600 hover:text-purple-500"
+                  onClick={() => navigate("/reset-password")}
+                >
+                  ¿Olvidaste tu contraseña?
+                </Button>
+              </div>
               <div className="relative">
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full"
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">La contraseña debe tener al menos 6 caracteres</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirmar contraseña</Label>
-              <div className="relative">
-                <Input
-                  id="confirm-password"
-                  name="confirm-password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full pr-10"
                 />
@@ -163,12 +128,12 @@ export default function Signup() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                  Creando cuenta...
+                  Iniciando sesión...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  Registrarse
+                  <LogIn className="h-4 w-4" />
+                  Iniciar sesión
                 </span>
               )}
             </Button>
@@ -176,13 +141,13 @@ export default function Signup() {
         </CardContent>
         <CardFooter className="flex justify-center border-t pt-4">
           <p className="text-sm text-gray-600">
-            ¿Ya tienes una cuenta?{" "}
+            ¿No tienes una cuenta?{" "}
             <Button
               variant="link"
               className="p-0 h-auto font-medium text-purple-600 hover:text-purple-500"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/signup")}
             >
-              Iniciar sesión
+              Regístrate
             </Button>
           </p>
         </CardFooter>
