@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { useRegisterSW } from 'virtual:pwa-register/react';
 
 // PWA installation event interface
 interface BeforeInstallPromptEvent extends Event {
@@ -13,22 +12,6 @@ export function PWAInstallPrompt() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
-
-  // Register and set up the service worker
-  const {
-    needRefresh,
-    updateServiceWorker,
-  } = useRegisterSW({
-    onRegistered(r) {
-      console.log('Service worker registered:', r);
-    },
-    onRegisterError(error) {
-      console.error('Service worker registration error:', error);
-    },
-    immediate: true,
-    // Skip waiting to avoid unnecessary update prompts
-    skipWaiting: true
-  });
 
   useEffect(() => {
     // Check if already installed

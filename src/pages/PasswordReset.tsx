@@ -160,6 +160,7 @@ export default function PasswordReset() {
             // Mark this token as verified
             if (!error) {
               console.log("Token verification successful");
+              console.log("Recovery token valid, showing reset form");
               sessionStorage.setItem('token_verified', 'true');
               // Store token in localStorage for password update stage
               localStorage.setItem('pending_reset_token', accessToken);
@@ -178,7 +179,6 @@ export default function PasswordReset() {
             console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
             
             // If token is valid, show the reset form
-            console.log("Recovery token valid, showing reset form");
             setHasToken(true); // Make sure we set hasToken explicitly to true
             setShowResetForm(true);
           } catch (tokenError) {

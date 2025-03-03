@@ -80,6 +80,12 @@ class GeofencingService {
       return;
     }
 
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000, // Reduced from 27000ms to 10000ms
+      maximumAge: 30000
+    };
+
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
         const currentPosition = {
@@ -91,14 +97,35 @@ class GeofencingService {
         this.lastPosition = currentPosition;
       },
       (error) => {
-        console.error("Error watching position:", error);
-        toast.error("Error al monitorear la ubicación");
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error("Permiso de ubicación denegado");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error("Ubicación no disponible");
+            break;
+          case error.TIMEOUT:
+            toast.error("Tiempo de espera agotado, reintentando...");
+            // Retry with less accurate position
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const currentPosition = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+                this.checkGeofences(currentPosition);
+                this.lastPosition = currentPosition;
+              },
+              () => toast.error("No se pudo obtener la ubicación"),
+              { ...options, enableHighAccuracy: false }
+            );
+            break;
+          default:
+            toast.error("Error al obtener la ubicación");
+        }
+        console.error("Geolocation error:", error);
       },
-      { 
-        enableHighAccuracy: true, 
-        maximumAge: 30000, 
-        timeout: 27000 
-      }
+      options
     );
 
     toast.success("Monitoreo de ubicación iniciado");
