@@ -10,10 +10,14 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
-    redirectTo: `${window.location.origin}/password-reset`,
-    debug: true
+    flowType: 'pkce',
+    debug: false,
+    onAuthStateChange: (event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        window.location.href = `${window.location.origin}/password-reset`;
+      }
+    }
   }
 });

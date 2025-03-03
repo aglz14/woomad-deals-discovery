@@ -5,17 +5,26 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Store } from '@/types/store';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { AlertCircle, MapPin } from "lucide-react";
 
 interface LocationMapProps {
   userLocation: { lat: number; lng: number } | null;
   className?: string;
 }
 
-// Initialize mapboxgl with error handling
-try {
-  mapboxgl.accessToken = 'pk.eyJ1IjoiYWdsejE0IiwiYSI6ImNtN24wMTV2cjByMncybHBycHAwMGQ3aG4ifQ.R5Qpb4QfKpXvuRLNt1yf-g';
-} catch (error) {
-  console.error('Error initializing Mapbox:', error);
+// Validate and set Mapbox token
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiYWdsejE0IiwiYSI6ImNtN24wMTV2cjByMncybHBycHAwMGQ3aG4ifQ.R5Qpb4QfKpXvuRLNt1yf-g';
+
+const isValidMapboxToken = (token: string): boolean => {
+  return token.startsWith('pk.') && token.length > 50;
+};
+
+if (!isValidMapboxToken(MAPBOX_TOKEN)) {
+  console.error('Invalid Mapbox token format');
+} else {
+  mapboxgl.accessToken = MAPBOX_TOKEN;
 }
 
 export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) => {
@@ -39,18 +48,25 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    if (!mapboxgl.accessToken) {
-      setMapError('Error initializing map: Invalid access token');
+    if (!isValidMapboxToken(MAPBOX_TOKEN)) {
+      const error = 'Error: Invalid map configuration';
+      console.error(error);
+      setMapError(error);
+      toast.error(error);
       return;
     }
 
     try {
+      const defaultCenter = [-99.1332, 19.4326]; // Mexico City
+      const initialCenter = userLocation ? [userLocation.lng, userLocation.lat] : defaultCenter;
+      const initialZoom = userLocation ? 12 : 5;
+
       // Initialize map
       map.current = new mapboxgl.Map({
         container: mapContainer.current!,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: userLocation ? [userLocation.lng, userLocation.lat] : [-99.1332, 19.4326], // Default to Mexico City if no user location
-        zoom: userLocation ? 12 : 5,
+        center: initialCenter,
+        zoom: initialZoom,
         attributionControl: false
       });
 
@@ -78,10 +94,13 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       // Handle any errors
       map.current.on('error', (e) => {
         console.error('Map error:', e);
+        setMapError('Error loading map components');
+        toast.error('Error loading map components');
       });
     } catch (error) {
       console.error('Error initializing map:', error);
-      setMapError('Error initializing map');
+      setMapError('Error initializing map interface');
+      toast.error('Error initializing map interface');
     }
 
     return () => {
@@ -186,8 +205,19 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
 
   if (mapError) {
     return (
-      <div className={`relative w-full h-[400px] rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 ${className}`}>
-        <p>{mapError}</p>
+      <div className={`relative w-full h-[400px] rounded-lg bg-gray-100 flex flex-col items-center justify-center gap-4 ${className}`}>
+        <AlertCircle className="h-12 w-12 text-gray-400" />
+        <div className="text-center">
+          <p className="text-gray-600 mb-2">{mapError}</p>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-2"
+          >
+            <MapPin className="h-4 w-4" />
+            <span>Reintentar cargar mapa</span>
+          </Button>
+        </div>
       </div>
     );
   }

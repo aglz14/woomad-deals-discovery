@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'robots.txt'], // Added robots.txt
-      selfDestroying: true,
+      selfDestroying: false,
       manifest: {
         name: 'Woomad - Ofertas en centros comerciales', // Kept original name
         short_name: 'Woomad',
@@ -45,9 +45,7 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         skipWaiting: true,
-        clientsClaim: true,
-        cleanupOutdatedCaches: true,
-        disableDevLogs: true
+        clientsClaim: true
       }
     }),
     mode === 'development' &&
