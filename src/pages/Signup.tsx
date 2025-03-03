@@ -6,92 +6,67 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { EyeIcon, EyeOffIcon, UserPlus } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (password.length < 8) {
+      toast.error("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      // Log the signup attempt (without password)
-      console.log("Attempting signup with email:", email);
-      
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          // Add any additional data needed for user profiles
-          // data: { firstName: firstName, lastName: lastName }
-        }
       });
-      
+
       if (error) throw error;
-      
-      console.log("Signup response:", data);
-      
-      // Check if user was created
-      if (data.user) {
-        // The database tables user_preferences and profiles will be created 
-        // automatically by a Supabase database trigger
-        console.log("User created successfully with ID:", data.user.id);
-        
-        // No need to manually create user_preferences - this should be handled by a database trigger
-        
-        toast.success("¡Cuenta creada exitosamente!");
-        navigate("/");
-      } else {
-        // In some cases, user might be null even though there's no error
-        toast.error("No se pudo crear el usuario. Intenta nuevamente.");
-      }
+
+      toast.success("¡Cuenta creada con éxito!");
+      navigate("/");
     } catch (error: any) {
-      console.error("Signup error:", error);
-      
-      // Log detailed Supabase error information if available
-      if (error.code) {
-        console.error("Error code:", error.code);
-        console.error("Error message:", error.message);
-        console.error("Error details:", error.details);
-      }
-      
-      // Show a more specific error message if possible
-      if (error.code === '23505') {
-        toast.error("Este correo electrónico ya está registrado. Intenta iniciar sesión.");
-      } else if (error.code === 'PGRST116') {
-        toast.error("Error en la base de datos. La tabla user_preferences podría no existir.");
-      } else {
-        toast.error(error.message || "Error al crear la cuenta. Intenta nuevamente.");
-      }
+      toast.error(error.message || "Error al crear la cuenta");
     } finally {
       setLoading(false);
     }
   };
 
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Crear una cuenta nueva
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            O{" "}
-            <button
-              onClick={() => navigate("/")}
-              className="font-medium text-purple-600 hover:text-purple-500"
-            >
-              ir a Woomad.com
-            </button>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <Label htmlFor="email">Correo electrónico</Label>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md shadow-lg border-purple-100">
+        <CardHeader className="space-y-1">
+          <div className="flex justify-center mb-2">
+            <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+              <UserPlus className="h-6 w-6 text-purple-600" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl font-bold text-center text-gray-900">
+            Crea tu cuenta
+          </CardTitle>
+          <CardDescription className="text-center text-gray-600">
+            Regístrate para descubrir las mejores promociones
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-sm font-medium">
+                Correo electrónico
+              </Label>
               <Input
                 id="email"
                 name="email"
@@ -100,35 +75,87 @@ export default function Signup() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1"
+                className="h-11"
                 placeholder="tu@email.com"
               />
             </div>
-            <div>
-              <Label htmlFor="password">Contraseña</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1"
-                placeholder="••••••••"
-              />
+            
+            <div className="space-y-1">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Contraseña
+              </Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-11 pr-10"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={toggleShowPassword}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-5 w-5" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Mínimo 8 caracteres
+              </p>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 bg-purple-600 hover:bg-purple-700 text-white font-medium"
+              disabled={loading}
+            >
+              {loading ? "Creando cuenta..." : "Registrarse"}
+            </Button>
+            
+            <div className="text-center text-sm">
+              <span className="text-gray-600">¿Ya tienes una cuenta? </span>
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
+                className="text-purple-600 hover:text-purple-800 font-medium"
+              >
+                Inicia sesión
+              </button>
+            </div>
+          </form>
+          
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">O</span>
+              </div>
+            </div>
+            
+            <div className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate("/")}
+              >
+                Volver a la página principal
+              </Button>
             </div>
           </div>
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? "Creando cuenta..." : "Registrarse"}
-          </Button>
-        </form>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
