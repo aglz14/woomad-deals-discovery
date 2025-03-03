@@ -124,9 +124,9 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
         if (mall.latitude && mall.longitude) {
           // Create a custom popup with a button to view mall details
           const popupHtml = `
-            <div>
-              <strong>${mall.name}</strong>
-              <p>${mall.address}</p>
+            <div style="color: #333;">
+              <strong style="color: #111; font-size: 14px;">${mall.name}</strong>
+              <p style="color: #444; font-size: 12px; margin: 4px 0;">${mall.address}</p>
               <button class="mapbox-popup-button" data-mall-id="${mall.id}" style="
                 background-color: #3FB1CE; 
                 color: white; 
