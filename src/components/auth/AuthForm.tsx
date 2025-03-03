@@ -44,7 +44,8 @@ export const AuthForm = ({
         const {
           error
         } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/callback#type=recovery`
+          // Update to use the correct password reset URL
+          redirectTo: `${window.location.origin}/password-reset`
         });
         if (error) throw error;
         toast.success("¡Revisa tu correo para restablecer tu contraseña!");
@@ -59,6 +60,7 @@ export const AuthForm = ({
         if (error) throw error;
         toast.success("¡Has iniciado sesión exitosamente!");
       }
+      // Close the popup form if it's open
       onClose();
     } catch (error: any) {
       toast.error(error.message);

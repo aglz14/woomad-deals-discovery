@@ -12,6 +12,7 @@ export default function PasswordReset() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -123,7 +124,10 @@ export default function PasswordReset() {
       // Sign out and clean up the session
       await supabase.auth.signOut();
       toast.success("Contraseña actualizada con éxito");
-      navigate("/");
+      
+      // Show a message and provide a link instead of automatic redirect
+      setShowResetForm(false);
+      setShowSuccess(true); 
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -142,6 +146,29 @@ export default function PasswordReset() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p className="text-gray-600">Procesando autenticación...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 text-center">
+          <div>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              ¡Contraseña actualizada!
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-600">
+              Tu contraseña ha sido actualizada exitosamente.
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate("/")}
+            className="mt-4"
+          >
+            Ir al inicio
+          </Button>
         </div>
       </div>
     );
