@@ -226,3 +226,162 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
     <div ref={mapContainer} className={`relative w-full h-[400px] rounded-lg shadow-lg bg-white z-10 ${className}`} />
   );
 };
+import { useRef, useEffect, useState } from 'react';
+import { UserLocation } from '@/hooks/use-location';
+import { MapPin, AlertTriangle } from 'lucide-react';
+
+interface LocationMapProps {
+  userLocation: UserLocation | null;
+  className?: string;
+  mallLocations?: Array<{id: string; latitude: number; longitude: number; name: string}>;
+}
+
+export const LocationMap = ({ userLocation, className = '', mallLocations = [] }: LocationMapProps) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+
+  useEffect(() => {
+    // Skip if map reference doesn't exist
+    if (!mapRef.current) return;
+
+    let mapInstance: google.maps.Map | null = null;
+    let markers: google.maps.Marker[] = [];
+
+    const initMap = async () => {
+      try {
+        // Check if Google Maps API is loaded
+        if (!window.google || !window.google.maps) {
+          throw new Error('Google Maps API failed to load');
+        }
+
+        // Create map centered on user location or default to a central location
+        const center = userLocation 
+          ? { lat: userLocation.lat, lng: userLocation.lng } 
+          : { lat: 19.4326, lng: -99.1332 }; // Default to Mexico City if no location
+
+        mapInstance = new google.maps.Map(mapRef.current, {
+          center,
+          zoom: userLocation ? 11 : 5,
+          mapTypeControl: false,
+          fullscreenControl: false,
+          streetViewControl: false,
+          zoomControl: true,
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }]
+            }
+          ]
+        });
+        
+        // Add user marker if location is available
+        if (userLocation) {
+          const userMarker = new google.maps.Marker({
+            position: { lat: userLocation.lat, lng: userLocation.lng },
+            map: mapInstance,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 7,
+              fillColor: '#4338CA',
+              fillOpacity: 1,
+              strokeColor: '#ffffff',
+              strokeWeight: 2,
+            },
+            title: 'Tu ubicación',
+          });
+          
+          // Add a circle to show user's location radius
+          new google.maps.Circle({
+            strokeColor: '#4338CA',
+            strokeOpacity: 0.3,
+            strokeWeight: 2,
+            fillColor: '#4338CA',
+            fillOpacity: 0.1,
+            map: mapInstance,
+            center: { lat: userLocation.lat, lng: userLocation.lng },
+            radius: 5000, // 5km radius
+          });
+        }
+        
+        // Add mall markers
+        if (mallLocations.length > 0) {
+          console.log("Adding markers for", mallLocations.length, "malls");
+          
+          mallLocations.forEach(mall => {
+            if (mall.latitude && mall.longitude) {
+              const marker = new google.maps.Marker({
+                position: { lat: mall.latitude, lng: mall.longitude },
+                map: mapInstance,
+                title: mall.name,
+                icon: {
+                  url: 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png',
+                }
+              });
+              
+              markers.push(marker);
+            }
+          });
+          
+          // Adjust bounds to include all markers if we have user location
+          if (userLocation && markers.length > 0) {
+            const bounds = new google.maps.LatLngBounds();
+            bounds.extend({ lat: userLocation.lat, lng: userLocation.lng });
+            
+            markers.forEach(marker => {
+              bounds.extend(marker.getPosition()!);
+            });
+            
+            mapInstance.fitBounds(bounds);
+            
+            // Don't zoom in too far
+            const listener = google.maps.event.addListener(mapInstance, 'idle', () => {
+              if (mapInstance!.getZoom()! > 13) {
+                mapInstance!.setZoom(13);
+              }
+              google.maps.event.removeListener(listener);
+            });
+          }
+        }
+        
+        setIsMapLoaded(true);
+        console.log("Map loaded successfully");
+      } catch (error) {
+        console.error("Error initializing map:", error);
+        setMapError("Error al cargar el mapa. Por favor, recarga la página.");
+      }
+    };
+
+    initMap();
+
+    // Cleanup function
+    return () => {
+      markers.forEach(marker => marker.setMap(null));
+    };
+  }, [userLocation, mallLocations]);
+
+  if (mapError) {
+    return (
+      <div className={`${className} flex items-center justify-center bg-gray-100 rounded-lg`}>
+        <div className="text-center p-4">
+          <AlertTriangle className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+          <p className="text-gray-700">{mapError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isMapLoaded) {
+    return (
+      <div className={`${className} flex items-center justify-center bg-gray-100 rounded-lg`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-2"></div>
+          <p className="text-gray-600">Cargando mapa...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <div ref={mapRef} className={className} />;
+};

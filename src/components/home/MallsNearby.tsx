@@ -24,8 +24,8 @@ export const MallsNearby = ({ searchTerm, selectedMallId }: MallsNearbyProps) =>
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 9;
   const { userLocation, calculateDistance } = useLocation();
-  // Notifications functionality moved to Profile page only
-  const { isMonitoring } = useGeofencing(null); // Placeholder - needs actual malls data
+  // Passing the actual malls data to the useGeofencing hook
+  const { isMonitoring } = useGeofencing(malls || []);
 
 
   const { data: malls, isLoading } = useQuery({
