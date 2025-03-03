@@ -96,7 +96,7 @@ export const AuthForm = ({
 
       <div className="text-center space-y-2">
         {mode === "login" ? (
-            <Button variant="link" className="text-sm" onClick={() => onModeChange("reset")}>¿Olvidaste tu contraseña? Iniciar Sesión</Button>
+            <></>
           ) : (
             <Button variant="link" className="text-sm" onClick={() => onModeChange("login")}>
               ¿Ya tienes una cuenta? Inicia sesión
