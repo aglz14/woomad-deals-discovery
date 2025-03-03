@@ -50,19 +50,27 @@ export default function PasswordReset() {
           return;
         }
 
-        // Only proceed with setting session for recovery tokens
+        // First check the token type before proceeding
         if (type === 'recovery') {
-          const { data: { session }, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: '',
-          });
+          try {
+            // For recovery tokens, we just validate the token but don't complete authentication
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: '',
+            });
 
-          if (error) throw error;
-          
-          // Show password reset form
-          setShowResetForm(true);
+            if (error) throw error;
+            
+            // If token is valid, show the reset form
+            setShowResetForm(true);
+            console.log("Password reset form should display now");
+          } catch (tokenError) {
+            console.error("Invalid recovery token:", tokenError);
+            toast.error("Token de recuperación inválido");
+            navigate("/");
+          }
         } else if (type === 'signup' || type === 'magiclink') {
-          // Handle email confirmation or magic link
+          // For other types, we complete the authentication flow
           const { data: { session }, error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: '',
@@ -123,6 +131,11 @@ export default function PasswordReset() {
     }
   };
 
+  useEffect(() => {
+    console.log("ShowResetForm state:", showResetForm);
+  }, [showResetForm]);
+
+  // Only show loading if we're still processing the token
   if (!showResetForm) {
     return (
       <div className="min-h-screen flex items-center justify-center">
