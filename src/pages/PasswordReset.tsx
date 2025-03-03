@@ -52,8 +52,27 @@ export default function PasswordReset() {
           
           // Look for token parameter which might be named differently
           const searchParams = new URLSearchParams(search);
-          const token = searchParams.get('token') || searchParams.get('t');
-          if (token) accessToken = token;
+          // Check all possible token parameter names
+          const token = searchParams.get('token') || 
+                       searchParams.get('t') || 
+                       searchParams.get('code') || 
+                       searchParams.get('recovery_token');
+          
+          if (token) {
+            console.log("Found token in search params with length:", token.length);
+            accessToken = token;
+          }
+        }
+        
+        // Also check for token as a standalone parameter
+        if (!accessToken && search) {
+          const searchParams = new URLSearchParams(search);
+          const rawToken = searchParams.get('token');
+          if (rawToken) {
+            console.log("Found standalone token in URL");
+            accessToken = rawToken;
+            type = 'recovery'; // Assume recovery if only token is present
+          }
         }
 
         // If no token found, show the email form
@@ -74,7 +93,7 @@ export default function PasswordReset() {
         // First check the token type before proceeding
         if (type === 'recovery') {
           try {
-            console.log("Verifying recovery token");
+            console.log("Verifying recovery token:", accessToken.substring(0, 5) + "...");
             // For recovery tokens, we validate the token and establish a session
             // This is crucial for password update to work later
             const { data, error } = await supabase.auth.verifyOtp({
@@ -86,7 +105,14 @@ export default function PasswordReset() {
               }
             });
 
-            if (error) throw error;
+            if (error) {
+              console.error("Token verification error:", error.message);
+              throw error;
+            }
+            
+            // Log the session state
+            const { data: sessionData } = await supabase.auth.getSession();
+            console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
             
             // If token is valid, show the reset form
             console.log("Recovery token valid, showing reset form");
@@ -169,8 +195,31 @@ export default function PasswordReset() {
 
     setLoading(true);
     try {
-      // Get current session - don't immediately reject if no session
+      // First check if we have a valid session
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("Current session before password update:", session ? "Active" : "None");
+      
+      // If we don't have a session, try to get URL parameters again
+      // This helps in case the token is still in the URL but wasn't processed correctly
+      if (!session) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        const token = urlParams.get('token') || hashParams.get('access_token');
+        
+        if (token) {
+          console.log("Trying to verify token again before password update");
+          try {
+            // Try to verify the token again
+            await supabase.auth.verifyOtp({
+              type: 'recovery',
+              token: token
+            });
+          } catch (e) {
+            console.error("Failed to re-verify token:", e);
+          }
+        }
+      }
       
       // Try to update the password regardless of session state
       // The auth API might still have the token in context even if getSession doesn't show it
