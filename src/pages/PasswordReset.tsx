@@ -24,183 +24,37 @@ export default function PasswordReset() {
   }, [hasToken, showResetForm]);
 
   useEffect(() => {
-    // Flag to avoid re-running token verification on re-renders
-    let isHandlingCallback = false;
-    
     const handleAuthCallback = async () => {
       try {
-        console.log("Starting auth callback handling");
-        // Check both hash and search parameters
-        const fragment = location.hash;
         const search = location.search;
-        
-        // Clear any existing session first
-        await supabase.auth.signOut();
-        
-        let accessToken = null;
-        let type = null;
-        let refreshToken = '';
+        const searchParams = new URLSearchParams(search);
+        const code = searchParams.get('code');
 
-        // Check hash parameters first (old format)
-        if (fragment) {
-          const hashParams = new URLSearchParams(fragment.substring(1));
-          accessToken = hashParams.get('access_token');
-          refreshToken = hashParams.get('refresh_token') || '';
-          type = hashParams.get('type');
-        }
-
-        // If not in hash, check search parameters (new format)
-        if (!accessToken && search) {
-          const searchParams = new URLSearchParams(search);
-          accessToken = searchParams.get('access_token');
-          refreshToken = searchParams.get('refresh_token') || '';
-          type = searchParams.get('type');
-        }
-
-        // Check for recovery token in combination with other params
-        if (search && search.includes('type=recovery')) {
-          type = 'recovery';
-          
-          // Look for token parameter which might be named differently
-          const searchParams = new URLSearchParams(search);
-          // Check all possible token parameter names
-          const token = searchParams.get('token') || 
-                       searchParams.get('t') || 
-                       searchParams.get('code') || 
-                       searchParams.get('recovery_token');
-          
-          if (token) {
-            console.log("Found token in search params with length:", token.length);
-            accessToken = token;
-            // Store token in sessionStorage to persist it through re-renders
-            sessionStorage.setItem('password_reset_token', token);
-          }
-        }
-        
-        // Check if token is stored in sessionStorage from previous attempt
-        if (!accessToken) {
-          const storedToken = sessionStorage.getItem('password_reset_token');
-          if (storedToken) {
-            console.log("Retrieved token from sessionStorage");
-            accessToken = storedToken;
-            type = 'recovery';
-          }
-        }
-        
-        // Also check for token as a standalone parameter and in all possible locations
-        if (!accessToken && search) {
-          // Check all possible token parameter names
-          const searchParams = new URLSearchParams(search);
-          const possibleTokenNames = ['token', 't', 'access_token', 'code', 'recovery_token', 'reset_token'];
-          
-          for (const tokenName of possibleTokenNames) {
-            const rawToken = searchParams.get(tokenName);
-            if (rawToken) {
-              console.log(`Found token in URL with parameter name: ${tokenName}`);
-              accessToken = rawToken;
-              type = 'recovery'; // Assume recovery if token is present
-              break;
-            }
-          }
-          
-          // Check if token is included in the URL path instead of as a parameter
-          // This handles URLs like /password-reset/TOKEN
-          const pathParts = window.location.pathname.split('/');
-          if (pathParts.length > 2 && pathParts[1] === 'password-reset') {
-            const pathToken = pathParts[2];
-            if (pathToken && pathToken.length > 10) { // Basic validation - tokens are usually long
-              console.log("Found token in URL path");
-              accessToken = pathToken;
-              type = 'recovery';
-            }
-          }
-        }
-
-        // If no token found, show the email form
-        if (!accessToken) {
+        if (!code) {
           console.log('No access token found in URL, showing email form');
           setShowResetForm(true);
           return;
         }
 
-        console.log('Token found, type:', type);
-        
-        // Clear any existing session first to avoid conflicts
-        await supabase.auth.signOut();
-        
-        // Mark as having token before verification to keep UI consistent
-        setHasToken(true);
-
-        // First check the token type before proceeding
-        if (type === 'recovery') {
-          try {
-            console.log("Verifying recovery token:", accessToken.substring(0, 5) + "...", "Length:", accessToken.length);
-            console.log("Attempting to verify recovery token");
-            
-            // For recovery tokens, we validate the token and establish a session
-            // This is crucial for password update to work later
-            const { data, error } = await supabase.auth.verifyOtp({
-              type: 'recovery',
-              token: accessToken,
-              options: {
-                // Avoid redirects which might cause loops
-                redirectTo: undefined
-              }
-            });
-            
-            // Mark this token as verified
-            if (!error) {
-              console.log("Token verification successful");
-              setHasToken(true);
-              setShowResetForm(true);
-            } else {
-              console.error("Token verification failed:", error.message);
-              throw new Error(error.message);
-            }
-          } catch (tokenError) {
-            console.error("Invalid recovery token:", tokenError);
-            toast.error("Token de recuperación inválido o expirado");
-            setHasToken(false);
-            setShowResetForm(true);
-          }
-        } else if (type === 'signup' || type === 'magiclink') {
-          // For other types, we complete the authentication flow
-          const { data: { session }, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-          
+        try {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) throw error;
-          
-          if (session) {
-            toast.success("Autenticación exitosa");
-            navigate("/");
-          } else {
-            throw new Error("No se pudo establecer la sesión");
-          }
-        } else {
-          console.error('Unknown auth callback type:', type);
-          toast.error("Tipo de autenticación no válido");
-          setHasToken(false);
+          setHasToken(true);
+          setShowResetForm(true);
+        } catch (error) {
+          console.error('Error exchanging code for session:', error);
+          toast.error("Token de recuperación inválido o expirado");
           setShowResetForm(true);
         }
       } catch (error) {
         console.error('Error handling auth callback:', error);
         toast.error(error.message || "Error procesando la autenticación");
-        // Clear stored data to prevent looping
-        sessionStorage.removeItem('password_reset_token');
-        sessionStorage.removeItem('token_verified');
-        setHasToken(false);
         setShowResetForm(true);
-      } finally {
-        isHandlingCallback = false;
       }
     };
 
-    // Only run this once on initial render
     handleAuthCallback();
-    
-  }, []); // Remove dependencies to prevent re-runs on location changes
+  }, [location.search]);
 
   const handleSendResetLink = async (e) => {
     e.preventDefault();
