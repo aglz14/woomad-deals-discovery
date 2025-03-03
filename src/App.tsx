@@ -52,7 +52,7 @@ function App() {
                   <Route path="/" errorElement={<div>Error loading page</div>}>
                     <Route path="/" element={<Index />} />
                     <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<lazy(() => import('./pages/Login'))()} />
+          <Route path="/login" element={<Suspense fallback={<div>Loading...</div>}><React.lazy(() => import('./pages/Login'))} /></Suspense>}
                     <Route path="/password-reset" element={<PasswordReset />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/nosotros" element={<Nosotros />} />
