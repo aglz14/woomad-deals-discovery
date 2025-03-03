@@ -191,7 +191,8 @@ export default function PasswordReset() {
             setHasToken(false);
             setShowResetForm(true);
           } finally {
-            // Empty finally block to properly close the try-catch statement
+            // Clean up any resources or state used during token verification
+            console.log("Token verification process completed");
           }
         } else if (type === 'signup' || type === 'magiclink') {
           // For other types, we complete the authentication flow
