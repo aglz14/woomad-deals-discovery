@@ -25,7 +25,7 @@ export const HomeHero = ({ userLocation }: HomeHeroProps) => {
                 {userLocation ? t("nearMe") : t("deals")}
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mx-auto px-2 leading-relaxed">
-                {t("searchPlaceholder")}
+                Ofertas Cerca de Ti
               </p>
               {userLocation && (
                 <div className="inline-flex items-center justify-center gap-2 py-1 px-3 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/90">
