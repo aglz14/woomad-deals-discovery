@@ -5,21 +5,25 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Store } from '@/types/store';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from "@/components/ui/button";
 
 interface LocationMapProps {
   userLocation: { lat: number; lng: number } | null;
   className?: string;
 }
 
-// Set the access token directly
-mapboxgl.accessToken = 'pk.eyJ1IjoiYWdsejE0IiwiYSI6ImNtN24wMTV2cjByMncybHBycHAwMGQ3aG4ifQ.R5Qpb4QfKpXvuRLNt1yf-g';
+// Initialize mapboxgl with error handling
+try {
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYWdsejE0IiwiYSI6ImNtN24wMTV2cjByMncybHBycHAwMGQ3aG4ifQ.R5Qpb4QfKpXvuRLNt1yf-g';
+} catch (error) {
+  console.error('Error initializing Mapbox:', error);
+}
 
 export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [mapReady, setMapReady] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   const { data: malls } = useQuery({
     queryKey: ['shopping-malls-map'],
@@ -34,6 +38,11 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
+
+    if (!mapboxgl.accessToken) {
+      setMapError('Error initializing map: Invalid access token');
+      return;
+    }
 
     try {
       // Initialize map
@@ -72,6 +81,7 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       });
     } catch (error) {
       console.error('Error initializing map:', error);
+      setMapError('Error initializing map');
     }
 
     return () => {
@@ -173,6 +183,14 @@ export const LocationMap = ({ userLocation, className = "" }: LocationMapProps) 
       }
     });
   }, [malls, mapReady]);
+
+  if (mapError) {
+    return (
+      <div className={`relative w-full h-[400px] rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 ${className}`}>
+        <p>{mapError}</p>
+      </div>
+    );
+  }
 
   return (
     <div ref={mapContainer} className={`relative w-full h-[400px] rounded-lg shadow-lg bg-white z-10 ${className}`} />

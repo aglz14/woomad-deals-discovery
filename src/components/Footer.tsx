@@ -17,9 +17,9 @@ export const Footer = () => {
                 to="/" 
                 className="inline-block transform hover:scale-105 transition-transform duration-200"
               >
-                <img 
-                  src="/lovable-uploads/c852587b-0ed0-4fee-9630-1f53f53a9ea3.png" 
-                  alt="Woomad Commerce" 
+                <img
+                  src="https://qpdwvinsbpxdsvumslho.supabase.co/storage/v1/object/public/official_logos//brandmark-design-23.png"
+                  alt="Woomad Commerce"
                   className="h-10"
                 />
               </Link>

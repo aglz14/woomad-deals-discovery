@@ -37,7 +37,7 @@ export const Header = () => {
         <div className="mx-auto max-w-7xl px-2 sm:px-4"> {/* Responsive padding */}
           <div className="flex items-center justify-between h-16 px-2 sm:px-[40px]">
             <Link to="/" className="flex items-center">
-              <img src="/lovable-uploads/375924b8-bf3a-4f85-868b-b1befe051793.png" alt="Woomad Commerce" className="h-8" />
+              <img src="https://qpdwvinsbpxdsvumslho.supabase.co/storage/v1/object/public/official_logos//brandmark-design-24.png" alt="Woomad Commerce" className="h-8" />
             </Link>
 
             <div className="flex items-center">

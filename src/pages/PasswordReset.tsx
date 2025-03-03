@@ -28,18 +28,14 @@ export default function PasswordReset() {
     let isHandlingCallback = false;
     
     const handleAuthCallback = async () => {
-      // Prevent multiple simultaneous calls
-      if (isHandlingCallback) {
-        console.log("Already handling auth callback, skipping");
-        return;
-      }
-      
-      isHandlingCallback = true;
       try {
         console.log("Starting auth callback handling");
         // Check both hash and search parameters
         const fragment = location.hash;
         const search = location.search;
+        
+        // Clear any existing session first
+        await supabase.auth.signOut();
         
         let accessToken = null;
         let type = null;
@@ -139,11 +135,6 @@ export default function PasswordReset() {
         if (type === 'recovery') {
           try {
             console.log("Verifying recovery token:", accessToken.substring(0, 5) + "...", "Length:", accessToken.length);
-            
-            // Store the token in sessionStorage to persist through page refreshes
-            sessionStorage.setItem('password_reset_token', accessToken);
-            
-            // Once we have a token, try to verify it only once
             console.log("Attempting to verify recovery token");
             
             // For recovery tokens, we validate the token and establish a session
@@ -160,33 +151,15 @@ export default function PasswordReset() {
             // Mark this token as verified
             if (!error) {
               console.log("Token verification successful");
-              console.log("Recovery token valid, showing reset form");
-              sessionStorage.setItem('token_verified', 'true');
-              // Store token in localStorage for password update stage
-              localStorage.setItem('pending_reset_token', accessToken);
+              setHasToken(true);
+              setShowResetForm(true);
             } else {
               console.error("Token verification failed:", error.message);
               throw new Error(error.message);
             }
-
-            if (error) {
-              console.error("Token verification error:", error.message);
-              throw error;
-            }
-            
-            // Log the session state
-            const { data: sessionData } = await supabase.auth.getSession();
-            console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
-            
-            // If token is valid, show the reset form
-            setHasToken(true); // Make sure we set hasToken explicitly to true
-            setShowResetForm(true);
           } catch (tokenError) {
             console.error("Invalid recovery token:", tokenError);
             toast.error("Token de recuperación inválido o expirado");
-            // Clear stored data to prevent looping
-            sessionStorage.removeItem('password_reset_token');
-            sessionStorage.removeItem('token_verified');
             setHasToken(false);
             setShowResetForm(true);
           }
@@ -227,11 +200,6 @@ export default function PasswordReset() {
     // Only run this once on initial render
     handleAuthCallback();
     
-    // Cleanup function to remove the token verification state if we navigate away
-    return () => {
-      console.log("Cleanup: Removing temporary token verification flags");
-      sessionStorage.removeItem('token_verified');
-    };
   }, []); // Remove dependencies to prevent re-runs on location changes
 
   const handleSendResetLink = async (e) => {
