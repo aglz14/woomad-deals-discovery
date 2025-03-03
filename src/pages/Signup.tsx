@@ -121,16 +121,7 @@ export default function Signup() {
               {loading ? "Creando cuenta..." : "Registrarse"}
             </Button>
             
-            <div className="text-center text-sm">
-              <span className="text-gray-600">¿Ya tienes una cuenta? </span>
-              <button
-                type="button"
-                onClick={() => navigate("/login")}
-                className="text-purple-600 hover:text-purple-800 font-medium"
-              >
-                Inicia sesión
-              </button>
-            </div>
+            {/* Login link removed */}
           </form>
           
           <div className="mt-6">
