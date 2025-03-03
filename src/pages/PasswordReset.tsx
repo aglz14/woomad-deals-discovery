@@ -26,23 +26,40 @@ export default function PasswordReset() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const search = location.search;
-        const searchParams = new URLSearchParams(search);
+        // Check for hash parameters first
+        const hash = location.hash;
+        const hashParams = new URLSearchParams(hash.replace('#', ''));
+        const accessToken = hashParams.get('access_token');
+        const type = hashParams.get('type');
+
+        // If no hash parameters, check search parameters
+        const searchParams = new URLSearchParams(location.search);
         const code = searchParams.get('code');
 
-        if (!code) {
-          console.log('No access token found in URL, showing email form');
+        if (!accessToken && !code) {
+          console.log('No token or code found in URL, showing email form');
           setShowResetForm(true);
           return;
         }
 
         try {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) throw error;
+          if (code) {
+            // Handle PKCE flow
+            const { error } = await supabase.auth.exchangeCodeForSession(code);
+            if (error) throw error;
+          } else if (accessToken && type === 'recovery') {
+            // Handle implicit flow with access token
+            const { error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: ''
+            });
+            if (error) throw error;
+          }
+
           setHasToken(true);
           setShowResetForm(true);
         } catch (error) {
-          console.error('Error exchanging code for session:', error);
+          console.error('Error setting up auth session:', error);
           toast.error("Token de recuperación inválido o expirado");
           setShowResetForm(true);
         }
@@ -54,7 +71,7 @@ export default function PasswordReset() {
     };
 
     handleAuthCallback();
-  }, [location.search]);
+  }, [location.search, location.hash]);
 
   const handleSendResetLink = async (e) => {
     e.preventDefault();

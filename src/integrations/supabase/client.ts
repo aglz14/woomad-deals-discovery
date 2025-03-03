@@ -7,12 +7,13 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    autoRefreshToken: false,
+    autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'implicit',
+    flowType: 'pkce',
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
-    redirectTo: `${window.location.origin}/password-reset`
+    redirectTo: `${window.location.origin}/password-reset`,
+    debug: true
   }
 });
