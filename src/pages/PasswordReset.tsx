@@ -176,8 +176,6 @@ export default function PasswordReset() {
             // Log the session state
               const { data: sessionData } = await supabase.auth.getSession();
               console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
-            } else {
-              console.log("Token already verified, using existing session");
             }
             
             // If token is valid, show the reset form
