@@ -44,7 +44,7 @@ export const AuthForm = ({
         const {
           error
         } = await supabase.auth.resetPasswordForEmail(email, {
-          // Update to use the correct password reset URL
+          // Using the URL pattern that Supabase will recognize and properly process
           redirectTo: `${window.location.origin}/password-reset`
         });
         if (error) throw error;

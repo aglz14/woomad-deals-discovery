@@ -42,6 +42,16 @@ export default function PasswordReset() {
           type = searchParams.get('type');
         }
 
+        // Check for recovery token in combination with other params
+        if (search && search.includes('type=recovery')) {
+          type = 'recovery';
+          
+          // Look for token parameter which might be named differently
+          const searchParams = new URLSearchParams(search);
+          const token = searchParams.get('token') || searchParams.get('t');
+          if (token) accessToken = token;
+        }
+
         // If no token found, show the email form
         if (!accessToken) {
           console.log('No access token found in URL, showing email form');
