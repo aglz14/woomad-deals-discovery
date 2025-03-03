@@ -27,11 +27,13 @@ export default function PasswordReset() {
         
         let accessToken = null;
         let type = null;
+        let refreshToken = '';
 
         // Check hash parameters first (old format)
         if (fragment) {
           const hashParams = new URLSearchParams(fragment.substring(1));
           accessToken = hashParams.get('access_token');
+          refreshToken = hashParams.get('refresh_token') || '';
           type = hashParams.get('type');
         }
 
@@ -39,6 +41,7 @@ export default function PasswordReset() {
         if (!accessToken && search) {
           const searchParams = new URLSearchParams(search);
           accessToken = searchParams.get('access_token');
+          refreshToken = searchParams.get('refresh_token') || '';
           type = searchParams.get('type');
         }
 
@@ -54,11 +57,12 @@ export default function PasswordReset() {
 
         // If no token found, show the email form
         if (!accessToken) {
-          console.log('No access token found in URL, showing email form');
+          console.log('No access token found in URL');
           setShowResetForm(true);
           return;
         }
 
+        console.log('Token found, type:', type);
         setHasToken(true);
 
         // Clear any existing session first to avoid conflicts
@@ -67,10 +71,11 @@ export default function PasswordReset() {
         // First check the token type before proceeding
         if (type === 'recovery') {
           try {
-            // For recovery tokens, we just validate the token but don't complete authentication
-            const { data, error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: '',
+            // For recovery tokens, we validate the token and establish a session
+            // This is crucial for password update to work later
+            const { data, error } = await supabase.auth.verifyOtp({
+              type: 'recovery',
+              token: accessToken,
             });
 
             if (error) throw error;
@@ -80,14 +85,15 @@ export default function PasswordReset() {
             console.log("Password reset form should display now");
           } catch (tokenError) {
             console.error("Invalid recovery token:", tokenError);
-            toast.error("Token de recuperación inválido");
+            toast.error("Token de recuperación inválido o expirado");
+            setHasToken(false);
             setShowResetForm(true);
           }
         } else if (type === 'signup' || type === 'magiclink') {
           // For other types, we complete the authentication flow
           const { data: { session }, error } = await supabase.auth.setSession({
             access_token: accessToken,
-            refresh_token: '',
+            refresh_token: refreshToken,
           });
           
           if (error) throw error;
@@ -106,6 +112,7 @@ export default function PasswordReset() {
       } catch (error: any) {
         console.error('Error handling auth callback:', error);
         toast.error(error.message || "Error procesando la autenticación");
+        setHasToken(false);
         setShowResetForm(true);
       }
     };
@@ -153,21 +160,37 @@ export default function PasswordReset() {
 
     setLoading(true);
     try {
+      // Check if we have a valid session first
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If no session, show a more helpful error
+        toast.error("Tu sesión de recuperación ha expirado. Por favor, solicita un nuevo enlace.");
+        // Reset the form to request a new link
+        setHasToken(false);
+        setShowResetForm(true);
+        return;
+      }
+      
+      // Now try to update the password with the active session
       const { error } = await supabase.auth.updateUser({ 
         password: password 
       });
 
       if (error) throw error;
 
+      // Password was updated successfully
+      toast.success("Contraseña actualizada con éxito");
+      
       // Sign out and clean up the session
       await supabase.auth.signOut();
-      toast.success("Contraseña actualizada con éxito");
       
       // Show a message and provide a link instead of automatic redirect
       setShowResetForm(false);
       setShowSuccess(true); 
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Error updating password:", error);
+      toast.error(error.message || "Error al actualizar la contraseña");
     } finally {
       setLoading(false);
     }
