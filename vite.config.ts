@@ -12,8 +12,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    // Only include PWA plugin in production build
-    mode === 'production' && VitePWA({
+    VitePWA({
       registerType: 'prompt', // Changed from autoUpdate to prompt for better control
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'robots.txt'], // Added robots.txt
       selfDestroying: false,
