@@ -174,9 +174,8 @@ export default function PasswordReset() {
             }
             
             // Log the session state
-              const { data: sessionData } = await supabase.auth.getSession();
-              console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
-            }
+            const { data: sessionData } = await supabase.auth.getSession();
+            console.log("Session after verification:", sessionData?.session ? "Active" : "Not active");
             
             // If token is valid, show the reset form
             console.log("Recovery token valid, showing reset form");
@@ -212,7 +211,7 @@ export default function PasswordReset() {
           setHasToken(false);
           setShowResetForm(true);
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error handling auth callback:', error);
         toast.error(error.message || "Error procesando la autenticación");
         // Clear stored data to prevent looping
@@ -235,7 +234,7 @@ export default function PasswordReset() {
     };
   }, []); // Remove dependencies to prevent re-runs on location changes
 
-  const handleSendResetLink = async (e: React.FormEvent) => {
+  const handleSendResetLink = async (e) => {
     e.preventDefault();
     
     if (!email) {
@@ -253,14 +252,14 @@ export default function PasswordReset() {
 
       toast.success("Se ha enviado un enlace a tu correo electrónico");
       setEmail("");
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -427,7 +426,7 @@ export default function PasswordReset() {
       
       // Remove navigation warning
       window.onbeforeunload = null; 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating password:", error);
       toast.error(error.message || "Error al actualizar la contraseña");
     } finally {

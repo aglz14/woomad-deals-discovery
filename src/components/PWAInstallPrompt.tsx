@@ -13,8 +13,6 @@ export function PWAInstallPrompt() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
-  const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
-  const [hasAttemptedUpdate, setHasAttemptedUpdate] = useState(false);
 
   // Register and set up the service worker
   const {
@@ -28,8 +26,8 @@ export function PWAInstallPrompt() {
       console.error('Service worker registration error:', error);
     },
     immediate: true,
-    // This parameter will help avoid unnecessary update prompts
-    skipWaiting: false
+    // Skip waiting to avoid unnecessary update prompts
+    skipWaiting: true
   });
 
   useEffect(() => {
@@ -37,12 +35,6 @@ export function PWAInstallPrompt() {
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
       return;
-    }
-
-    // Check if we've already attempted update in this session
-    const hasAttemptedUpdateInSession = sessionStorage.getItem('hasAttemptedUpdate') === 'true';
-    if (hasAttemptedUpdateInSession) {
-      setHasAttemptedUpdate(true);
     }
 
     // Store the install prompt event for later use
@@ -54,15 +46,10 @@ export function PWAInstallPrompt() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // Check for updates - only show if we haven't already attempted
-    if (needRefresh && !hasAttemptedUpdate && !hasAttemptedUpdateInSession) {
-      setShowUpdatePrompt(true);
-    }
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, [needRefresh, hasAttemptedUpdate]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (!installPrompt) return;
@@ -82,50 +69,6 @@ export function PWAInstallPrompt() {
   const handleDismiss = () => {
     setShowPrompt(false);
   };
-
-  // Don't show update prompt if we've already tried updating
-  if (showUpdatePrompt && !hasAttemptedUpdate) {
-    return (
-      <div className="fixed bottom-20 right-4 z-[60] bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-        <p className="mb-2">Nueva actualización disponible</p>
-        <Button 
-          onClick={() => {
-            console.log("Updating service worker...");
-            // First hide the prompt to avoid confusion
-            setShowUpdatePrompt(false);
-            // Mark that we've attempted this update
-            setHasAttemptedUpdate(true);
-            // Store in sessionStorage to persist across page reloads
-            sessionStorage.setItem('hasAttemptedUpdate', 'true');;
-
-            // Update the service worker
-            try {
-              if (typeof updateServiceWorker === 'function') {
-                updateServiceWorker(true);
-                console.log("Service worker update triggered");
-              } else {
-                console.warn("updateServiceWorker is not a function");
-                // Force reload as fallback
-                window.location.reload();
-              };
-
-              // Force reload after a short delay
-              setTimeout(() => {
-                console.log("Reloading page after service worker update attempt...");
-                window.location.reload(true); // Force reload from server
-              }, 1000);
-            } catch (error) {
-              console.error("Error updating service worker:", error);
-              // Even if there's an error, reload the page to get a fresh state
-              setTimeout(() => window.location.reload(true), 1000);
-            }
-          }}
-        >
-          Actualizar
-        </Button>
-      </div>
-    );
-  }
 
   if (!showPrompt || isInstalled) return null;
 
