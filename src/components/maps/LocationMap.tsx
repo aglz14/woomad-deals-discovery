@@ -3,15 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { AlertCircle, MapPin, AlertTriangle } from "lucide-react";
-import { UserLocation } from '@/hooks/use-location';
+import { AlertCircle, MapPin } from "lucide-react";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Store } from '@/types/store';
+import { Mall } from '@/types/mall';
 
 interface LocationMapProps {
-  userLocation: UserLocation | null;
+  userLocation: { lat: number; lng: number } | null;
   className?: string;
-  mallLocations?: Array<{id: string; latitude: number; longitude: number; name: string}>;
+  mallLocations?: Mall[];
 }
 
 // Validate and set Mapbox token
@@ -61,168 +62,103 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
       const initialCenter = userLocation ? [userLocation.lng, userLocation.lat] : defaultCenter;
       const initialZoom = userLocation ? 12 : 5;
 
-      // Initialize map
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current!,
+      const mapInstance = new mapboxgl.Map({
+        container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
         center: initialCenter,
         zoom: initialZoom,
-        attributionControl: false
       });
 
-      // Add navigation controls
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.current = mapInstance;
 
-      // Add user location control
-      map.current.addControl(new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true
-        },
-        trackUserLocation: true,
-        showUserHeading: true
-      }));
-
-      // Add attribution control
-      map.current.addControl(new mapboxgl.AttributionControl(), 'bottom-right');
-
-      // Wait for map to load before doing anything else
-      map.current.on('load', () => {
+      mapInstance.on('load', () => {
         console.log('Map loaded successfully');
         setMapReady(true);
       });
 
-      // Handle any errors
-      map.current.on('error', (e) => {
+      mapInstance.on('error', (e) => {
         console.error('Map error:', e);
-        setMapError('Error loading map components');
-        toast.error('Error loading map components');
+        setMapError('Error loading map');
       });
+
+      return () => {
+        mapInstance.remove();
+        map.current = null;
+      };
     } catch (error) {
       console.error('Error initializing map:', error);
-      setMapError('Error initializing map interface');
-      toast.error('Error initializing map interface');
+      setMapError('Error initializing map');
+      toast.error('Could not load map. Please try again later.');
     }
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-        setMapReady(false);
-      }
-    };
   }, [userLocation]);
 
-  // Update markers when map is ready and malls data changes
+  // Add markers for user location and malls
   useEffect(() => {
-    if (!mapReady || !map.current || !malls) return;
-
-    console.log('Adding markers for', malls.length, 'malls');
+    if (!map.current || !mapReady) return;
 
     // Clear existing markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    malls.forEach(mall => {
-      if (!mall.longitude || !mall.latitude) {
-        console.warn('Mall missing coordinates:', mall.name);
-        return;
-      }
+    // Add user location marker if available
+    if (userLocation) {
+      const userMarker = new mapboxgl.Marker({ color: '#FF0000' })
+        .setLngLat([userLocation.lng, userLocation.lat])
+        .addTo(map.current);
+      markersRef.current.push(userMarker);
 
-      const storeCount = mall.stores?.length || 0;
+      // Center map on user location
+      map.current.flyTo({
+        center: [userLocation.lng, userLocation.lat],
+        zoom: 12,
+        essential: true
+      });
+    }
 
-      // Create custom marker element
-      const el = document.createElement('div');
-      el.className = 'relative';
-      el.innerHTML = `
-        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg cursor-pointer hover:bg-purple-700 transition-colors">
-          ${storeCount}
-        </div>
-      `;
+    // Add mall markers
+    const mallsToShow = mallLocations.length > 0 ? mallLocations : malls || [];
+    if (mallsToShow.length > 0) {
+      console.log('Adding markers for', mallsToShow.length, 'malls');
 
-      // Create popup with clickable link and rich details
-      const popup = new mapboxgl.Popup({ 
-        offset: 25, 
-        maxWidth: '300px',
-        className: 'mall-popup-container' // Custom class for styling
-      })
-        .setHTML(`
-          <div class="p-3 border-b border-purple-100">
-            <h3 class="font-bold text-gray-900 text-lg mb-1">${mall.name}</h3>
-            <div class="flex items-start gap-2 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              <p class="text-sm text-gray-600">${mall.address}</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="4" rx="2"/><path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01M9 9h.01"/></svg>
-              <p class="text-sm text-purple-600 font-medium">${storeCount} tiendas</p>
-            </div>
-            ${mall.description ? `<p class="text-sm text-gray-500 mt-2 italic line-clamp-2">${mall.description}</p>` : ''}
-          </div>
-          <div class="p-3">
-            <a href="/mall/${mall.id}" class="block w-full py-2 px-3 bg-purple-600 hover:bg-purple-700 text-white text-center rounded-md font-medium text-sm transition-colors">Ver perfil completo</a>
-          </div>
-        `);
+      mallsToShow.forEach(mall => {
+        if (mall.latitude && mall.longitude) {
+          const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+            `<strong>${mall.name}</strong><p>${mall.address}</p>`
+          );
 
-      // Add marker to map
-      try {
-        // Make the marker element clickable with improved interaction
-        el.style.cursor = 'pointer';
-        el.onclick = (e) => {
-          // First show popup when clicking on marker
-          marker.togglePopup();
+          const marker = new mapboxgl.Marker({ color: '#3FB1CE' })
+            .setLngLat([mall.longitude, mall.latitude])
+            .setPopup(popup)
+            .addTo(map.current!);
 
-          // Fly to the marker position with slight offset for popup visibility
-          if (map.current) {
-            // Get popup height to calculate proper offset
-            const popupHeight = document.querySelector('.mapboxgl-popup-content')?.clientHeight || 200;
-
-            // Center on marker with vertical offset to ensure popup is visible
-            map.current.flyTo({
-              center: [mall.longitude, mall.latitude],
-              offset: [0, -popupHeight/2],
-              zoom: Math.max(map.current.getZoom(), 13), // Ensure we're zoomed in enough
-              duration: 800,
-              essential: true
-            });
-          }
-
-          // Prevent immediate navigation to allow users to read popup details
-          e.stopPropagation();
-          e.preventDefault();
-        };
-
-        const marker = new mapboxgl.Marker(el)
-          .setLngLat([mall.longitude, mall.latitude])
-          .setPopup(popup)
-          .addTo(map.current!);
-
-        markersRef.current.push(marker);
-      } catch (error) {
-        console.error('Error adding marker for mall:', mall.name, error);
-      }
-    });
-  }, [malls, mapReady]);
+          markersRef.current.push(marker);
+        }
+      });
+    }
+  }, [malls, mallLocations, mapReady, userLocation]);
 
   if (mapError) {
     return (
-      <div className={`relative w-full h-[400px] rounded-lg bg-gray-100 flex flex-col items-center justify-center gap-4 ${className}`}>
-        <AlertCircle className="h-12 w-12 text-gray-400" />
-        <div className="text-center">
-          <p className="text-gray-600 mb-2">{mapError}</p>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2"
-          >
-            <MapPin className="h-4 w-4" />
-            <span>Reintentar cargar mapa</span>
-          </Button>
-        </div>
+      <div className={`flex flex-col items-center justify-center p-4 border border-red-300 bg-red-50 rounded-md h-64 ${className}`}>
+        <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
+        <p className="text-red-700">Error loading map: {mapError}</p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </Button>
       </div>
     );
   }
 
   return (
-    <div ref={mapContainer} className={`relative w-full h-[400px] rounded-lg shadow-lg bg-white z-10 ${className}`} />
+    <div 
+      ref={mapContainer} 
+      className={`rounded-lg border overflow-hidden bg-gray-100 ${className}`} 
+      style={{ minHeight: "300px" }}
+    />
   );
 };

@@ -1,26 +1,4 @@
 import { useLocationContext } from '@/contexts/LocationContext';
-
-export const useLocation = () => {
-  const {
-    userLocation,
-    isLoading,
-    error,
-    requestLocationPermission,
-    calculateDistance
-  } = useLocationContext();
-
-  return {
-    userLocation,
-    isLoading,
-    locationError: error,
-    requestLocationPermission,
-    calculateDistance
-  };
-};
-
-const deg2rad = (deg: number) => {
-  return deg * (Math.PI / 180);
-};
 import { useState, useEffect } from 'react';
 
 export interface UserLocation {
@@ -29,6 +7,15 @@ export interface UserLocation {
 }
 
 export const useLocation = () => {
+  // Get values from location context
+  const {
+    userLocation: contextUserLocation,
+    isLoading: contextIsLoading,
+    error: contextError,
+    requestLocationPermission,
+    calculateDistance: contextCalculateDistance
+  } = useLocationContext();
+
   const [userLocation, setUserLocation] = useState<UserLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +39,7 @@ export const useLocation = () => {
         },
         (error) => {
           console.error("Geolocation error:", error.code, error.message);
-          
+
           let errorMessage = 'Error al obtener tu ubicación';
           switch (error.code) {
             case error.PERMISSION_DENIED:
@@ -65,7 +52,7 @@ export const useLocation = () => {
               errorMessage = 'La solicitud de ubicación ha expirado.';
               break;
           }
-          
+
           setLocationError(errorMessage);
           setIsLoading(false);
         },
@@ -97,5 +84,5 @@ export const useLocation = () => {
     return deg * (Math.PI / 180);
   };
 
-  return { userLocation, locationError, isLoading, calculateDistance };
+  return { userLocation, locationError, isLoading, calculateDistance, requestLocationPermission };
 };
