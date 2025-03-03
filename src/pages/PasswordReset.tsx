@@ -17,51 +17,59 @@ export default function PasswordReset() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      // Clear any existing session first to avoid conflicts
-      await supabase.auth.signOut();
-
-      // Check both hash and search parameters
-      const fragment = location.hash;
-      const search = location.search;
-      
-      let accessToken = null;
-      let type = null;
-
-      // Check hash parameters first (old format)
-      if (fragment) {
-        const hashParams = new URLSearchParams(fragment.substring(1));
-        accessToken = hashParams.get('access_token');
-        type = hashParams.get('type');
-      }
-
-      // If not in hash, check search parameters (new format)
-      if (!accessToken && search) {
-        const searchParams = new URLSearchParams(search);
-        accessToken = searchParams.get('access_token');
-        type = searchParams.get('type');
-      }
-
-      // If no token found in either location, show error
-      if (!accessToken) {
-        console.error('No access token found in URL');
-        toast.error("Token no válido o expirado");
-        navigate("/");
-        return;
-      }
-
       try {
-        const { data: { session }, error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: '',
-        });
+        // Clear any existing session first to avoid conflicts
+        await supabase.auth.signOut();
 
-        if (error) throw error;
+        // Check both hash and search parameters
+        const fragment = location.hash;
+        const search = location.search;
+        
+        let accessToken = null;
+        let type = null;
 
+        // Check hash parameters first (old format)
+        if (fragment) {
+          const hashParams = new URLSearchParams(fragment.substring(1));
+          accessToken = hashParams.get('access_token');
+          type = hashParams.get('type');
+        }
+
+        // If not in hash, check search parameters (new format)
+        if (!accessToken && search) {
+          const searchParams = new URLSearchParams(search);
+          accessToken = searchParams.get('access_token');
+          type = searchParams.get('type');
+        }
+
+        // If no token found in either location, show error
+        if (!accessToken) {
+          console.error('No access token found in URL');
+          toast.error("Token no válido o expirado");
+          navigate("/");
+          return;
+        }
+
+        // Only proceed with setting session for recovery tokens
         if (type === 'recovery') {
+          const { data: { session }, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: '',
+          });
+
+          if (error) throw error;
+          
           // Show password reset form
           setShowResetForm(true);
         } else if (type === 'signup' || type === 'magiclink') {
           // Handle email confirmation or magic link
+          const { data: { session }, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: '',
+          });
+          
+          if (error) throw error;
+          
           if (session) {
             toast.success("Autenticación exitosa");
             navigate("/");
