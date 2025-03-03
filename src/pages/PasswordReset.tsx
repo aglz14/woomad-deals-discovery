@@ -18,8 +18,23 @@ export default function PasswordReset() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Debug state tracking
   useEffect(() => {
+    console.log("Current states - hasToken:", hasToken, "showResetForm:", showResetForm);
+  }, [hasToken, showResetForm]);
+
+  useEffect(() => {
+    // Flag to avoid re-running token verification on re-renders
+    let isHandlingCallback = false;
+    
     const handleAuthCallback = async () => {
+      // Prevent multiple simultaneous calls
+      if (isHandlingCallback) {
+        console.log("Already handling auth callback, skipping");
+        return;
+      }
+      
+      isHandlingCallback = true;
       try {
         console.log("Starting auth callback handling");
         // Check both hash and search parameters
@@ -128,26 +143,30 @@ export default function PasswordReset() {
             // Store the token in sessionStorage to persist through page refreshes
             sessionStorage.setItem('password_reset_token', accessToken);
             
-            // Check if we've already verified this token to prevent loops
-            const isTokenVerified = sessionStorage.getItem('token_verified') === 'true';
+            // Once we have a token, try to verify it only once
+            console.log("Attempting to verify recovery token");
             
-            if (!isTokenVerified) {
-              console.log("Token not yet verified, verifying now");
-              // For recovery tokens, we validate the token and establish a session
-              // This is crucial for password update to work later
-              const { data, error } = await supabase.auth.verifyOtp({
-                type: 'recovery',
-                token: accessToken,
-                options: {
-                  // Avoid redirects which might cause loops
-                  redirectTo: undefined
-                }
-              });
-              
-              // Mark this token as verified
-              if (!error) {
-                sessionStorage.setItem('token_verified', 'true');
+            // For recovery tokens, we validate the token and establish a session
+            // This is crucial for password update to work later
+            const { data, error } = await supabase.auth.verifyOtp({
+              type: 'recovery',
+              token: accessToken,
+              options: {
+                // Avoid redirects which might cause loops
+                redirectTo: undefined
               }
+            });
+            
+            // Mark this token as verified
+            if (!error) {
+              console.log("Token verification successful");
+              sessionStorage.setItem('token_verified', 'true');
+              // Store token in localStorage for password update stage
+              localStorage.setItem('pending_reset_token', accessToken);
+            } else {
+              console.error("Token verification failed:", error.message);
+              throw new Error(error.message);
+            }
 
             if (error) {
               console.error("Token verification error:", error.message);
@@ -163,10 +182,14 @@ export default function PasswordReset() {
             
             // If token is valid, show the reset form
             console.log("Recovery token valid, showing reset form");
+            setHasToken(true); // Make sure we set hasToken explicitly to true
             setShowResetForm(true);
           } catch (tokenError) {
             console.error("Invalid recovery token:", tokenError);
             toast.error("Token de recuperación inválido o expirado");
+            // Clear stored data to prevent looping
+            sessionStorage.removeItem('password_reset_token');
+            sessionStorage.removeItem('token_verified');
             setHasToken(false);
             setShowResetForm(true);
           }
@@ -194,13 +217,25 @@ export default function PasswordReset() {
       } catch (error: any) {
         console.error('Error handling auth callback:', error);
         toast.error(error.message || "Error procesando la autenticación");
+        // Clear stored data to prevent looping
+        sessionStorage.removeItem('password_reset_token');
+        sessionStorage.removeItem('token_verified');
         setHasToken(false);
         setShowResetForm(true);
+      } finally {
+        isHandlingCallback = false;
       }
     };
 
+    // Only run this once on initial render
     handleAuthCallback();
-  }, [location, navigate]);
+    
+    // Cleanup function to remove the token verification state if we navigate away
+    return () => {
+      console.log("Cleanup: Removing temporary token verification flags");
+      sessionStorage.removeItem('token_verified');
+    };
+  }, []); // Remove dependencies to prevent re-runs on location changes
 
   const handleSendResetLink = async (e: React.FormEvent) => {
     e.preventDefault();
