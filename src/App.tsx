@@ -1,5 +1,5 @@
 import './App.css'
-import { lazy, Suspense } from 'react'
+import React, { lazy, Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
@@ -52,7 +52,7 @@ function App() {
                   <Route path="/" errorElement={<div>Error loading page</div>}>
                     <Route path="/" element={<Index />} />
                     <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<React.lazy(() => import('./pages/Login'))()} />
+          <Route path="/login" element={<lazy(() => import('./pages/Login'))()} />
                     <Route path="/password-reset" element={<PasswordReset />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/nosotros" element={<Nosotros />} />
