@@ -64,14 +64,32 @@ export default function PasswordReset() {
           }
         }
         
-        // Also check for token as a standalone parameter
+        // Also check for token as a standalone parameter and in all possible locations
         if (!accessToken && search) {
+          // Check all possible token parameter names
           const searchParams = new URLSearchParams(search);
-          const rawToken = searchParams.get('token');
-          if (rawToken) {
-            console.log("Found standalone token in URL");
-            accessToken = rawToken;
-            type = 'recovery'; // Assume recovery if only token is present
+          const possibleTokenNames = ['token', 't', 'access_token', 'code', 'recovery_token', 'reset_token'];
+          
+          for (const tokenName of possibleTokenNames) {
+            const rawToken = searchParams.get(tokenName);
+            if (rawToken) {
+              console.log(`Found token in URL with parameter name: ${tokenName}`);
+              accessToken = rawToken;
+              type = 'recovery'; // Assume recovery if token is present
+              break;
+            }
+          }
+          
+          // Check if token is included in the URL path instead of as a parameter
+          // This handles URLs like /password-reset/TOKEN
+          const pathParts = window.location.pathname.split('/');
+          if (pathParts.length > 2 && pathParts[1] === 'password-reset') {
+            const pathToken = pathParts[2];
+            if (pathToken && pathToken.length > 10) { // Basic validation - tokens are usually long
+              console.log("Found token in URL path");
+              accessToken = pathToken;
+              type = 'recovery';
+            }
           }
         }
 
@@ -93,7 +111,11 @@ export default function PasswordReset() {
         // First check the token type before proceeding
         if (type === 'recovery') {
           try {
-            console.log("Verifying recovery token:", accessToken.substring(0, 5) + "...");
+            console.log("Verifying recovery token:", accessToken.substring(0, 5) + "...", "Length:", accessToken.length);
+            
+            // Store the token temporarily in localStorage to ensure persistence during redirects
+            localStorage.setItem('pending_reset_token', accessToken);
+            
             // For recovery tokens, we validate the token and establish a session
             // This is crucial for password update to work later
             const { data, error } = await supabase.auth.verifyOtp({
@@ -199,44 +221,132 @@ export default function PasswordReset() {
       const { data: { session } } = await supabase.auth.getSession();
       console.log("Current session before password update:", session ? "Active" : "None");
       
-      // If we don't have a session, try to get URL parameters again
-      // This helps in case the token is still in the URL but wasn't processed correctly
+      // If we don't have a session, try multiple fallback methods
       if (!session) {
+        console.log("No active session found, trying fallback methods");
+        
+        // Method 1: Check for token in URL
         const urlParams = new URLSearchParams(window.location.search);
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        let token = urlParams.get('token') || hashParams.get('access_token');
         
-        const token = urlParams.get('token') || hashParams.get('access_token');
+        // Method 2: Check for token in localStorage (set during initial verification)
+        if (!token) {
+          token = localStorage.getItem('pending_reset_token');
+          if (token) console.log("Retrieved token from localStorage");
+        }
+        
+        // Method 3: Check all possible token parameter names in URL
+        if (!token) {
+          const possibleTokenNames = ['t', 'code', 'recovery_token', 'reset_token'];
+          for (const name of possibleTokenNames) {
+            token = urlParams.get(name) || hashParams.get(name);
+            if (token) {
+              console.log(`Found token with parameter name: ${name}`);
+              break;
+            }
+          }
+        }
         
         if (token) {
-          console.log("Trying to verify token again before password update");
+          console.log("Found token for password update, attempting verification");
           try {
             // Try to verify the token again
-            await supabase.auth.verifyOtp({
+            const { error: verifyError } = await supabase.auth.verifyOtp({
               type: 'recovery',
               token: token
             });
+            
+            if (verifyError) {
+              console.error("Token verification failed:", verifyError.message);
+              
+              // As a last resort, try to create a direct session
+              try {
+                console.log("Attempting direct session creation with token");
+                await supabase.auth.setSession({
+                  access_token: token,
+                  refresh_token: '' // No refresh token available
+                });
+              } catch (sessionError) {
+                console.error("Direct session creation failed:", sessionError);
+              }
+            }
           } catch (e) {
             console.error("Failed to re-verify token:", e);
           }
         }
+        
+        // Clean up localStorage after attempt
+        localStorage.removeItem('pending_reset_token');
       }
       
-      // Try to update the password regardless of session state
-      // The auth API might still have the token in context even if getSession doesn't show it
-      const { error } = await supabase.auth.updateUser({ 
-        password: password 
-      });
-
-      if (error) {
+      // Try to update the password using multiple methods
+      let updateError = null;
+      
+      // Method 1: Standard update through session
+      try {
+        console.log("Attempting password update with session");
+        const { error } = await supabase.auth.updateUser({ 
+          password: password 
+        });
+        
+        if (!error) {
+          console.log("Password updated successfully with standard method");
+          updateError = null; // Clear any error
+        } else {
+          updateError = error;
+          console.error("Standard password update failed:", error.message);
+        }
+      } catch (e) {
+        console.error("Exception during standard password update:", e);
+        updateError = e;
+      }
+      
+      // Method 2: If standard update failed and we have a token in URL, try direct API method
+      if (updateError) {
+        try {
+          // Get token from URL or localStorage
+          const urlParams = new URLSearchParams(window.location.search);
+          const storedToken = localStorage.getItem('pending_reset_token');
+          const token = urlParams.get('token') || storedToken;
+          
+          if (token) {
+            console.log("Attempting direct password reset with token");
+            
+            // Try one more verification before password update
+            await supabase.auth.verifyOtp({
+              type: 'recovery',
+              token: token
+            });
+            
+            // Immediately try to update password after verification
+            const { error } = await supabase.auth.updateUser({ 
+              password: password 
+            });
+            
+            if (!error) {
+              console.log("Password updated successfully with direct method");
+              updateError = null; // Clear any error
+            }
+          }
+        } catch (directError) {
+          console.error("Direct password update method failed:", directError);
+        }
+      }
+      
+      // Check if we still have an error after all attempts
+      if (updateError) {
         // If error contains "JWT" or "token", it's likely a token issue
-        if (error.message.includes("JWT") || error.message.includes("token") || error.message.includes("session")) {
+        if (updateError.message.includes("JWT") || 
+            updateError.message.includes("token") || 
+            updateError.message.includes("session")) {
           toast.error("Tu sesión de recuperación ha expirado. Por favor, solicita un nuevo enlace.");
           // Reset the form to request a new link
           setHasToken(false);
           setShowResetForm(true);
           return;
         }
-        throw error;
+        throw updateError;
       }
 
       // Password was updated successfully
