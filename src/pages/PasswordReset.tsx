@@ -26,6 +26,9 @@ export default function PasswordReset() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // First, ensure we don't persist any unwanted session
+        await supabase.auth.signOut();
+
         // Check for hash parameters first
         const hash = location.hash;
         const hashParams = new URLSearchParams(hash.replace('#', ''));
@@ -43,23 +46,27 @@ export default function PasswordReset() {
         }
 
         try {
-          if (code) {
-            // Handle PKCE flow
-            const { error } = await supabase.auth.exchangeCodeForSession(code);
-            if (error) throw error;
-          } else if (accessToken && type === 'recovery') {
-            // Handle implicit flow with access token
-            const { error } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: ''
-            });
-            if (error) throw error;
+          // Store the token temporarily if found in hash
+          if (accessToken && type === 'recovery') {
+            localStorage.setItem('pending_reset_token', accessToken);
           }
-
-          setHasToken(true);
+          
+          if (code) {
+            // For PKCE flow, we need to verify the code without signing in
+            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+            if (error) throw error;
+            
+            // We successfully exchanged the code, now set hasToken
+            setHasToken(true);
+          } else if (accessToken && type === 'recovery') {
+            // For recovery flow, just verify the token is valid
+            setHasToken(true);
+          }
+          
+          // Always show the reset form
           setShowResetForm(true);
         } catch (error) {
-          console.error('Error setting up auth session:', error);
+          console.error('Error verifying token:', error);
           toast.error("Token de recuperación inválido o expirado");
           setShowResetForm(true);
         }
