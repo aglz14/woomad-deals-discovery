@@ -17,7 +17,7 @@ export const supabase = createClient<Database>(
       storage: window.localStorage,
       storageKey: "supabase.auth.token",
       flowType: "pkce",
-      debug: false,
+      debug: true,
       onAuthStateChange: (event) => {
         if (event === "PASSWORD_RECOVERY") {
           window.location.href = `${window.location.origin}/password-reset`;
