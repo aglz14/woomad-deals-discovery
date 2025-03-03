@@ -29,7 +29,3 @@ author = 38747565
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
-[env]
-REPLIT_KEEP_PACKAGE_DEV_DEPENDENCIES = "1"
-[env]
-REPLIT_KEEP_PACKAGE_DEV_DEPENDENCIES = "1"
