@@ -1,0 +1,53 @@
+[vite-plugin-pwa:build] Transform failed with 1 error:
+12:58:40 AM: /opt/build/repo/src/pages/PasswordReset.tsx:182:12: ERROR: Expected "finally" but found "console"
+12:58:40 AM: file: /opt/build/repo/src/pages/PasswordReset.tsx:182:12
+12:58:40 AM: 
+12:58:40 AM: Expected "finally" but found "console"
+12:58:40 AM: 180|
+12:58:40 AM: 181|              // If token is valid, show the reset form
+12:58:40 AM: 182|              console.log("Recovery token valid, showing reset form");
+12:58:40 AM:    |              ^
+12:58:40 AM: 183|              setHasToken(true); // Make sure we set hasToken explicitly to true
+12:58:40 AM: 184|              setShowResetForm(true);
+12:58:40 AM: 
+12:58:40 AM:     at failureErrorWithLog (/opt/build/repo/node_modules/esbuild/lib/main.js:1472:15)
+12:58:40 AM:     at /opt/build/repo/node_modules/esbuild/lib/main.js:755:50
+12:58:40 AM:     at responseCallbacks.<computed> (/opt/build/repo/node_modules/esbuild/lib/main.js:622:9)
+12:58:40 AM:     at handleIncomingPacket (/opt/build/repo/node_modules/esbuild/lib/main.js:677:12)
+12:58:40 AM:     at Socket.readFromStdout (/opt/build/repo/node_modules/esbuild/lib/main.js:600:7)
+12:58:40 AM:     at Socket.emit (node:events:517:28)
+12:58:40 AM:     at addChunk (node:internal/streams/readable:368:12)
+12:58:40 AM:     at readableAddChunk (node:internal/streams/readable:341:9)
+12:58:40 AM:     at Readable.push (node:internal/streams/readable:278:10)
+12:58:40 AM:     at Pipe.onStreamRead (node:internal/stream_base_commons:190:23)
+12:58:40 AM: error: script "build" exited with code 1
+12:58:40 AM: ​
+12:58:40 AM: "build.command" failed                                        
+12:58:40 AM: ────────────────────────────────────────────────────────────────
+12:58:40 AM: ​
+12:58:40 AM:   Error message
+12:58:40 AM:   Command failed with exit code 1: bun run build (https://ntl.fyi/exit-code-1)
+12:58:40 AM: ​
+12:58:40 AM:   Error location
+12:58:40 AM:   In Build command from Netlify app:
+12:58:40 AM:   bun run build
+12:58:40 AM: ​
+12:58:40 AM:   Resolved config
+12:58:40 AM:   build:
+12:58:40 AM:     command: bun run build
+12:58:40 AM:     commandOrigin: ui
+12:58:40 AM:     environment:
+12:58:40 AM:       - NETLIFY_EMAILS_DIRECTORY
+12:58:40 AM:       - NETLIFY_EMAILS_PROVIDER
+12:58:40 AM:       - NETLIFY_EMAILS_PROVIDER_API_KEY
+12:58:40 AM:       - NETLIFY_EMAILS_SECRET
+12:58:40 AM:     publish: /opt/build/repo/dist
+12:58:40 AM:     publishOrigin: ui
+12:58:40 AM:   plugins:
+12:58:40 AM:     - inputs: {}
+12:58:40 AM:       origin: ui
+12:58:40 AM:       package: '@netlify/plugin-emails'
+12:58:41 AM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
+12:58:41 AM: Build failed due to a user error: Build script returned non-zero exit code: 2
+12:58:41 AM: Failing build: Failed to build site
+12:58:41 AM: Finished processing build request in 19.994s
