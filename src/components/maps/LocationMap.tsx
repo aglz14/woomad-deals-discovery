@@ -16,7 +16,7 @@ interface LocationMapProps {
 }
 
 // Validate and set Mapbox token
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiYWdzezE0IiwiYSI6ImNtN24wMTV2cjByMncybHBycHAwMGQ3aG4ifQ.R5Qpb4QfKpXvuRLNt1yf-g';
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiYWdsejE0IiwiYSI6ImNtN24wMTV2cjByMncybHBycHAwMGQ3aG4ifQ.R5Qpb4QfKpXvuRLNt1yf-g';
 
 const isValidMapboxToken = (token: string): boolean => {
   return token.startsWith('pk.') && token.length > 50;
@@ -139,7 +139,7 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
               ">Ver detalles</button>
             </div>
           `;
-
+          
           const popup = new mapboxgl.Popup({ offset: 25 })
             .setHTML(popupHtml);
 
@@ -147,12 +147,12 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
             .setLngLat([mall.longitude, mall.latitude])
             .setPopup(popup)
             .addTo(map.current!);
-
+          
           // Add the mall ID to the marker element for reference
           const markerElement = marker.getElement();
           markerElement.setAttribute('data-mall-id', mall.id);
           markerElement.style.cursor = 'pointer';
-
+          
           // Also handle clicking directly on the marker
           markerElement.addEventListener('click', () => {
             // Open the popup
@@ -162,7 +162,7 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
           markersRef.current.push(marker);
         }
       });
-
+      
       // Add a global click listener to handle popup button clicks
       map.current.on('click', (e) => {
         // Check if clicked on a popup button
@@ -180,31 +180,6 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
       });
     }
   }, [malls, mallLocations, mapReady, userLocation]);
-
-  useEffect(() => {
-    if (!map.current || !userLocation) return;
-
-    const newLocation = new mapboxgl.LngLat(userLocation.lng, userLocation.lat);
-    map.current.setCenter(newLocation);
-
-    // Also update the user marker position
-    if (markersRef.current.length > 0) {
-      // First marker is assumed to be the user's location marker
-      const userMarker = markersRef.current[0];
-      userMarker.setLngLat(newLocation);
-    }
-  }, [userLocation]);
-
-
-  const handleRecenter = () => {
-    if (map.current && userLocation) {
-      map.current.flyTo({
-        center: [userLocation.lng, userLocation.lat],
-        zoom: 12,
-        essential: true
-      });
-    }
-  };
 
   if (mapError) {
     return (
@@ -224,15 +199,10 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
   }
 
   return (
-    <div>
-      <div 
-        ref={mapContainer} 
-        className={`rounded-lg border overflow-hidden bg-gray-100 ${className}`} 
-        style={{ minHeight: "300px" }}
-      />
-      {userLocation && (
-        <Button onClick={handleRecenter} className="mt-2">Recenter Map</Button>
-      )}
-    </div>
+    <div 
+      ref={mapContainer} 
+      className={`rounded-lg border overflow-hidden bg-gray-100 ${className}`} 
+      style={{ minHeight: "300px" }}
+    />
   );
 };
