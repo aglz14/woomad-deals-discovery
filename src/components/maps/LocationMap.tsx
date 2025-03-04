@@ -198,11 +198,35 @@ export const LocationMap = ({ userLocation, className = "", mallLocations = [] }
     );
   }
 
+  const handleRecenter = () => {
+    if (map.current && userLocation) {
+      map.current.flyTo({
+        center: [userLocation.lng, userLocation.lat],
+        zoom: 12,
+        essential: true
+      });
+    }
+  };
+
   return (
-    <div 
-      ref={mapContainer} 
-      className={`rounded-lg border overflow-hidden bg-gray-100 ${className}`} 
-      style={{ minHeight: "300px" }}
-    />
+    <div className="relative">
+      <div 
+        ref={mapContainer} 
+        className={`rounded-lg border overflow-hidden bg-gray-100 ${className}`} 
+        style={{ minHeight: "300px" }}
+      />
+      {userLocation && (
+        <button
+          onClick={handleRecenter}
+          className="absolute bottom-3 right-3 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
+          title="Recentrar mapa"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+          </svg>
+        </button>
+      )}
+    </div>
   );
 };
