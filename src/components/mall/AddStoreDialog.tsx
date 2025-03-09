@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers/SessionProvider";
-import { useCategories } from "@/hooks/useCategories";
+import { useCategories, Category } from "@/hooks/useCategories";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -89,24 +89,65 @@ export function AddStoreDialog({
         })
         .filter((name) => name !== null) as string[];
 
-      console.log("Adding store with categories:", categoryNames);
+      console.log("Adding store with category names:", categoryNames);
+      console.log("Selected category IDs:", selectedCategories);
 
-      // Insert the store with array_categories only
-      const { error: storeError } = await supabase.from("stores").insert({
-        name: store.name,
-        description: store.description,
-        phone: store.phone,
-        local_number: store.local_number,
-        floor: store.floor,
-        image: store.image,
-        array_categories: categoryNames,
-        mall_id: mallId,
-        user_id: session.user.id,
-      });
+      // Insert the store with array_categories
+      const { data: newStore, error: storeError } = await supabase
+        .from("stores")
+        .insert({
+          name: store.name,
+          description: store.description,
+          phone: store.phone,
+          local_number: store.local_number,
+          floor: store.floor,
+          image: store.image,
+          array_categories: categoryNames,
+          mall_id: mallId,
+          user_id: session.user.id,
+        })
+        .select("id")
+        .single();
 
       if (storeError) {
         console.error("Error inserting store:", storeError);
         throw storeError;
+      }
+
+      console.log("Store added successfully with ID:", newStore?.id);
+
+      // Skip store_categories operations if we don't have a store ID
+      if (!newStore?.id) {
+        console.warn("No store ID returned, skipping store_categories insert");
+        toast.success("Tienda agregada exitosamente");
+        resetForm();
+        onSuccess();
+        onClose();
+        return;
+      }
+
+      // Insert into store_categories junction table
+      try {
+        const storeCategoriesToInsert = selectedCategories.map(
+          (categoryId) => ({
+            store_id: newStore.id,
+            category_id: categoryId,
+          })
+        );
+
+        console.log("Inserting store_categories:", storeCategoriesToInsert);
+
+        const { error: categoriesError } = await supabase
+          .from("store_categories")
+          .insert(storeCategoriesToInsert);
+
+        if (categoriesError) {
+          console.error("Error inserting store_categories:", categoriesError);
+          // Continue anyway since we already have the array_categories
+        }
+      } catch (error) {
+        console.error("Error with store_categories operations:", error);
+        // Continue since we already saved the store with array_categories
       }
 
       toast.success("Tienda agregada exitosamente");

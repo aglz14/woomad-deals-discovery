@@ -1,8 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+export interface Category {
+  id: string;
+  name: string;
+}
+
 export function useCategories() {
-  return useQuery({
+  return useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: async () => {
       console.log("Fetching categories");
