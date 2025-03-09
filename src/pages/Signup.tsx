@@ -36,8 +36,12 @@ export default function Signup() {
 
       toast.success("¡Cuenta creada con éxito!");
       navigate("/");
-    } catch (error: any) {
-      toast.error(error.message || "Error al crear la cuenta");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message || "Error al crear la cuenta");
+      } else {
+        toast.error("Error al crear la cuenta");
+      }
     } finally {
       setLoading(false);
     }

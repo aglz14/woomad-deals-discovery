@@ -65,8 +65,17 @@ export function AddPromotionForm({
     const loadPromotionTypes = async () => {
       setIsLoading(true);
       try {
+        console.log("Loading promotion types in AddPromotionForm...");
         const types = await fetchPromotionTypes();
+        console.log("Received promotion types:", types);
         setPromotionTypes(types);
+
+        // If types are loaded but no promotion_type is selected and types exist, select the first one
+        if (types.length > 0 && !formState.promotion_type) {
+          console.log("Auto-selecting first promotion type:", types[0]);
+          setFormState((prev) => ({ ...prev, promotion_type: types[0].id }));
+        }
+
         toast.success(`Loaded ${types.length} promotion types`);
       } catch (err) {
         console.error("Error loading promotion types:", err);

@@ -85,7 +85,9 @@ export function normalizeError(error: unknown): ErrorResponse {
  */
 export async function fetchPromotionTypes(): Promise<PromotionType[]> {
   try {
+    console.log("Fetching promotion types from database...");
     const { data, error } = await supabase.from("promotion_type").select("*");
+    console.log("Raw promotion types data:", data);
 
     if (error) {
       console.error("Error fetching promotion types:", error);
@@ -93,6 +95,7 @@ export async function fetchPromotionTypes(): Promise<PromotionType[]> {
     }
 
     if (!data || data.length === 0) {
+      console.log("No promotion types found in database, creating defaults...");
       // Create default promotion types if none exist
       const defaultTypes = [
         { type: "Promoción", name: "Promoción" },
@@ -106,15 +109,21 @@ export async function fetchPromotionTypes(): Promise<PromotionType[]> {
         .insert(defaultTypes)
         .select();
 
+      console.log("Inserted promotion types data:", insertedData);
+
       if (insertError) {
         console.error("Error creating promotion types:", insertError);
         return getFallbackPromotionTypes();
       }
 
-      return mapPromotionTypeData(insertedData);
+      const mappedTypes = mapPromotionTypeData(insertedData);
+      console.log("Mapped promotion types after insertion:", mappedTypes);
+      return mappedTypes;
     }
 
-    return mapPromotionTypeData(data);
+    const mappedTypes = mapPromotionTypeData(data);
+    console.log("Mapped promotion types from existing data:", mappedTypes);
+    return mappedTypes;
   } catch (err) {
     console.error("Error handling promotion types:", err);
     return getFallbackPromotionTypes();
@@ -127,16 +136,39 @@ export async function fetchPromotionTypes(): Promise<PromotionType[]> {
 function mapPromotionTypeData(data: Record<string, any>[]): PromotionType[] {
   if (!data || !Array.isArray(data)) return getFallbackPromotionTypes();
 
+  console.log("Raw promotion type data for mapping:", JSON.stringify(data));
+  
   return data.map((item) => {
-    // Try to get the display name from the correct column
-    const displayName =
-      getSafeProperty(item, "type", "") ||
-      getSafeProperty(item, "name", "") ||
-      Object.values(item || {})[1] ||
-      "Unknown";
-
+    // Extract the keys from the item to help with debugging
+    const keys = Object.keys(item);
+    console.log("Item keys:", keys);
+    
+    // Try multiple strategies to get the name
+    let displayName = "Unknown";
+    
+    // Strategy 1: Try direct property access
+    if (item.type) displayName = item.type;
+    else if (item.name) displayName = item.name;
+    
+    // Strategy 2: If no direct property, inspect all keys and find a string value
+    else {
+      for (const key of keys) {
+        const value = item[key];
+        if (typeof value === 'string' && value.length > 0 && key !== 'id' && key !== 'created_at') {
+          displayName = value;
+          console.log(`Found displayName in property "${key}": ${value}`);
+          break;
+        }
+      }
+    }
+    
+    // Ensure we have a valid ID
+    const id = item.id || generateFallbackId();
+    
+    console.log(`Mapped promotion type: id=${id}, name=${displayName}`);
+    
     return {
-      id: getSafeProperty(item, "id", generateFallbackId()),
+      id,
       name: displayName,
     };
   });

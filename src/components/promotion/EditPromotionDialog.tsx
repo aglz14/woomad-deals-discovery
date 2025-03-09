@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updatePromotion } from "../../utils/supabaseHelpers";
+import {
+  fetchPromotionTypes,
+  PromotionType,
+  updatePromotion,
+} from "../../utils/supabaseHelpers";
 
 interface EditPromotionDialogProps {
   promotion: DatabasePromotion;
@@ -46,6 +50,29 @@ export function EditPromotionDialog({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [promotionTypes, setPromotionTypes] = useState<PromotionType[]>([]);
+
+  // Fetch promotion types
+  useEffect(() => {
+    const loadPromotionTypes = async () => {
+      setIsLoading(true);
+      try {
+        console.log("Loading promotion types in EditPromotionDialog...");
+        const types = await fetchPromotionTypes();
+        console.log("Received promotion types:", types);
+        setPromotionTypes(types);
+        toast.success(`Loaded ${types.length} promotion types`);
+      } catch (err) {
+        console.error("Error loading promotion types:", err);
+        toast.error("Failed to load promotion types");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPromotionTypes();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,17 +146,24 @@ export function EditPromotionDialog({
               onValueChange={(value) =>
                 setFormData({
                   ...formData,
-                  promotion_type: value as ValidPromotionType,
+                  promotion_type: value,
                 })
               }
+              disabled={isLoading}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecciona un tipo" />
+                <SelectValue
+                  placeholder={
+                    isLoading ? "Cargando tipos..." : "Selecciona un tipo"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="promotion">Promoción</SelectItem>
-                <SelectItem value="coupon">Cupón</SelectItem>
-                <SelectItem value="sale">Oferta</SelectItem>
+                {promotionTypes.map((type) => (
+                  <SelectItem key={type.id} value={type.id}>
+                    {type.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
