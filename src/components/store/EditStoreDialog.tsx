@@ -114,8 +114,9 @@ export function EditStoreDialog({
               );
               if (!category) {
                 console.warn(`Category with name "${categoryName}" not found`);
+                return null;
               }
-              return category ? category.id : null;
+              return category.id;
             })
             .filter((id) => id !== null) as string[];
 
@@ -141,8 +142,9 @@ export function EditStoreDialog({
             );
             if (!category) {
               console.warn(`Category with name "${categoryName}" not found`);
+              return null;
             }
-            return category ? category.id : null;
+            return category.id;
           })
           .filter((id) => id !== null) as string[];
 
@@ -186,12 +188,14 @@ export function EditStoreDialog({
           const category = categoriesData?.find((cat) => cat.id === id);
           if (!category) {
             console.warn(`Category with ID ${id} not found`);
+            return null;
           }
-          return category?.name;
+          return category.name;
         })
-        .filter((name) => name !== undefined) as string[];
+        .filter((name) => name !== null) as string[];
 
       console.log("Updating store with categories:", categoryNames);
+      console.log("Selected category IDs:", selectedCategories);
 
       // Update store information with array_categories
       const { error: storeError } = await supabase

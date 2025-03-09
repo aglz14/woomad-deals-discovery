@@ -88,12 +88,14 @@ export function AddStoreDialog({
           const category = categoriesData?.find((cat) => cat.id === id);
           if (!category) {
             console.warn(`Category with ID ${id} not found`);
+            return null;
           }
-          return category?.name;
+          return category.name;
         })
-        .filter((name) => name !== undefined) as string[];
+        .filter((name) => name !== null) as string[];
 
       console.log("Adding store with categories:", categoryNames);
+      console.log("Selected category IDs:", selectedCategories);
 
       // Insert the store with array_categories
       const { data: newStore, error: storeError } = await supabase

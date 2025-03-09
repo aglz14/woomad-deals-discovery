@@ -5,6 +5,7 @@ export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
+      console.log("Fetching categories");
       const { data, error } = await supabase
         .from("categories")
         .select("id, name")
@@ -15,6 +16,7 @@ export function useCategories() {
         throw error;
       }
 
+      console.log("Categories fetched:", data);
       return data || [];
     },
   });
