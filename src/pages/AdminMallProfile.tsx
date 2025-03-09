@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +19,11 @@ export default function AdminMallProfile() {
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
   const [storeToEdit, setStoreToEdit] = useState<string | null>(null);
 
-  const { data: mall, isLoading: isLoadingMall, refetch: refetchMall } = useQuery({
+  const {
+    data: mall,
+    isLoading: isLoadingMall,
+    refetch: refetchMall,
+  } = useQuery({
     queryKey: ["mall", id],
     queryFn: async () => {
       console.log("Fetching mall with ID:", id);
@@ -33,16 +36,20 @@ export default function AdminMallProfile() {
       if (error) {
         console.error("Error fetching mall:", error);
         toast("Error", {
-          description: "No se pudo cargar el centro comercial"
+          description: "No se pudo cargar el centro comercial",
         });
         throw error;
       }
-      
+
       return data;
     },
   });
 
-  const { data: stores, isLoading: isLoadingStores, refetch: refetchStores } = useQuery({
+  const {
+    data: stores,
+    isLoading: isLoadingStores,
+    refetch: refetchStores,
+  } = useQuery({
     queryKey: ["mall-stores", id],
     enabled: !!id,
     queryFn: async () => {
@@ -55,6 +62,33 @@ export default function AdminMallProfile() {
       if (error) {
         console.error("Error fetching stores:", error);
         throw error;
+      }
+
+      // Fetch promotion counts for each store
+      const storeIds = data.map((store) => store.id);
+      const { data: promotionCounts, error: promotionsError } = await supabase
+        .from("promotions")
+        .select("store_id, count")
+        .in("store_id", storeIds)
+        .eq("is_active", true)
+        .group("store_id");
+
+      if (promotionsError) {
+        console.error("Error fetching promotion counts:", promotionsError);
+      } else if (promotionCounts) {
+        // Create a mapping of store IDs to promotion counts
+        const countMap = promotionCounts.reduce(
+          (acc: Record<string, number>, item: any) => {
+            acc[item.store_id] = parseInt(item.count, 10);
+            return acc;
+          },
+          {}
+        );
+
+        // Add the promotion count to each store
+        data.forEach((store: any) => {
+          store.activePromotionCount = countMap[store.id] || 0;
+        });
       }
 
       return data;
@@ -71,13 +105,13 @@ export default function AdminMallProfile() {
       if (error) throw error;
 
       toast("Éxito", {
-        description: "Tienda eliminada exitosamente"
+        description: "Tienda eliminada exitosamente",
       });
       refetchStores();
     } catch (error) {
       console.error("Error deleting store:", error);
       toast("Error", {
-        description: "Error al eliminar la tienda"
+        description: "Error al eliminar la tienda",
       });
     }
   };
@@ -126,9 +160,9 @@ export default function AdminMallProfile() {
         }}
       />
 
-      {storeToEdit && stores?.find(s => s.id === storeToEdit) && (
+      {storeToEdit && stores?.find((s) => s.id === storeToEdit) && (
         <EditStoreDialog
-          store={stores.find(s => s.id === storeToEdit)!}
+          store={stores.find((s) => s.id === storeToEdit)!}
           isOpen={true}
           onClose={() => setStoreToEdit(null)}
           onSuccess={() => {

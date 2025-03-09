@@ -42,6 +42,7 @@ type Store = {
   array_categories?: string[];
   location_in_mall?: string;
   contact_number?: string;
+  activePromotionCount?: number;
 };
 
 interface MallStoresSectionProps {
@@ -272,6 +273,19 @@ export const MallStoresSection = ({
                     <h3 className="font-medium text-lg text-gray-900 line-clamp-1">
                       {store.name}
                     </h3>
+                    {typeof store.activePromotionCount !== "undefined" && (
+                      <div className="flex items-center mt-1">
+                        <Badge
+                          variant="outline"
+                          className="bg-purple-50 text-purple-700 border-purple-200 font-normal"
+                        >
+                          {store.activePromotionCount}{" "}
+                          {store.activePromotionCount === 1
+                            ? "promoción activa"
+                            : "promociones activas"}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-1">
