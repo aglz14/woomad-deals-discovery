@@ -41,7 +41,7 @@ export function EditPromotionDialog({
     start_date: format(new Date(promotion.start_date), "yyyy-MM-dd'T'HH:mm"),
     end_date: format(new Date(promotion.end_date), "yyyy-MM-dd'T'HH:mm"),
     terms_conditions: promotion.terms_conditions || "",
-    image_url: promotion.image_url || "",
+    image: promotion.image || "",
     is_active: promotion.is_active !== false,
   });
 
@@ -67,7 +67,7 @@ export function EditPromotionDialog({
           start_date: formData.start_date,
           end_date: formData.end_date,
           terms_conditions: formData.terms_conditions || null,
-          image_url: formData.image_url || null,
+          image: formData.image || null,
           is_active: formData.is_active,
         })
         .eq("id", promotion.id);
@@ -178,12 +178,12 @@ export function EditPromotionDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image_url">URL de imagen</Label>
+            <Label htmlFor="image">URL de imagen</Label>
             <Input
-              id="image_url"
-              value={formData.image_url}
+              id="image"
+              value={formData.image}
               onChange={(e) =>
-                setFormData({ ...formData, image_url: e.target.value })
+                setFormData({ ...formData, image: e.target.value })
               }
             />
           </div>

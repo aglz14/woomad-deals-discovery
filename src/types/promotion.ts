@@ -8,7 +8,7 @@ export interface DatabasePromotion {
   start_date: string;
   end_date: string;
   terms_conditions?: string;
-  image_url?: string;
+  image?: string;
   store_id?: string;
   user_id?: string;
   created_at: string;

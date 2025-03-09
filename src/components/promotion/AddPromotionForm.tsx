@@ -54,7 +54,7 @@ export function AddPromotionForm({
     start_date: getTomorrowStart(),
     end_date: getTomorrowEnd(),
     terms_conditions: "",
-    image_url: "",
+    image: "",
     is_active: true,
     store_id: preselectedStoreId || "",
   });
@@ -180,11 +180,11 @@ export function AddPromotionForm({
       const newPromotionData = {
         title: newPromotion.title,
         description: newPromotion.description,
-        promotion_type: newPromotion.promotion_type, // This is now a UUID reference
+        promotion_type: newPromotion.promotion_type,
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
         terms_conditions: newPromotion.terms_conditions || null,
-        image_url: newPromotion.image_url || null,
+        image: newPromotion.image || null,
         store_id: preselectedStoreId || newPromotion.store_id,
         user_id: session.user.id,
         is_active: true,
@@ -282,9 +282,9 @@ export function AddPromotionForm({
       <div>
         <Label>URL de la Imagen</Label>
         <Input
-          value={newPromotion.image_url}
+          value={newPromotion.image}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, image_url: e.target.value })
+            setNewPromotion({ ...newPromotion, image: e.target.value })
           }
           placeholder="Opcional"
         />

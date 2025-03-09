@@ -37,7 +37,7 @@ interface RawPromotion {
   is_active?: boolean;
   created_at: string;
   terms_conditions?: string;
-  image_url?: string;
+  image?: string;
   store?: RawStore;
 }
 
@@ -78,7 +78,7 @@ const normalizePromotion = (promotion: RawPromotion): DatabasePromotion => {
     start_date: promotion.start_date || new Date().toISOString(),
     end_date: promotion.end_date || new Date().toISOString(),
     terms_conditions: promotion.terms_conditions,
-    image_url: promotion.image_url,
+    image: promotion.image,
     store_id: promotion.store_id,
     user_id: promotion.user_id,
     created_at: promotion.created_at,
@@ -125,7 +125,7 @@ export default function StoreProfile() {
             mall:shopping_malls(id, name, latitude, longitude, address)
           `
         )
-        // @ts-ignore - Supabase types incompatibility
+        // @ts-expect-error - Supabase types incompatibility
         .eq("id", id || "")
         .maybeSingle();
 
@@ -170,7 +170,7 @@ export default function StoreProfile() {
             )
           `
         )
-        // @ts-ignore - Supabase types incompatibility
+        // @ts-expect-error - Supabase types incompatibility
         .eq("store_id", id || "")
         .order("created_at", { ascending: false }); // Show newest first
 
@@ -244,7 +244,7 @@ export default function StoreProfile() {
       const { error } = await supabase
         .from("promotions")
         .delete()
-        // @ts-ignore - Supabase types incompatibility
+        // @ts-expect-error - Supabase types incompatibility
         .eq("id", promotionId);
 
       if (error) throw error;
