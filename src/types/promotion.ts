@@ -1,4 +1,3 @@
-
 export type ValidPromotionType = "promotion" | "coupon" | "sale";
 
 export interface DatabasePromotion {
@@ -14,6 +13,8 @@ export interface DatabasePromotion {
   store_id?: string;
   user_id?: string;
   created_at: string;
+  is_active?: boolean;
+  status?: "active" | "inactive";
   store?: {
     id: string;
     name: string;

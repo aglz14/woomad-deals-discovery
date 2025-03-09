@@ -99,7 +99,7 @@ export default function StoreProfile() {
   } = useQuery({
     queryKey: ["promotions", id],
     queryFn: async () => {
-      // Get all active promotions for this store
+      // Get ALL promotions for this store, not just active ones
       const { data, error } = await supabase
         .from("promotions")
         .select(
@@ -118,8 +118,7 @@ export default function StoreProfile() {
           `
         )
         .eq("store_id", id as any)
-        .gte("end_date", new Date().toISOString()) // Same filter as public view
-        .order("start_date", { ascending: true });
+        .order("start_date", { ascending: false }); // Show newest first
 
       if (error) {
         console.error("Error fetching promotions:", error);
@@ -131,24 +130,46 @@ export default function StoreProfile() {
         return [];
       }
 
-      // Filter out invalid types and inactive promotions
-      const validPromotions = data
+      // Only filter out promotions with invalid types, keep inactive ones
+      const allValidPromotions = data
         .filter((promo: any) => {
           // Skip invalid objects
           if (!promo || typeof promo !== "object") return false;
-
-          // Check if active (explicitly set to false)
-          const isActive = promo.is_active !== false;
 
           // Check if type is valid
           const typeValue = promo.promotion_type || promo.type || "";
           const isValidType = isValidPromotionType(typeValue);
 
-          return isActive && isValidType;
+          return isValidType;
         })
-        .map(normalizePromotion);
+        .map((promotion: any) => {
+          // Add active status for display purposes
+          const now = new Date();
+          const startDate = promotion.start_date
+            ? new Date(promotion.start_date)
+            : null;
+          const endDate = promotion.end_date
+            ? new Date(promotion.end_date)
+            : null;
 
-      return validPromotions;
+          // A promotion is active if:
+          // 1. It's not explicitly marked inactive
+          // 2. Current date is within date range
+          const isDateActive =
+            startDate && endDate ? startDate <= now && endDate >= now : true;
+          const isExplicitlyActive = promotion.is_active !== false;
+
+          // Normalize promotion
+          const normalized = normalizePromotion(promotion);
+
+          // Add status field
+          return {
+            ...normalized,
+            status: isDateActive && isExplicitlyActive ? "active" : "inactive",
+          };
+        });
+
+      return allValidPromotions;
     },
     enabled: !!id,
   });
@@ -235,7 +256,7 @@ export default function StoreProfile() {
               <div className="w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                    Promociones Actuales
+                    Todas las Promociones
                   </h2>
                   {isOwner && (
                     <Dialog
@@ -270,6 +291,7 @@ export default function StoreProfile() {
                   promotions={promotions || []}
                   onEdit={setPromotionToEdit}
                   onDelete={handleDeletePromotion}
+                  showStatus={true}
                 />
               </div>
             </div>
