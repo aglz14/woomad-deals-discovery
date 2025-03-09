@@ -94,6 +94,7 @@ export default function StoreProfile() {
           `
         )
         .eq("store_id", id as any)
+        .gte("end_date", new Date().toISOString()) // Match the public store profile
         .order("start_date", { ascending: true });
 
       console.log("Raw promotions data:", rawData);
@@ -124,50 +125,24 @@ export default function StoreProfile() {
         }
       });
 
-      const currentDate = new Date().toISOString();
-      console.log("Current date for comparison:", currentDate);
-
-      // Filter for valid promotions
+      // Simplified filtering approach that matches the public store profile
+      // but still keeps the is_active check for admin view
       const validPromotions = (rawData as any[])
         .filter((promotion: any) => {
           if (!promotion || typeof promotion !== "object") {
-            console.log("Skipping invalid promotion object:", promotion);
             return false;
           }
 
-          // Try both column names, promotion_type is preferred if it exists
-          const typeValue = promotion.promotion_type || promotion.type || "";
-
-          // Check if it's a valid type
-          const isValid = isValidPromotionType(typeValue);
-
-          // Check date range
-          const startDate = promotion.start_date
-            ? new Date(promotion.start_date)
-            : null;
-          const endDate = promotion.end_date
-            ? new Date(promotion.end_date)
-            : null;
-          const now = new Date();
-
-          const isInDateRange =
-            startDate && endDate ? startDate <= now && endDate >= now : true; // If no dates, assume it's valid
-
-          // Check active status if present
+          // Check active status if present (additional check for admin view)
           const isActive = promotion.is_active !== false; // Consider true if undefined or null
 
-          console.log(`Promotion ${promotion.id} evaluation:`, {
-            typeValue,
-            isValidType: isValid,
-            startDate: startDate?.toISOString(),
-            endDate: endDate?.toISOString(),
-            currentDate: now.toISOString(),
-            isInDateRange,
-            isActive,
-            shouldInclude: isValid && isInDateRange && isActive,
-          });
+          // Apply type normalization for display
+          const typeValue = (promotion.promotion_type || promotion.type || "")
+            .toString()
+            .toLowerCase();
+          const isValidType = isValidPromotionType(typeValue);
 
-          return isValid && isInDateRange && isActive;
+          return isValidType && isActive;
         })
         .map((promotion: any) => {
           // Normalize the type field to ensure consistent data
