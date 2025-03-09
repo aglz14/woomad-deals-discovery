@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EditPromotionDialog } from "@/components/promotion/EditPromotionDialog";
 import { DatabasePromotion, ValidPromotionType } from "@/types/promotion";
 import { StoreLoadingState } from "@/components/store/StoreLoadingState";
@@ -30,6 +30,28 @@ const isValidPromotionType = (
   if (!type) return false;
   const normalizedType = type.toString().toLowerCase();
   return ["promotion", "coupon", "sale"].includes(normalizedType);
+};
+
+// New helper function to debug promotion data
+const logPromotionData = (title: string, data: any) => {
+  console.group(`🔍 ${title}`);
+  if (Array.isArray(data)) {
+    console.log(`Total count: ${data.length}`);
+    data.forEach((item, index) => {
+      console.log(`Item ${index + 1}:`, {
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        promotion_type: item.promotion_type,
+        start_date: item.start_date,
+        end_date: item.end_date,
+        is_active: item.is_active,
+      });
+    });
+  } else {
+    console.log("Data:", data);
+  }
+  console.groupEnd();
 };
 
 export default function StoreProfile() {
@@ -68,6 +90,78 @@ export default function StoreProfile() {
     enabled: !!id,
   });
 
+  // For direct debugging of public vs admin discrepancies
+  useEffect(() => {
+    const compareWithPublicView = async () => {
+      if (!id) return;
+
+      console.log(
+        "🔄 Comparing admin and public store profiles for store:",
+        id
+      );
+
+      // Fetch what the public view would show
+      const { data: publicData, error: publicError } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("store_id", id as any)
+        .gte("end_date", new Date().toISOString())
+        .order("start_date", { ascending: true });
+
+      if (publicError) {
+        console.error("Error fetching public view data:", publicError);
+        return;
+      }
+
+      logPromotionData("Public Store Profile would show", publicData);
+
+      // Fetch raw admin data without filters for comparison
+      const { data: adminRawData, error: adminError } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("store_id", id as any)
+        .order("start_date", { ascending: true });
+
+      if (adminError) {
+        console.error("Error fetching admin raw data:", adminError);
+        return;
+      }
+
+      logPromotionData(
+        "All promotions for this store (unfiltered)",
+        adminRawData
+      );
+
+      // Compare what's being filtered out
+      if (publicData && adminRawData) {
+        const publicIds = new Set(publicData.map((p: any) => p.id));
+        const filteredOut = adminRawData.filter(
+          (p: any) => !publicIds.has(p.id)
+        );
+
+        if (filteredOut.length > 0) {
+          logPromotionData(
+            "Promotions filtered out in public view",
+            filteredOut
+          );
+        }
+      }
+
+      // Additional check for explicitly inactive promotions
+      const { data: inactiveData } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("store_id", id as any)
+        .eq("is_active", false as any);
+
+      if (inactiveData && inactiveData.length > 0) {
+        logPromotionData("Explicitly inactive promotions", inactiveData);
+      }
+    };
+
+    compareWithPublicView();
+  }, [id]);
+
   const {
     data: promotions = [],
     isLoading: isPromotionsLoading,
@@ -76,6 +170,18 @@ export default function StoreProfile() {
     queryKey: ["promotions", id],
     queryFn: async () => {
       console.log("Fetching promotions for store ID:", id);
+
+      // Step 1: First get all promotions to see what's available
+      const { data: allPromos, error: allError } = await supabase
+        .from("promotions")
+        .select("*")
+        .eq("store_id", id as any);
+
+      if (allPromos) {
+        logPromotionData("All promotions before filtering", allPromos);
+      }
+
+      // Step 2: Now get the filtered promotions matching public view
       const { data: rawData, error } = await supabase
         .from("promotions")
         .select(
@@ -142,6 +248,16 @@ export default function StoreProfile() {
             .toLowerCase();
           const isValidType = isValidPromotionType(typeValue);
 
+          // Log why a promotion might be filtered out
+          if (!isActive || !isValidType) {
+            console.log(`Promotion ${promotion.id} filtered out:`, {
+              title: promotion.title,
+              isActive,
+              typeValue,
+              isValidType,
+            });
+          }
+
           return isValidType && isActive;
         })
         .map((promotion: any) => {
@@ -159,7 +275,10 @@ export default function StoreProfile() {
           };
         });
 
-      console.log("Final filtered promotions:", validPromotions.length);
+      logPromotionData(
+        "Final filtered promotions for admin view",
+        validPromotions
+      );
       return validPromotions as DatabasePromotion[];
     },
     enabled: !!id,
