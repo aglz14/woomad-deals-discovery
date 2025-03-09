@@ -4,7 +4,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,12 +55,12 @@ export function EditStoreDialog({
         local_number: store.local_number || "",
       });
 
-      // Also fetch categories
-      if (store.id) {
-        fetchStoreCategories();
+      // Initialize selected categories from array_categories
+      if (categoriesData && store.array_categories) {
+        initializeSelectedCategories();
       }
     }
-  }, [isOpen, store]);
+  }, [isOpen, store, categoriesData]);
 
   // Reset form when dialog is closed
   useEffect(() => {
@@ -84,81 +83,31 @@ export function EditStoreDialog({
     setIsLoading(false);
   };
 
-  const fetchStoreCategories = async () => {
-    try {
-      setIsLoading(true);
-      console.log("Fetching categories for store ID:", store.id);
+  const initializeSelectedCategories = () => {
+    if (!categoriesData || !store.array_categories) return;
 
-      // First try to get categories from the junction table
-      const { data, error } = await supabase
-        .from("store_categories")
-        .select("category_id")
-        .eq("store_id", store.id);
+    setIsLoading(true);
+    console.log(
+      "Initializing categories from array_categories:",
+      store.array_categories
+    );
 
-      if (error) {
-        console.error(
-          "Error fetching store categories from junction table:",
-          error
+    const categoryIds = store.array_categories
+      .map((categoryName) => {
+        const category = categoriesData.find(
+          (cat) => cat.name === categoryName
         );
-
-        // If there's an error or no data in junction table, fall back to array_categories
-        if (categoriesData && store.array_categories) {
-          console.log(
-            "Falling back to array_categories:",
-            store.array_categories
-          );
-          const categoryIds = store.array_categories
-            .map((categoryName) => {
-              const category = categoriesData.find(
-                (cat) => cat.name === categoryName
-              );
-              if (!category) {
-                console.warn(`Category with name "${categoryName}" not found`);
-                return null;
-              }
-              return category.id;
-            })
-            .filter((id) => id !== null) as string[];
-
-          console.log("Mapped category IDs:", categoryIds);
-          setSelectedCategories(categoryIds);
-        } else {
-          console.warn("No array_categories available as fallback");
+        if (!category) {
+          console.warn(`Category with name "${categoryName}" not found`);
+          return null;
         }
-      } else if (data && data.length > 0) {
-        // Use data from junction table
-        console.log("Found categories in junction table:", data);
-        setSelectedCategories(data.map((item) => item.category_id));
-      } else if (categoriesData && store.array_categories) {
-        // Fall back to array_categories if junction table is empty
-        console.log(
-          "Junction table empty, falling back to array_categories:",
-          store.array_categories
-        );
-        const categoryIds = store.array_categories
-          .map((categoryName) => {
-            const category = categoriesData.find(
-              (cat) => cat.name === categoryName
-            );
-            if (!category) {
-              console.warn(`Category with name "${categoryName}" not found`);
-              return null;
-            }
-            return category.id;
-          })
-          .filter((id) => id !== null) as string[];
+        return category.id;
+      })
+      .filter((id) => id !== null) as string[];
 
-        console.log("Mapped category IDs:", categoryIds);
-        setSelectedCategories(categoryIds);
-      } else {
-        console.warn("No categories found for store");
-      }
-    } catch (error) {
-      console.error("Error in fetchStoreCategories:", error);
-      toast.error("Error al cargar las categorías de la tienda");
-    } finally {
-      setIsLoading(false);
-    }
+    console.log("Mapped category IDs:", categoryIds);
+    setSelectedCategories(categoryIds);
+    setIsLoading(false);
   };
 
   const handleCategoryToggle = (categoryId: string) => {
@@ -195,9 +144,8 @@ export function EditStoreDialog({
         .filter((name) => name !== null) as string[];
 
       console.log("Updating store with categories:", categoryNames);
-      console.log("Selected category IDs:", selectedCategories);
 
-      // Update store information with array_categories
+      // Update store information with array_categories only
       const { error: storeError } = await supabase
         .from("stores")
         .update({
@@ -215,50 +163,6 @@ export function EditStoreDialog({
       if (storeError) {
         console.error("Error updating store:", storeError);
         throw storeError;
-      }
-
-      console.log("Store updated successfully");
-
-      // Update the junction table for proper relational structure
-      try {
-        // First delete existing relationships
-        console.log(
-          "Deleting existing store categories for store ID:",
-          store.id
-        );
-        const { error: deleteError } = await supabase
-          .from("store_categories")
-          .delete()
-          .eq("store_id", store.id);
-
-        if (deleteError) {
-          console.error(
-            "Error deleting existing store categories:",
-            deleteError
-          );
-          // Continue anyway since we already have the array_categories
-        }
-
-        // Then insert new relationships
-        const storeCategoriesToInsert = selectedCategories.map(
-          (categoryId) => ({
-            store_id: store.id,
-            category_id: categoryId,
-          })
-        );
-
-        console.log("Inserting new store categories:", storeCategoriesToInsert);
-        const { error: insertError } = await supabase
-          .from("store_categories")
-          .insert(storeCategoriesToInsert);
-
-        if (insertError) {
-          console.error("Error inserting new store categories:", insertError);
-          // Continue anyway since we already have the array_categories
-        }
-      } catch (junctionError) {
-        console.error("Error managing store_categories:", junctionError);
-        // Continue since we already saved the store with array_categories
       }
 
       toast.success("Tienda actualizada correctamente");
