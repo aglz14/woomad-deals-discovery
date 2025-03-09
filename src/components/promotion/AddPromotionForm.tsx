@@ -65,7 +65,7 @@ export function AddPromotionForm({
         store_id: preselectedStoreId,
         title: newPromotion.title,
         description: newPromotion.description,
-        type: newPromotion.promotion_type, // Map promotion_type to type
+        promotion_type: newPromotion.promotion_type, // Use promotion_type instead of type
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
         image: newPromotion.image || null, // Use image instead of image_url
