@@ -43,21 +43,62 @@ export function EditStoreDialog({
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useCategories();
 
-  // Initialize selected categories from store.array_categories
+  // Fetch store categories from junction table when dialog opens
   useEffect(() => {
-    if (isOpen && categoriesData && store.array_categories) {
-      const categoryIds = store.array_categories
-        .map((categoryName) => {
-          const category = categoriesData.find(
-            (cat) => cat.name === categoryName
-          );
-          return category ? category.id : null;
-        })
-        .filter((id) => id !== null) as string[];
-
-      setSelectedCategories(categoryIds);
+    if (isOpen && store.id) {
+      fetchStoreCategories();
     }
-  }, [isOpen, categoriesData, store.array_categories]);
+  }, [isOpen, store.id]);
+
+  const fetchStoreCategories = async () => {
+    try {
+      setIsLoading(true);
+
+      // First try to get categories from the junction table
+      const { data, error } = await supabase
+        .from("store_categories")
+        .select("category_id")
+        .eq("store_id", store.id);
+
+      if (error) {
+        console.error("Error fetching store categories:", error);
+
+        // If there's an error or no data in junction table, fall back to array_categories
+        if (categoriesData && store.array_categories) {
+          const categoryIds = store.array_categories
+            .map((categoryName) => {
+              const category = categoriesData.find(
+                (cat) => cat.name === categoryName
+              );
+              return category ? category.id : null;
+            })
+            .filter((id) => id !== null) as string[];
+
+          setSelectedCategories(categoryIds);
+        }
+      } else if (data && data.length > 0) {
+        // Use data from junction table
+        setSelectedCategories(data.map((item) => item.category_id));
+      } else if (categoriesData && store.array_categories) {
+        // Fall back to array_categories if junction table is empty
+        const categoryIds = store.array_categories
+          .map((categoryName) => {
+            const category = categoriesData.find(
+              (cat) => cat.name === categoryName
+            );
+            return category ? category.id : null;
+          })
+          .filter((id) => id !== null) as string[];
+
+        setSelectedCategories(categoryIds);
+      }
+    } catch (error) {
+      console.error("Error in fetchStoreCategories:", error);
+      toast.error("Error al cargar las categorías de la tienda");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCategoryToggle = (categoryId: string) => {
     setSelectedCategories((prev) => {
@@ -100,6 +141,35 @@ export function EditStoreDialog({
         .eq("id", store.id);
 
       if (storeError) throw storeError;
+
+      // Update the junction table for proper relational structure
+      try {
+        // First delete existing relationships
+        await supabase
+          .from("store_categories")
+          .delete()
+          .eq("store_id", store.id);
+
+        // Then insert new relationships
+        const storeCategoriesToInsert = selectedCategories.map(
+          (categoryId) => ({
+            store_id: store.id,
+            category_id: categoryId,
+          })
+        );
+
+        const { error: categoriesError } = await supabase
+          .from("store_categories")
+          .insert(storeCategoriesToInsert);
+
+        if (categoriesError) {
+          console.error("Error updating store categories:", categoriesError);
+          // Continue anyway since we already have the array_categories
+        }
+      } catch (error) {
+        console.error("Error managing store_categories:", error);
+        // Continue anyway since we already have the array_categories
+      }
 
       toast.success("Tienda actualizada correctamente");
       onSuccess();

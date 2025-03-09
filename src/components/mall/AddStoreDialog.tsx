@@ -77,18 +77,41 @@ export function AddStoreDialog({
         .filter((name) => name !== undefined) as string[];
 
       // Insert the store with array_categories
-      const { error: storeError } = await supabase.from("stores").insert({
-        name: store.name,
-        description: store.description,
-        contact_number: store.contact_number,
-        floor: store.floor,
-        image: store.image,
-        array_categories: categoryNames,
-        mall_id: mallId,
-        user_id: session.user.id,
-      });
+      const { data: newStore, error: storeError } = await supabase
+        .from("stores")
+        .insert({
+          name: store.name,
+          description: store.description,
+          contact_number: store.contact_number,
+          floor: store.floor,
+          image: store.image,
+          array_categories: categoryNames,
+          mall_id: mallId,
+          user_id: session.user.id,
+        })
+        .select("id")
+        .single();
 
       if (storeError) throw storeError;
+
+      // Also insert into the junction table for proper relational structure
+      if (newStore) {
+        const storeCategoriesToInsert = selectedCategories.map(
+          (categoryId) => ({
+            store_id: newStore.id,
+            category_id: categoryId,
+          })
+        );
+
+        const { error: categoriesError } = await supabase
+          .from("store_categories")
+          .insert(storeCategoriesToInsert);
+
+        if (categoriesError) {
+          console.error("Error inserting store categories:", categoriesError);
+          // Continue anyway since we already have the array_categories
+        }
+      }
 
       toast.success("Tienda agregada exitosamente");
       setStore({
