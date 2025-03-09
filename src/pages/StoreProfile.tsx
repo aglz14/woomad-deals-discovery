@@ -102,14 +102,13 @@ export default function StoreProfile() {
   const [isAddingPromotion, setIsAddingPromotion] = useState(false);
   const [promotionToEdit, setPromotionToEdit] =
     useState<DatabasePromotion | null>(null);
-  const [promotions, setPromotions] = useState<DatabasePromotion[]>([]);
 
   // Fetch store data
   const {
     data: store,
     isLoading: isStoreLoading,
     error: storeError,
-  } = useQuery({
+  } = useQuery<Store | null>({
     queryKey: ["store", id],
     queryFn: async () => {
       console.log("Fetching store with ID:", id);
@@ -148,6 +147,8 @@ export default function StoreProfile() {
   } = useQuery({
     queryKey: ["promotions", id],
     queryFn: async () => {
+      console.log("Fetching promotions for store ID:", id);
+
       // Get ALL promotions for this store
       const { data, error } = await supabase
         .from("promotions")
@@ -170,6 +171,8 @@ export default function StoreProfile() {
         .eq("store_id", id || "")
         .order("created_at", { ascending: false }); // Show newest first
 
+      console.log("Raw promotions data:", data);
+
       if (error) {
         console.error("Error fetching promotions:", error);
         toast.error("Failed to fetch promotions");
@@ -177,6 +180,7 @@ export default function StoreProfile() {
       }
 
       if (!data || !Array.isArray(data) || data.length === 0) {
+        console.log("No promotions found for store ID:", id);
         return [];
       }
 
@@ -247,6 +251,9 @@ export default function StoreProfile() {
     );
   }
 
+  // Debug information
+  console.log("Promotions state:", promotionsData);
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
@@ -278,7 +285,7 @@ export default function StoreProfile() {
               <div className="w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                    Promociones
+                    Promociones Disponibles
                   </h2>
                   {isOwner && (
                     <Dialog
@@ -308,9 +315,16 @@ export default function StoreProfile() {
                   )}
                 </div>
 
+                {/* Debug information */}
+                {process.env.NODE_ENV === "development" && (
+                  <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
+                    <p>Debug: Found {promotionsData?.length || 0} promotions</p>
+                  </div>
+                )}
+
                 {/* Promotions List - show all promotions */}
                 <PromotionsList
-                  promotions={promotions}
+                  promotions={promotionsData}
                   onEdit={setPromotionToEdit}
                   onDelete={handleDeletePromotion}
                 />
