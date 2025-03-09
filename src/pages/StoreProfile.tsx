@@ -211,12 +211,6 @@ export default function StoreProfile() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           <div className="flex flex-wrap gap-2 mb-6">
             <button
-              onClick={() => navigate("/admin")}
-              className="text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
-            >
-              ← Volver al Panel Admin
-            </button>
-            <button
               onClick={() => {
                 if ((store as any)?.mall_id) {
                   navigate(`/admin/mall/${(store as any).mall_id}`);
