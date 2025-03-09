@@ -41,11 +41,11 @@ export default function PublicStoreProfile() {
       if (!id) throw new Error("No store ID provided");
 
       try {
-        // @ts-ignore - Supabase types are complex
+        // @ts-expect-error - Supabase types are complex
         const { data, error } = await supabase
           .from("stores")
           .select("*, mall:shopping_malls(*)")
-          .eq("id", id)
+          .eq("id", id as any)
           .maybeSingle();
 
         if (error) {
@@ -76,11 +76,11 @@ export default function PublicStoreProfile() {
       if (!id) throw new Error("No store ID provided");
 
       try {
-        // @ts-ignore - Supabase types are complex
+        // @ts-expect-error - Supabase types are complex
         const { data, error } = await supabase
           .from("promotions")
           .select("*")
-          .eq("store_id", id)
+          .eq("store_id", id as any)
           .gte("end_date", new Date().toISOString())
           .order("start_date", { ascending: true });
 
