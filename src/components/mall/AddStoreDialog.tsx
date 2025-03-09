@@ -45,6 +45,7 @@ export function AddStoreDialog({
     image: "",
   });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useCategories();
 
@@ -60,6 +61,8 @@ export function AddStoreDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     try {
       if (!session?.user?.id) {
         toast.error("Debes iniciar sesión para agregar una tienda");
@@ -73,8 +76,16 @@ export function AddStoreDialog({
 
       // Get category names for the array_categories field
       const categoryNames = selectedCategories
-        .map((id) => categoriesData?.find((cat) => cat.id === id)?.name)
+        .map((id) => {
+          const category = categoriesData?.find((cat) => cat.id === id);
+          if (!category) {
+            console.warn(`Category with ID ${id} not found`);
+          }
+          return category?.name;
+        })
         .filter((name) => name !== undefined) as string[];
+
+      console.log("Adding store with categories:", categoryNames);
 
       // Insert the store with array_categories
       const { data: newStore, error: storeError } = await supabase
@@ -92,16 +103,34 @@ export function AddStoreDialog({
         .select("id")
         .single();
 
-      if (storeError) throw storeError;
+      if (storeError) {
+        console.error("Error inserting store:", storeError);
+        throw storeError;
+      }
 
-      // Also insert into the junction table for proper relational structure
-      if (newStore) {
+      console.log("Store added successfully with ID:", newStore?.id);
+
+      // Skip junction table operations if store_categories table doesn't exist
+      // or if we don't have a store ID
+      if (!newStore?.id) {
+        console.warn("No store ID returned, skipping store_categories insert");
+        toast.success("Tienda agregada exitosamente");
+        resetForm();
+        onSuccess();
+        onClose();
+        return;
+      }
+
+      try {
+        // Also insert into the junction table for proper relational structure
         const storeCategoriesToInsert = selectedCategories.map(
           (categoryId) => ({
             store_id: newStore.id,
             category_id: categoryId,
           })
         );
+
+        console.log("Inserting store categories:", storeCategoriesToInsert);
 
         const { error: categoriesError } = await supabase
           .from("store_categories")
@@ -111,23 +140,36 @@ export function AddStoreDialog({
           console.error("Error inserting store categories:", categoriesError);
           // Continue anyway since we already have the array_categories
         }
+      } catch (junctionError) {
+        console.error("Error with junction table operations:", junctionError);
+        // Continue since we already saved the store with array_categories
       }
 
       toast.success("Tienda agregada exitosamente");
-      setStore({
-        name: "",
-        description: "",
-        contact_number: "",
-        floor: "",
-        image: "",
-      });
-      setSelectedCategories([]);
+      resetForm();
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Error adding store:", error);
-      toast.error("Error al agregar la tienda");
+      toast.error(
+        `Error al agregar la tienda: ${
+          error instanceof Error ? error.message : "Error desconocido"
+        }`
+      );
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const resetForm = () => {
+    setStore({
+      name: "",
+      description: "",
+      contact_number: "",
+      floor: "",
+      image: "",
+    });
+    setSelectedCategories([]);
   };
 
   return (
@@ -220,10 +262,17 @@ export function AddStoreDialog({
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               Cancelar
             </Button>
-            <Button type="submit">Agregar</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Agregando..." : "Agregar"}
+            </Button>
           </div>
         </form>
       </DialogContent>
