@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { EditPromotionDialog } from "@/components/promotion/EditPromotionDialog";
 import { DatabasePromotion, ValidPromotionType } from "@/types/promotion";
 import { StoreLoadingState } from "@/components/store/StoreLoadingState";
@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/components/providers/SessionProvider";
 import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
+import { useSession } from "@/components/providers/SessionProvider";
 
 // Helper function to validate promotion type
 const isValidPromotionType = (
@@ -32,37 +32,36 @@ const isValidPromotionType = (
   return ["promotion", "coupon", "sale"].includes(normalizedType);
 };
 
-// New helper function to debug promotion data
-const logPromotionData = (title: string, data: any) => {
-  console.group(`🔍 ${title}`);
-  if (Array.isArray(data)) {
-    console.log(`Total count: ${data.length}`);
-    data.forEach((item, index) => {
-      console.log(`Item ${index + 1}:`, {
-        id: item.id,
-        title: item.title,
-        type: item.type,
-        promotion_type: item.promotion_type,
-        start_date: item.start_date,
-        end_date: item.end_date,
-        is_active: item.is_active,
-      });
-    });
-  } else {
-    console.log("Data:", data);
-  }
-  console.groupEnd();
+// Helper function to normalize promotion data
+const normalizePromotion = (promotion: any): DatabasePromotion => {
+  const effectiveType = (
+    promotion.promotion_type ||
+    promotion.type ||
+    "promotion"
+  )
+    .toString()
+    .toLowerCase();
+
+  return {
+    ...promotion,
+    type: effectiveType as ValidPromotionType,
+  };
 };
 
 export default function StoreProfile() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { session } = useSession();
+  const [isAddingPromotion, setIsAddingPromotion] = useState(false);
   const [promotionToEdit, setPromotionToEdit] =
     useState<DatabasePromotion | null>(null);
-  const [isAddingPromotion, setIsAddingPromotion] = useState(false);
 
-  const { data: store, isLoading: isStoreLoading } = useQuery({
+  // Fetch store data
+  const {
+    data: store,
+    isLoading: isStoreLoading,
+    error: storeError,
+  } = useQuery({
     queryKey: ["store", id],
     queryFn: async () => {
       console.log("Fetching store with ID:", id);
@@ -76,92 +75,23 @@ export default function StoreProfile() {
         )
         .eq("id", id as any)
         .maybeSingle();
+
       if (error) {
         toast.error("Failed to fetch store details");
         throw error;
       }
+
       if (!store) {
         toast.error("Store not found");
         throw new Error("Store not found");
       }
-      console.log("Store data:", store);
+
       return store;
     },
     enabled: !!id,
   });
 
-  // For direct debugging of public vs admin discrepancies
-  useEffect(() => {
-    const compareWithPublicView = async () => {
-      if (!id) return;
-
-      console.log(
-        "🔄 Comparing admin and public store profiles for store:",
-        id
-      );
-
-      // Fetch what the public view would show
-      const { data: publicData, error: publicError } = await supabase
-        .from("promotions")
-        .select("*")
-        .eq("store_id", id as any)
-        .gte("end_date", new Date().toISOString())
-        .order("start_date", { ascending: true });
-
-      if (publicError) {
-        console.error("Error fetching public view data:", publicError);
-        return;
-      }
-
-      logPromotionData("Public Store Profile would show", publicData);
-
-      // Fetch raw admin data without filters for comparison
-      const { data: adminRawData, error: adminError } = await supabase
-        .from("promotions")
-        .select("*")
-        .eq("store_id", id as any)
-        .order("start_date", { ascending: true });
-
-      if (adminError) {
-        console.error("Error fetching admin raw data:", adminError);
-        return;
-      }
-
-      logPromotionData(
-        "All promotions for this store (unfiltered)",
-        adminRawData
-      );
-
-      // Compare what's being filtered out
-      if (publicData && adminRawData) {
-        const publicIds = new Set(publicData.map((p: any) => p.id));
-        const filteredOut = adminRawData.filter(
-          (p: any) => !publicIds.has(p.id)
-        );
-
-        if (filteredOut.length > 0) {
-          logPromotionData(
-            "Promotions filtered out in public view",
-            filteredOut
-          );
-        }
-      }
-
-      // Additional check for explicitly inactive promotions
-      const { data: inactiveData } = await supabase
-        .from("promotions")
-        .select("*")
-        .eq("store_id", id as any)
-        .eq("is_active", false as any);
-
-      if (inactiveData && inactiveData.length > 0) {
-        logPromotionData("Explicitly inactive promotions", inactiveData);
-      }
-    };
-
-    compareWithPublicView();
-  }, [id]);
-
+  // Fetch and filter promotions using the same approach as public store profile
   const {
     data: promotions = [],
     isLoading: isPromotionsLoading,
@@ -169,20 +99,8 @@ export default function StoreProfile() {
   } = useQuery({
     queryKey: ["promotions", id],
     queryFn: async () => {
-      console.log("Fetching promotions for store ID:", id);
-
-      // Step 1: First get all promotions to see what's available
-      const { data: allPromos, error: allError } = await supabase
-        .from("promotions")
-        .select("*")
-        .eq("store_id", id as any);
-
-      if (allPromos) {
-        logPromotionData("All promotions before filtering", allPromos);
-      }
-
-      // Step 2: Now get the filtered promotions matching public view
-      const { data: rawData, error } = await supabase
+      // Get all active promotions for this store
+      const { data, error } = await supabase
         .from("promotions")
         .select(
           `
@@ -200,10 +118,8 @@ export default function StoreProfile() {
           `
         )
         .eq("store_id", id as any)
-        .gte("end_date", new Date().toISOString()) // Match the public store profile
+        .gte("end_date", new Date().toISOString()) // Same filter as public view
         .order("start_date", { ascending: true });
-
-      console.log("Raw promotions data:", rawData);
 
       if (error) {
         console.error("Error fetching promotions:", error);
@@ -211,86 +127,42 @@ export default function StoreProfile() {
         throw error;
       }
 
-      if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
-        console.log("No promotions found for this store");
+      if (!data || !Array.isArray(data) || data.length === 0) {
         return [];
       }
 
-      // Log each promotion to check column names
-      rawData.forEach((promo: any, index) => {
-        if (promo && typeof promo === "object") {
-          console.log(`Promotion ${index + 1}:`, {
-            id: promo.id,
-            typeColumn: promo.type,
-            promotionTypeColumn: promo.promotion_type,
-            title: promo.title,
-            startDate: promo.start_date,
-            endDate: promo.end_date,
-            isActive: promo.is_active,
-          });
-        }
-      });
+      // Filter out invalid types and inactive promotions
+      const validPromotions = data
+        .filter((promo: any) => {
+          // Skip invalid objects
+          if (!promo || typeof promo !== "object") return false;
 
-      // Simplified filtering approach that matches the public store profile
-      // but still keeps the is_active check for admin view
-      const validPromotions = (rawData as any[])
-        .filter((promotion: any) => {
-          if (!promotion || typeof promotion !== "object") {
-            return false;
-          }
+          // Check if active (explicitly set to false)
+          const isActive = promo.is_active !== false;
 
-          // Check active status if present (additional check for admin view)
-          const isActive = promotion.is_active !== false; // Consider true if undefined or null
-
-          // Apply type normalization for display
-          const typeValue = (promotion.promotion_type || promotion.type || "")
-            .toString()
-            .toLowerCase();
+          // Check if type is valid
+          const typeValue = promo.promotion_type || promo.type || "";
           const isValidType = isValidPromotionType(typeValue);
 
-          // Log why a promotion might be filtered out
-          if (!isActive || !isValidType) {
-            console.log(`Promotion ${promotion.id} filtered out:`, {
-              title: promotion.title,
-              isActive,
-              typeValue,
-              isValidType,
-            });
-          }
-
-          return isValidType && isActive;
+          return isActive && isValidType;
         })
-        .map((promotion: any) => {
-          // Normalize the type field to ensure consistent data
-          const effectiveType = (
-            promotion.promotion_type ||
-            promotion.type ||
-            ""
-          )
-            .toString()
-            .toLowerCase();
-          return {
-            ...promotion,
-            type: effectiveType as ValidPromotionType,
-          };
-        });
+        .map(normalizePromotion);
 
-      logPromotionData(
-        "Final filtered promotions for admin view",
-        validPromotions
-      );
-      return validPromotions as DatabasePromotion[];
+      return validPromotions;
     },
     enabled: !!id,
   });
 
+  // Handle deleting a promotion
   const handleDeletePromotion = async (promotionId: string) => {
     try {
       const { error } = await supabase
         .from("promotions")
         .delete()
         .eq("id", promotionId as any);
+
       if (error) throw error;
+
       toast.success("Promoción eliminada exitosamente");
       refetchPromotions();
     } catch (error) {
@@ -299,7 +171,38 @@ export default function StoreProfile() {
     }
   };
 
+  // Check if the current user is the store owner
   const isOwner = session?.user?.id === (store as any)?.user_id;
+
+  // Show loading state while data is being fetched
+  if (isStoreLoading || isPromotionsLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+            <StoreLoadingState />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Show not found state if store doesn't exist
+  if (storeError || !store) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
+        <Header />
+        <main className="flex-grow pt-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+            <StoreNotFound />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
@@ -327,15 +230,14 @@ export default function StoreProfile() {
             </button>
           </div>
 
-          {isStoreLoading || isPromotionsLoading ? (
-            <StoreLoadingState />
-          ) : !store ? (
-            <StoreNotFound />
-          ) : (
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="space-y-6 sm:space-y-8">
+              {/* Store Info Section */}
               <div className="w-full">
                 <StoreInfo store={store as any} />
               </div>
+
+              {/* Promotions Section */}
               <div className="w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
@@ -368,6 +270,8 @@ export default function StoreProfile() {
                     </Dialog>
                   )}
                 </div>
+
+                {/* Promotions List */}
                 <PromotionsList
                   promotions={promotions || []}
                   onEdit={setPromotionToEdit}
@@ -375,22 +279,23 @@ export default function StoreProfile() {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Edit Promotion Dialog */}
+          {promotionToEdit && (
+            <EditPromotionDialog
+              promotion={promotionToEdit}
+              isOpen={true}
+              onClose={() => setPromotionToEdit(null)}
+              onSuccess={() => {
+                setPromotionToEdit(null);
+                refetchPromotions();
+              }}
+            />
           )}
         </div>
       </main>
       <Footer />
-
-      {promotionToEdit && (
-        <EditPromotionDialog
-          promotion={promotionToEdit}
-          isOpen={true}
-          onClose={() => setPromotionToEdit(null)}
-          onSuccess={() => {
-            refetchPromotions();
-            setPromotionToEdit(null);
-          }}
-        />
-      )}
     </div>
   );
 }
