@@ -91,7 +91,7 @@ export default function StoreProfile() {
     enabled: !!id,
   });
 
-  // Fetch and filter promotions using the same approach as public store profile
+  // Fetch all promotions, calculate status based on new schema
   const {
     data: promotions = [],
     isLoading: isPromotionsLoading,
@@ -99,7 +99,7 @@ export default function StoreProfile() {
   } = useQuery({
     queryKey: ["promotions", id],
     queryFn: async () => {
-      // Get ALL promotions for this store, not just active ones
+      // Get ALL promotions for this store
       const { data, error } = await supabase
         .from("promotions")
         .select(
@@ -118,7 +118,7 @@ export default function StoreProfile() {
           `
         )
         .eq("store_id", id as any)
-        .order("start_date", { ascending: false }); // Show newest first
+        .order("created_at", { ascending: false }); // Show newest first
 
       if (error) {
         console.error("Error fetching promotions:", error);
@@ -130,20 +130,18 @@ export default function StoreProfile() {
         return [];
       }
 
-      // Only filter out promotions with invalid types, keep inactive ones
-      const allValidPromotions = data
+      // Process promotions according to new schema
+      const processedPromotions = data
         .filter((promo: any) => {
           // Skip invalid objects
           if (!promo || typeof promo !== "object") return false;
 
           // Check if type is valid
           const typeValue = promo.promotion_type || promo.type || "";
-          const isValidType = isValidPromotionType(typeValue);
-
-          return isValidType;
+          return isValidPromotionType(typeValue);
         })
         .map((promotion: any) => {
-          // Add active status for display purposes
+          // Add status based on dates and is_active field
           const now = new Date();
           const startDate = promotion.start_date
             ? new Date(promotion.start_date)
@@ -162,17 +160,29 @@ export default function StoreProfile() {
           // Normalize promotion
           const normalized = normalizePromotion(promotion);
 
-          // Add status field
+          // Add properly typed status field
           return {
             ...normalized,
-            status: isDateActive && isExplicitlyActive ? "active" : "inactive",
+            status:
+              isDateActive && isExplicitlyActive
+                ? ("active" as const)
+                : ("inactive" as const),
           };
         });
 
-      return allValidPromotions;
+      return processedPromotions;
     },
     enabled: !!id,
   });
+
+  // Get available (active) promotions for main display
+  const availablePromotions = promotions.filter(
+    (promo) => promo.status === "active"
+  );
+  // Get inactive promotions for secondary display
+  const inactivePromotions = promotions.filter(
+    (promo) => promo.status === "inactive"
+  );
 
   // Handle deleting a promotion
   const handleDeletePromotion = async (promotionId: string) => {
@@ -252,11 +262,11 @@ export default function StoreProfile() {
                 <StoreInfo store={store as any} />
               </div>
 
-              {/* Promotions Section */}
+              {/* Available Promotions Section */}
               <div className="w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                    Todas las Promociones
+                    Promociones Disponibles
                   </h2>
                   {isOwner && (
                     <Dialog
@@ -286,14 +296,33 @@ export default function StoreProfile() {
                   )}
                 </div>
 
-                {/* Promotions List */}
+                {/* Available Promotions List */}
                 <PromotionsList
-                  promotions={promotions || []}
+                  promotions={availablePromotions}
                   onEdit={setPromotionToEdit}
                   onDelete={handleDeletePromotion}
-                  showStatus={true}
+                  showStatus={false}
                 />
               </div>
+
+              {/* Inactive Promotions Section - Only show if there are any */}
+              {inactivePromotions.length > 0 && (
+                <div className="w-full border-t pt-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
+                      Promociones Inactivas
+                    </h2>
+                  </div>
+
+                  {/* Inactive Promotions List */}
+                  <PromotionsList
+                    promotions={inactivePromotions}
+                    onEdit={setPromotionToEdit}
+                    onDelete={handleDeletePromotion}
+                    showStatus={true}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
