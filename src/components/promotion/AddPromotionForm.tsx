@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,12 +26,11 @@ export function AddPromotionForm({
   preselectedStoreId,
 }: AddPromotionFormProps) {
   const { session } = useSession();
-  // Define fixed promotion types since there's no promotion_types table
-  const promotionTypes = [
-    { id: "promotion", name: "Promoción" },
-    { id: "coupon", name: "Cupón" },
-    { id: "sale", name: "Oferta" },
-  ];
+  // Use proper IDs from the database instead of string identifiers
+  const [promotionTypes, setPromotionTypes] = useState<
+    { id: string; name: string }[]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [newPromotion, setNewPromotion] = useState({
     title: "",
@@ -39,15 +38,68 @@ export function AddPromotionForm({
     promotion_type: "",
     start_date: "",
     end_date: "",
-    image: "", // Changed from image_url to image
+    image: "",
     terms_conditions: "",
   });
+
+  // Fetch real promotion types from database
+  useEffect(() => {
+    const fetchPromotionTypes = async () => {
+      setIsLoading(true);
+      try {
+        // Attempt to fetch from promotion_type table
+        const { data, error } = await supabase
+          .from("promotion_type")
+          .select("id, name");
+
+        if (error) {
+          console.error("Error fetching promotion types:", error);
+          // Fallback to hardcoded values if table doesn't exist or can't be accessed
+          setPromotionTypes([
+            { id: "1c8930f0-9168-4247-9b3c-5a3c8d94a10e", name: "Promoción" },
+            { id: "2d7841a1-0279-5358-0c4d-6b4d7e05b11f", name: "Cupón" },
+            { id: "3e6752b2-1389-6469-1e5e-7c5e8f16c20g", name: "Oferta" },
+          ]);
+          setIsLoading(false);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setPromotionTypes(data);
+        } else {
+          // Fallback if no data
+          setPromotionTypes([
+            { id: "1c8930f0-9168-4247-9b3c-5a3c8d94a10e", name: "Promoción" },
+            { id: "2d7841a1-0279-5358-0c4d-6b4d7e05b11f", name: "Cupón" },
+            { id: "3e6752b2-1389-6469-1e5e-7c5e8f16c20g", name: "Oferta" },
+          ]);
+        }
+      } catch (err) {
+        console.error("Error fetching promotion types:", err);
+        // Fallback
+        setPromotionTypes([
+          { id: "1c8930f0-9168-4247-9b3c-5a3c8d94a10e", name: "Promoción" },
+          { id: "2d7841a1-0279-5358-0c4d-6b4d7e05b11f", name: "Cupón" },
+          { id: "3e6752b2-1389-6469-1e5e-7c5e8f16c20g", name: "Oferta" },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPromotionTypes();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (!session?.user?.id) {
         toast.error("Debes iniciar sesión para agregar una promoción");
+        return;
+      }
+
+      if (!newPromotion.promotion_type) {
+        toast.error("Selecciona un tipo de promoción");
         return;
       }
 
@@ -65,28 +117,35 @@ export function AddPromotionForm({
         store_id: preselectedStoreId,
         title: newPromotion.title,
         description: newPromotion.description,
-        promotion_type: newPromotion.promotion_type, // Use promotion_type instead of type
+        promotion_type: newPromotion.promotion_type, // This is now a UUID reference
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
-        image: newPromotion.image || null, // Use image instead of image_url
+        image: newPromotion.image || null,
         terms_conditions: newPromotion.terms_conditions || null,
         user_id: session.user.id,
       };
 
+      console.log("Sending promotion data:", newPromotionData);
+
       // Using 'as any' to bypass TypeScript issues with the Supabase types
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("promotions")
-        .insert(newPromotionData as any);
+        .insert(newPromotionData as any)
+        .select();
 
       if (error) throw error;
 
+      console.log("Promotion created:", data);
       toast.success("Promoción agregada exitosamente");
       onSuccess();
     } catch (error) {
       console.error("Error adding promotion:", error);
-      toast.error("Error al agregar la promoción");
+      toast.error("Error al agregar la promoción: " + JSON.stringify(error));
     }
   };
+
+  // Find the coupon type for conditional rendering
+  const couponTypeId = promotionTypes.find((t) => t.name === "Cupón")?.id;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -97,10 +156,13 @@ export function AddPromotionForm({
           onValueChange={(value) =>
             setNewPromotion({ ...newPromotion, promotion_type: value })
           }
+          disabled={isLoading}
           required
         >
           <SelectTrigger>
-            <SelectValue placeholder="Seleccionar tipo" />
+            <SelectValue
+              placeholder={isLoading ? "Cargando tipos..." : "Seleccionar tipo"}
+            />
           </SelectTrigger>
           <SelectContent>
             {promotionTypes.map((type) => (
@@ -114,7 +176,7 @@ export function AddPromotionForm({
 
       <div>
         <Label>
-          {newPromotion.promotion_type === "coupon"
+          {newPromotion.promotion_type === couponTypeId
             ? "Código del Cupón"
             : "Título"}
         </Label>
