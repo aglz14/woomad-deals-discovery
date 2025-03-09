@@ -11,7 +11,13 @@ import { StoreLoadingState } from "@/components/store/StoreLoadingState";
 import { StoreNotFound } from "@/components/store/StoreNotFound";
 import { StoreInfo } from "@/components/store/StoreInfo";
 import { PromotionsList } from "@/components/store/PromotionsList";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/components/providers/SessionProvider";
@@ -26,7 +32,8 @@ export default function StoreProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { session } = useSession();
-  const [promotionToEdit, setPromotionToEdit] = useState<DatabasePromotion | null>(null);
+  const [promotionToEdit, setPromotionToEdit] =
+    useState<DatabasePromotion | null>(null);
   const [isAddingPromotion, setIsAddingPromotion] = useState(false);
 
   const { data: store, isLoading: isStoreLoading } = useQuery({
@@ -34,7 +41,9 @@ export default function StoreProfile() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("stores")
-        .select("*, mall:shopping_malls(id, name, latitude, longitude, address)")
+        .select(
+          "*, mall:shopping_malls(id, name, latitude, longitude, address)"
+        )
         .eq("id", id)
         .maybeSingle();
       if (error) {
@@ -42,15 +51,20 @@ export default function StoreProfile() {
         throw error;
       }
       return data;
-    }
+    },
   });
 
-  const { data: promotions, isLoading: isPromotionsLoading, refetch: refetchPromotions } = useQuery({
+  const {
+    data: promotions,
+    isLoading: isPromotionsLoading,
+    refetch: refetchPromotions,
+  } = useQuery({
     queryKey: ["promotions", id],
     queryFn: async () => {
       const { data: rawData, error } = await supabase
         .from("promotions")
-        .select(`
+        .select(
+          `
           *,
           store:stores (
             id,
@@ -62,7 +76,8 @@ export default function StoreProfile() {
               longitude
             )
           )
-        `)
+        `
+        )
         .eq("store_id", id)
         .order("start_date", { ascending: true });
 
@@ -80,7 +95,7 @@ export default function StoreProfile() {
         })) as DatabasePromotion[];
 
       return validPromotions;
-    }
+    },
   });
 
   const handleDeletePromotion = async (promotionId: string) => {
@@ -133,7 +148,10 @@ export default function StoreProfile() {
                     Promociones Actuales
                   </h2>
                   {isOwner && (
-                    <Dialog open={isAddingPromotion} onOpenChange={setIsAddingPromotion}>
+                    <Dialog
+                      open={isAddingPromotion}
+                      onOpenChange={setIsAddingPromotion}
+                    >
                       <DialogTrigger asChild>
                         <Button className="w-full sm:w-auto">
                           <Plus className="h-4 w-4 mr-2" />
