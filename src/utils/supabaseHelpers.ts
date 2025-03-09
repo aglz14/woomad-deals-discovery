@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { PostgrestError } from "@supabase/supabase-js";
 import { Store } from "../types/store";
 
@@ -137,36 +137,40 @@ function mapPromotionTypeData(data: Record<string, any>[]): PromotionType[] {
   if (!data || !Array.isArray(data)) return getFallbackPromotionTypes();
 
   console.log("Raw promotion type data for mapping:", JSON.stringify(data));
-  
+
   return data.map((item) => {
     // Extract the keys from the item to help with debugging
     const keys = Object.keys(item);
     console.log("Item keys:", keys);
-    
+
     // Try multiple strategies to get the name
     let displayName = "Unknown";
-    
+
     // Strategy 1: Try direct property access
     if (item.type) displayName = item.type;
     else if (item.name) displayName = item.name;
-    
     // Strategy 2: If no direct property, inspect all keys and find a string value
     else {
       for (const key of keys) {
         const value = item[key];
-        if (typeof value === 'string' && value.length > 0 && key !== 'id' && key !== 'created_at') {
+        if (
+          typeof value === "string" &&
+          value.length > 0 &&
+          key !== "id" &&
+          key !== "created_at"
+        ) {
           displayName = value;
           console.log(`Found displayName in property "${key}": ${value}`);
           break;
         }
       }
     }
-    
+
     // Ensure we have a valid ID
     const id = item.id || generateFallbackId();
-    
+
     console.log(`Mapped promotion type: id=${id}, name=${displayName}`);
-    
+
     return {
       id,
       name: displayName,
