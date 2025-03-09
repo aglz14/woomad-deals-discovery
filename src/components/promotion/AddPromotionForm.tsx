@@ -47,10 +47,10 @@ export function AddPromotionForm({
     const fetchPromotionTypes = async () => {
       setIsLoading(true);
       try {
-        // Attempt to fetch from promotion_type table
+        // Attempt to fetch from promotion_type table with the correct column 'type' instead of 'name'
         const { data, error } = await supabase
           .from("promotion_type")
-          .select("id, name");
+          .select("id, type");
 
         if (error) {
           console.error("Error fetching promotion types:", error);
@@ -65,7 +65,12 @@ export function AddPromotionForm({
         }
 
         if (data && data.length > 0) {
-          setPromotionTypes(data);
+          // Map from 'type' to 'name' for consistent interface
+          const formattedTypes = data.map((item: any) => ({
+            id: item.id,
+            name: item.type, // Use the 'type' column as the displayed name
+          }));
+          setPromotionTypes(formattedTypes);
         } else {
           // Fallback if no data
           setPromotionTypes([
