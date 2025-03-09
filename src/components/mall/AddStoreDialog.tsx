@@ -40,8 +40,9 @@ export function AddStoreDialog({
   const [store, setStore] = useState({
     name: "",
     description: "",
-    location_in_mall: "",
     contact_number: "",
+    floor: "",
+    image: "",
   });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const { data: categoriesData, isLoading: isCategoriesLoading } =
@@ -70,44 +71,32 @@ export function AddStoreDialog({
         return;
       }
 
-      // Insert the store first
-      const { data: newStore, error: storeError } = await supabase
-        .from("stores")
-        .insert({
-          name: store.name,
-          // Use the first category as the main category for backward compatibility
-          category:
-            categoriesData?.find((cat) => cat.id === selectedCategories[0])
-              ?.name || "",
-          description: store.description,
-          location_in_mall: store.location_in_mall,
-          contact_number: store.contact_number,
-          mall_id: mallId,
-          user_id: session.user.id,
-        })
-        .select("id")
-        .single();
+      // Get category names for the array_categories field
+      const categoryNames = selectedCategories
+        .map((id) => categoriesData?.find((cat) => cat.id === id)?.name)
+        .filter((name) => name !== undefined) as string[];
+
+      // Insert the store with array_categories
+      const { error: storeError } = await supabase.from("stores").insert({
+        name: store.name,
+        description: store.description,
+        contact_number: store.contact_number,
+        floor: store.floor,
+        image: store.image,
+        array_categories: categoryNames,
+        mall_id: mallId,
+        user_id: session.user.id,
+      });
 
       if (storeError) throw storeError;
-
-      // Insert the store-category relationships
-      const storeCategoriesToInsert = selectedCategories.map((categoryId) => ({
-        store_id: newStore.id,
-        category_id: categoryId,
-      }));
-
-      const { error: categoriesError } = await supabase
-        .from("store_categories")
-        .insert(storeCategoriesToInsert);
-
-      if (categoriesError) throw categoriesError;
 
       toast.success("Tienda agregada exitosamente");
       setStore({
         name: "",
         description: "",
-        location_in_mall: "",
         contact_number: "",
+        floor: "",
+        image: "",
       });
       setSelectedCategories([]);
       onSuccess();
@@ -178,24 +167,33 @@ export function AddStoreDialog({
               }
             />
           </div>
-          <div>
-            <Label htmlFor="location">Ubicación en el Centro Comercial</Label>
-            <Input
-              id="location"
-              value={store.location_in_mall}
-              onChange={(e) =>
-                setStore({ ...store, location_in_mall: e.target.value })
-              }
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="floor">Piso</Label>
+              <Input
+                id="floor"
+                value={store.floor}
+                onChange={(e) => setStore({ ...store, floor: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="contact">Número de Contacto</Label>
+              <Input
+                id="contact"
+                value={store.contact_number}
+                onChange={(e) =>
+                  setStore({ ...store, contact_number: e.target.value })
+                }
+              />
+            </div>
           </div>
           <div>
-            <Label htmlFor="contact">Número de Contacto</Label>
+            <Label htmlFor="image">URL de la Imagen (opcional)</Label>
             <Input
-              id="contact"
-              value={store.contact_number}
-              onChange={(e) =>
-                setStore({ ...store, contact_number: e.target.value })
-              }
+              id="image"
+              value={store.image}
+              onChange={(e) => setStore({ ...store, image: e.target.value })}
+              placeholder="https://ejemplo.com/imagen.png"
             />
           </div>
           <div className="flex justify-end gap-2">

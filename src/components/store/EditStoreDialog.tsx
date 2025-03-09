@@ -35,40 +35,29 @@ export function EditStoreDialog({
   const [storeData, setStoreData] = useState({
     name: store.name || "",
     description: store.description || "",
-    logo_url: store.logo_url || "",
-    location_in_mall: store.location_in_mall || "",
+    image: store.image || "",
+    floor: store.floor || "",
+    contact_number: store.contact_number || "",
   });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useCategories();
 
-  // Fetch store categories when dialog opens
+  // Initialize selected categories from store.array_categories
   useEffect(() => {
-    if (isOpen && store.id) {
-      fetchStoreCategories();
+    if (isOpen && categoriesData && store.array_categories) {
+      const categoryIds = store.array_categories
+        .map((categoryName) => {
+          const category = categoriesData.find(
+            (cat) => cat.name === categoryName
+          );
+          return category ? category.id : null;
+        })
+        .filter((id) => id !== null) as string[];
+
+      setSelectedCategories(categoryIds);
     }
-  }, [isOpen, store.id]);
-
-  const fetchStoreCategories = async () => {
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from("store_categories")
-        .select("category_id")
-        .eq("store_id", store.id);
-
-      if (error) throw error;
-
-      if (data) {
-        setSelectedCategories(data.map((item) => item.category_id));
-      }
-    } catch (error) {
-      console.error("Error fetching store categories:", error);
-      toast.error("Error al cargar las categorías de la tienda");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [isOpen, categoriesData, store.array_categories]);
 
   const handleCategoryToggle = (categoryId: string) => {
     setSelectedCategories((prev) => {
@@ -91,43 +80,26 @@ export function EditStoreDialog({
         return;
       }
 
-      // Update store information
+      // Get category names for the array_categories field
+      const categoryNames = selectedCategories
+        .map((id) => categoriesData?.find((cat) => cat.id === id)?.name)
+        .filter((name) => name !== undefined) as string[];
+
+      // Update store information with array_categories
       const { error: storeError } = await supabase
         .from("stores")
         .update({
           name: storeData.name,
           description: storeData.description,
-          // Use the first category as the main category for backward compatibility
-          category:
-            categoriesData?.find((cat) => cat.id === selectedCategories[0])
-              ?.name || store.category,
-          logo_url: storeData.logo_url,
-          location_in_mall: storeData.location_in_mall,
+          image: storeData.image,
+          floor: storeData.floor,
+          contact_number: storeData.contact_number,
+          array_categories: categoryNames,
           mall_id: store.mall_id,
         })
         .eq("id", store.id);
 
       if (storeError) throw storeError;
-
-      // Delete existing store-category relationships
-      const { error: deleteError } = await supabase
-        .from("store_categories")
-        .delete()
-        .eq("store_id", store.id);
-
-      if (deleteError) throw deleteError;
-
-      // Insert new store-category relationships
-      const storeCategoriesToInsert = selectedCategories.map((categoryId) => ({
-        store_id: store.id,
-        category_id: categoryId,
-      }));
-
-      const { error: insertError } = await supabase
-        .from("store_categories")
-        .insert(storeCategoriesToInsert);
-
-      if (insertError) throw insertError;
 
       toast.success("Tienda actualizada correctamente");
       onSuccess();
@@ -206,14 +178,37 @@ export function EditStoreDialog({
               }
             />
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="floor">Piso</Label>
+              <Input
+                id="floor"
+                value={storeData.floor}
+                onChange={(e) =>
+                  setStoreData({ ...storeData, floor: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="contact">Número de Contacto</Label>
+              <Input
+                id="contact"
+                value={storeData.contact_number}
+                onChange={(e) =>
+                  setStoreData({ ...storeData, contact_number: e.target.value })
+                }
+              />
+            </div>
+          </div>
           <div>
-            <Label htmlFor="location">Ubicación en el centro comercial</Label>
+            <Label htmlFor="image">URL de la Imagen (opcional)</Label>
             <Input
-              id="location_in_mall"
-              value={storeData.location_in_mall}
+              id="image"
+              value={storeData.image}
               onChange={(e) =>
-                setStoreData({ ...storeData, location_in_mall: e.target.value })
+                setStoreData({ ...storeData, image: e.target.value })
               }
+              placeholder="https://ejemplo.com/imagen.png"
             />
           </div>
           <div className="flex justify-end gap-2">
