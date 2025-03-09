@@ -273,7 +273,7 @@ export const MallStoresSection = ({
                     <h3 className="font-medium text-lg text-gray-900 line-clamp-1">
                       {store.name}
                     </h3>
-                    {typeof store.activePromotionCount !== "undefined" && (
+                    {store.activePromotionCount !== undefined && (
                       <div className="flex items-center mt-1">
                         <Badge
                           variant="outline"

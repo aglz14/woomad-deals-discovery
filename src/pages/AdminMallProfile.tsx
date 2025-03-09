@@ -64,31 +64,36 @@ export default function AdminMallProfile() {
         throw error;
       }
 
-      // Fetch promotion counts for each store
-      const storeIds = data.map((store) => store.id);
-      const { data: promotionCounts, error: promotionsError } = await supabase
-        .from("promotions")
-        .select("store_id, count")
-        .in("store_id", storeIds)
-        .eq("is_active", true)
-        .group("store_id");
+      try {
+        // Fetch all active promotions for these stores
+        const storeIds = data.map((store) => store.id);
+        if (storeIds.length > 0) {
+          const { data: promotions, error: promotionsError } = await supabase
+            .from("promotions")
+            .select("store_id")
+            .in("store_id", storeIds)
+            .eq("is_active", true);
 
-      if (promotionsError) {
-        console.error("Error fetching promotion counts:", promotionsError);
-      } else if (promotionCounts) {
-        // Create a mapping of store IDs to promotion counts
-        const countMap = promotionCounts.reduce(
-          (acc: Record<string, number>, item: any) => {
-            acc[item.store_id] = parseInt(item.count, 10);
-            return acc;
-          },
-          {}
-        );
+          if (!promotionsError && promotions) {
+            // Count promotions for each store
+            const storeCounts: Record<string, number> = {};
 
-        // Add the promotion count to each store
-        data.forEach((store: any) => {
-          store.activePromotionCount = countMap[store.id] || 0;
-        });
+            promotions.forEach((promotion) => {
+              if (!storeCounts[promotion.store_id]) {
+                storeCounts[promotion.store_id] = 0;
+              }
+              storeCounts[promotion.store_id]++;
+            });
+
+            // Add counts to store objects
+            data.forEach((store) => {
+              store.activePromotionCount = storeCounts[store.id] || 0;
+            });
+          }
+        }
+      } catch (countError) {
+        console.error("Error counting promotions:", countError);
+        // Still return stores even if counting fails
       }
 
       return data;
