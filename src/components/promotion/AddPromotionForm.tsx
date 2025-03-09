@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers/SessionProvider";
-import { ValidPromotionType } from "@/types/promotion";
 
 interface AddPromotionFormProps {
   onSuccess: () => void;
@@ -30,13 +29,11 @@ export function AddPromotionForm({
   const [newPromotion, setNewPromotion] = useState({
     title: "",
     description: "",
-    type: "" as ValidPromotionType,
+    promotion_type: "",
     start_date: "",
     end_date: "",
-    discount_value: "",
-    terms_conditions: "",
     image_url: "",
-    is_active: true,
+    terms_conditions: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,21 +53,23 @@ export function AddPromotionForm({
         return;
       }
 
-      const { error } = await supabase.from("promotions").insert([
-        {
-          store_id: preselectedStoreId,
-          title: newPromotion.title,
-          description: newPromotion.description,
-          type: newPromotion.type,
-          start_date: startDate.toISOString(),
-          end_date: endDate.toISOString(),
-          discount_value: newPromotion.discount_value || null,
-          terms_conditions: newPromotion.terms_conditions || null,
-          image_url: newPromotion.image_url || null,
-          user_id: session.user.id,
-          is_active: newPromotion.is_active,
-        },
-      ]);
+      // Logic to add a new promotion to the database
+      const newPromotionData = {
+        store_id: preselectedStoreId,
+        title: newPromotion.title,
+        description: newPromotion.description,
+        promotion_type: newPromotion.promotion_type,
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        image_url: newPromotion.image_url || null,
+        terms_conditions: newPromotion.terms_conditions || null,
+        user_id: session.user.id,
+      };
+
+      // Using 'as any' to bypass TypeScript issues with the Supabase types
+      const { error } = await supabase
+        .from("promotions")
+        .insert(newPromotionData as any);
 
       if (error) throw error;
 
@@ -87,12 +86,9 @@ export function AddPromotionForm({
       <div>
         <Label>Tipo de Promoción</Label>
         <Select
-          value={newPromotion.type}
+          value={newPromotion.promotion_type}
           onValueChange={(value) =>
-            setNewPromotion({
-              ...newPromotion,
-              type: value as ValidPromotionType,
-            })
+            setNewPromotion({ ...newPromotion, promotion_type: value })
           }
           required
         >
@@ -109,7 +105,9 @@ export function AddPromotionForm({
 
       <div>
         <Label>
-          {newPromotion.type === "coupon" ? "Código del Cupón" : "Título"}
+          {newPromotion.promotion_type === "coupon"
+            ? "Código del Cupón"
+            : "Título"}
         </Label>
         <Input
           value={newPromotion.title}
@@ -128,17 +126,7 @@ export function AddPromotionForm({
             setNewPromotion({ ...newPromotion, description: e.target.value })
           }
           required
-        />
-      </div>
-
-      <div>
-        <Label>Valor del Descuento (ej. 20%, $500, 2x1)</Label>
-        <Input
-          value={newPromotion.discount_value}
-          onChange={(e) =>
-            setNewPromotion({ ...newPromotion, discount_value: e.target.value })
-          }
-          placeholder="Opcional"
+          placeholder="Incluye aquí cualquier término y condición de la promoción"
         />
       </div>
 
