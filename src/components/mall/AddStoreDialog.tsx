@@ -10,6 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers/SessionProvider";
 import { useCategories, Category } from "@/hooks/useCategories";
@@ -77,22 +84,15 @@ export function AddStoreDialog({
         return;
       }
 
-      // Get category names for the array_categories field
-      const categoryNames = selectedCategories
-        .map((id) => {
-          const category = categoriesData?.find((cat) => cat.id === id);
-          if (!category) {
-            console.warn(`Category with ID ${id} not found`);
-            return null;
-          }
-          return category.name;
-        })
-        .filter((name) => name !== null) as string[];
+      // For display purposes, get the first category name
+      const firstCategoryName =
+        categoriesData?.find((cat) => cat.id === selectedCategories[0])?.name ||
+        "";
 
-      console.log("Adding store with category names:", categoryNames);
-      console.log("Selected category IDs:", selectedCategories);
+      console.log("Selected category IDs for store:", selectedCategories);
+      console.log("First category name (for display):", firstCategoryName);
 
-      // Insert the store with array_categories
+      // First insert the store without array_categories
       const { data: newStore, error: storeError } = await supabase
         .from("stores")
         .insert({
@@ -102,7 +102,6 @@ export function AddStoreDialog({
           local_number: store.local_number,
           floor: store.floor,
           image: store.image,
-          array_categories: categoryNames,
           mall_id: mallId,
           user_id: session.user.id,
         })
@@ -126,7 +125,7 @@ export function AddStoreDialog({
         return;
       }
 
-      // Insert into store_categories junction table
+      // Insert into store_categories junction table and collect the IDs
       try {
         const storeCategoriesToInsert = selectedCategories.map(
           (categoryId) => ({
@@ -137,17 +136,40 @@ export function AddStoreDialog({
 
         console.log("Inserting store_categories:", storeCategoriesToInsert);
 
-        const { error: categoriesError } = await supabase
-          .from("store_categories")
-          .insert(storeCategoriesToInsert);
+        const { data: insertedCategories, error: categoriesError } =
+          await supabase
+            .from("store_categories")
+            .insert(storeCategoriesToInsert)
+            .select("id");
 
         if (categoriesError) {
           console.error("Error inserting store_categories:", categoriesError);
-          // Continue anyway since we already have the array_categories
+          // Continue anyway
+        } else if (insertedCategories) {
+          // Update the store with the store_categories IDs
+          const storeCategoryIds = insertedCategories.map((item) => item.id);
+          console.log(
+            "Updating store with store_categories IDs:",
+            storeCategoryIds
+          );
+
+          const { error: updateError } = await supabase
+            .from("stores")
+            .update({
+              array_categories: storeCategoryIds,
+            })
+            .eq("id", newStore.id);
+
+          if (updateError) {
+            console.error(
+              "Error updating store with array_categories:",
+              updateError
+            );
+          }
         }
       } catch (error) {
         console.error("Error with store_categories operations:", error);
-        // Continue since we already saved the store with array_categories
+        // Continue since we already saved the store
       }
 
       toast.success("Tienda agregada exitosamente");

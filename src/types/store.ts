@@ -3,7 +3,7 @@ export interface Store {
   name: string;
   description?: string;
   image?: string;
-  array_categories?: string[];
+  array_categories?: string[]; // Contains store_categories IDs (UUIDs)
   phone?: string;
   local_number?: string;
   floor?: string;
