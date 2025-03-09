@@ -17,6 +17,11 @@ import { useCategories, Category } from "@/hooks/useCategories";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+interface StoreCategoryRelation {
+  id: string;
+  category_id: string;
+}
+
 interface EditStoreDialogProps {
   store: Store;
   isOpen: boolean;
@@ -42,7 +47,7 @@ export function EditStoreDialog({
   });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [storeCategoryRelations, setStoreCategoryRelations] = useState<
-    { id: string; category_id: string }[]
+    StoreCategoryRelation[]
   >([]);
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useCategories();
@@ -97,7 +102,7 @@ export function EditStoreDialog({
       const { data, error } = await supabase
         .from("store_categories")
         .select("id, category_id")
-        .eq("store_id", store.id);
+        .eq("store_id", store.id as any);
 
       if (error) {
         console.error(
@@ -108,10 +113,10 @@ export function EditStoreDialog({
         initializeFromArrayCategories();
       } else if (data && data.length > 0) {
         // Store the full relation objects for later use
-        setStoreCategoryRelations(data);
+        setStoreCategoryRelations(data as StoreCategoryRelation[]);
 
         // Extract just the category IDs for the UI
-        const categoryIds = data.map((item) => item.category_id);
+        const categoryIds = data.map((item: any) => item.category_id);
         console.log("Found categories in junction table:", categoryIds);
         setSelectedCategories(categoryIds);
       } else {
@@ -145,7 +150,9 @@ export function EditStoreDialog({
       const categoryIds = store.array_categories
         .map((item) => {
           // Check if this looks like a UUID for a category
-          const category = categoriesData.find((cat) => cat.id === item);
+          const category = (categoriesData as Category[]).find(
+            (cat) => cat.id === item
+          );
           if (category) {
             return category.id;
           }
@@ -186,8 +193,9 @@ export function EditStoreDialog({
 
       // For display purposes, get the first category name
       const firstCategoryName =
-        categoriesData?.find((cat) => cat.id === selectedCategories[0])?.name ||
-        "";
+        (categoriesData as Category[])?.find(
+          (cat) => cat.id === selectedCategories[0]
+        )?.name || "";
 
       console.log("Selected category IDs for store:", selectedCategories);
       console.log("First category name (for display):", firstCategoryName);
@@ -203,8 +211,8 @@ export function EditStoreDialog({
           phone: storeData.phone,
           local_number: storeData.local_number,
           mall_id: store.mall_id,
-        })
-        .eq("id", store.id);
+        } as any)
+        .eq("id", store.id as any);
 
       if (storeError) {
         console.error("Error updating store:", storeError);
@@ -223,7 +231,7 @@ export function EditStoreDialog({
         const { error: deleteError } = await supabase
           .from("store_categories")
           .delete()
-          .eq("store_id", store.id);
+          .eq("store_id", store.id as any);
 
         if (deleteError) {
           console.error(
@@ -243,14 +251,16 @@ export function EditStoreDialog({
         console.log("Inserting new store categories:", storeCategoriesToInsert);
         const { data: insertedCategories, error: insertError } = await supabase
           .from("store_categories")
-          .insert(storeCategoriesToInsert)
+          .insert(storeCategoriesToInsert as any)
           .select("id");
 
         if (insertError) {
           console.error("Error inserting new store categories:", insertError);
         } else if (insertedCategories) {
           // Update the store with the store_categories IDs
-          const storeCategoryIds = insertedCategories.map((item) => item.id);
+          const storeCategoryIds = (insertedCategories as any[]).map(
+            (item) => item.id
+          );
           console.log(
             "Updating store with store_categories IDs:",
             storeCategoryIds
@@ -260,8 +270,8 @@ export function EditStoreDialog({
             .from("stores")
             .update({
               array_categories: storeCategoryIds,
-            })
-            .eq("id", store.id);
+            } as any)
+            .eq("id", store.id as any);
 
           if (updateError) {
             console.error(
@@ -322,9 +332,10 @@ export function EditStoreDialog({
                 <div className="text-sm text-muted-foreground">
                   Cargando categorías...
                 </div>
-              ) : categoriesData?.length > 0 ? (
+              ) : categoriesData &&
+                (categoriesData as Category[]).length > 0 ? (
                 <div className="space-y-2">
-                  {categoriesData.map((cat) => (
+                  {(categoriesData as Category[]).map((cat) => (
                     <div key={cat.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`category-${cat.id}`}

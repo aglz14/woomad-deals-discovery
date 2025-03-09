@@ -86,8 +86,9 @@ export function AddStoreDialog({
 
       // For display purposes, get the first category name
       const firstCategoryName =
-        categoriesData?.find((cat) => cat.id === selectedCategories[0])?.name ||
-        "";
+        (categoriesData as Category[])?.find(
+          (cat) => cat.id === selectedCategories[0]
+        )?.name || "";
 
       console.log("Selected category IDs for store:", selectedCategories);
       console.log("First category name (for display):", firstCategoryName);
@@ -104,7 +105,7 @@ export function AddStoreDialog({
           image: store.image,
           mall_id: mallId,
           user_id: session.user.id,
-        })
+        } as any)
         .select("id")
         .single();
 
@@ -139,7 +140,7 @@ export function AddStoreDialog({
         const { data: insertedCategories, error: categoriesError } =
           await supabase
             .from("store_categories")
-            .insert(storeCategoriesToInsert)
+            .insert(storeCategoriesToInsert as any)
             .select("id");
 
         if (categoriesError) {
@@ -147,7 +148,9 @@ export function AddStoreDialog({
           // Continue anyway
         } else if (insertedCategories) {
           // Update the store with the store_categories IDs
-          const storeCategoryIds = insertedCategories.map((item) => item.id);
+          const storeCategoryIds = (insertedCategories as any[]).map(
+            (item) => item.id
+          );
           console.log(
             "Updating store with store_categories IDs:",
             storeCategoryIds
@@ -157,8 +160,8 @@ export function AddStoreDialog({
             .from("stores")
             .update({
               array_categories: storeCategoryIds,
-            })
-            .eq("id", newStore.id);
+            } as any)
+            .eq("id", newStore.id as any);
 
           if (updateError) {
             console.error(
@@ -231,9 +234,10 @@ export function AddStoreDialog({
                 <div className="text-sm text-muted-foreground">
                   Cargando categorías...
                 </div>
-              ) : categoriesData?.length > 0 ? (
+              ) : categoriesData &&
+                (categoriesData as Category[]).length > 0 ? (
                 <div className="space-y-2">
-                  {categoriesData.map((cat) => (
+                  {(categoriesData as Category[]).map((cat) => (
                     <div key={cat.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`category-${cat.id}`}
