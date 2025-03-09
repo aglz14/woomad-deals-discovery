@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,14 +26,12 @@ export function AddPromotionForm({
   preselectedStoreId,
 }: AddPromotionFormProps) {
   const { session } = useSession();
-  const [promotionTypes, setPromotionTypes] = useState<
-    { id: string; name: string }[]
-  >([
+  // Define fixed promotion types since there's no promotion_types table
+  const promotionTypes = [
     { id: "promotion", name: "Promoción" },
     { id: "coupon", name: "Cupón" },
     { id: "sale", name: "Oferta" },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
+  ];
 
   const [newPromotion, setNewPromotion] = useState({
     title: "",
@@ -41,41 +39,9 @@ export function AddPromotionForm({
     promotion_type: "",
     start_date: "",
     end_date: "",
-    image_url: "",
+    image: "", // Changed from image_url to image
     terms_conditions: "",
   });
-
-  // Fetch promotion types from database if available
-  useEffect(() => {
-    const fetchPromotionTypes = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("promotion_types")
-          .select("id, name");
-
-        if (error) {
-          console.error("Error fetching promotion types:", error);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          // Use type assertion to match the expected format
-          const formattedData = data.map((item: any) => ({
-            id: item.id,
-            name: item.name,
-          }));
-          setPromotionTypes(formattedData);
-        }
-      } catch (err) {
-        console.error("Error fetching promotion types:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPromotionTypes();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,10 +65,10 @@ export function AddPromotionForm({
         store_id: preselectedStoreId,
         title: newPromotion.title,
         description: newPromotion.description,
-        type: newPromotion.promotion_type,
+        type: newPromotion.promotion_type, // Map promotion_type to type
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
-        image_url: newPromotion.image_url || null,
+        image: newPromotion.image || null, // Use image instead of image_url
         terms_conditions: newPromotion.terms_conditions || null,
         user_id: session.user.id,
       };
@@ -131,15 +97,10 @@ export function AddPromotionForm({
           onValueChange={(value) =>
             setNewPromotion({ ...newPromotion, promotion_type: value })
           }
-          disabled={isLoading}
           required
         >
           <SelectTrigger>
-            <SelectValue
-              placeholder={
-                isLoading ? "Cargando opciones..." : "Seleccionar tipo"
-              }
-            />
+            <SelectValue placeholder="Seleccionar tipo" />
           </SelectTrigger>
           <SelectContent>
             {promotionTypes.map((type) => (
@@ -174,7 +135,6 @@ export function AddPromotionForm({
             setNewPromotion({ ...newPromotion, description: e.target.value })
           }
           required
-          placeholder="Incluye aquí cualquier término y condición de la promoción"
         />
       </div>
 
@@ -195,9 +155,9 @@ export function AddPromotionForm({
       <div>
         <Label>URL de la Imagen</Label>
         <Input
-          value={newPromotion.image_url}
+          value={newPromotion.image}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, image_url: e.target.value })
+            setNewPromotion({ ...newPromotion, image: e.target.value })
           }
           placeholder="Opcional"
         />
