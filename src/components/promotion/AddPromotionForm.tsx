@@ -47,10 +47,28 @@ export function AddPromotionForm({
     const fetchPromotionTypes = async () => {
       setIsLoading(true);
       try {
-        // Attempt to fetch from promotion_type table with the correct column 'type' instead of 'name'
+        console.log("Attempting to fetch promotion types from database...");
+
+        // First list all tables to confirm what's available
+        const { data: tablesData, error: tablesError } = await supabase
+          .from("pg_catalog.pg_tables")
+          .select("tablename")
+          .eq("schemaname", "public");
+
+        if (tablesError) {
+          console.log("Error checking tables:", tablesError);
+        } else {
+          console.log("Available tables:", tablesData);
+        }
+
+        // Now try to fetch from promotion_type table directly
         const { data, error } = await supabase
           .from("promotion_type")
-          .select("id, type");
+          .select("*");
+
+        // Log everything for debugging
+        console.log("Raw promotion_type data:", data);
+        console.log("Promotion type fetch error:", error);
 
         if (error) {
           console.error("Error fetching promotion types:", error);
@@ -60,18 +78,39 @@ export function AddPromotionForm({
             { id: "2d7841a1-0279-5358-0c4d-6b4d7e05b11f", name: "Cupón" },
             { id: "3e6752b2-1389-6469-1e5e-7c5e8f16c20g", name: "Oferta" },
           ]);
+          toast.error(`Failed to fetch promotion types: ${error.message}`);
           setIsLoading(false);
           return;
         }
 
         if (data && data.length > 0) {
-          // Map from 'type' to 'name' for consistent interface
-          const formattedTypes = data.map((item: any) => ({
-            id: item.id,
-            name: item.type, // Use the 'type' column as the displayed name
-          }));
+          // Log the first item to see the structure
+          console.log("First promotion type item structure:", data[0]);
+
+          // Map the data to our expected format based on the actual structure
+          // Try to be flexible with the column names
+          const formattedTypes = data.map((item) => {
+            // Extract id and name, with fallbacks for different column names
+            const id = item.id;
+            // Try 'type', 'name', 'title' or any property for the name
+            const displayName =
+              item.type || item.name || item.title || Object.values(item)[1];
+
+            console.log(
+              `Mapping promotion type: ID=${id}, Name=${displayName}`
+            );
+
+            return {
+              id,
+              name: displayName,
+            };
+          });
+
+          console.log("Formatted promotion types:", formattedTypes);
           setPromotionTypes(formattedTypes);
+          toast.success(`Loaded ${formattedTypes.length} promotion types`);
         } else {
+          console.warn("No promotion types found in database, using defaults");
           // Fallback if no data
           setPromotionTypes([
             { id: "1c8930f0-9168-4247-9b3c-5a3c8d94a10e", name: "Promoción" },
