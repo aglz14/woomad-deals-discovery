@@ -20,7 +20,8 @@ import {
 import { toast } from "sonner";
 import { useSession } from "@/components/providers/SessionProvider";
 import { useCategories } from "@/hooks/useCategories";
-
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AddStoreDialogProps {
   mallId: string;
@@ -29,16 +30,32 @@ interface AddStoreDialogProps {
   onSuccess: () => void;
 }
 
-export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreDialogProps) {
+export function AddStoreDialog({
+  mallId,
+  isOpen,
+  onClose,
+  onSuccess,
+}: AddStoreDialogProps) {
   const { session } = useSession();
   const [store, setStore] = useState({
     name: "",
-    category: "",
     description: "",
     location_in_mall: "",
     contact_number: "",
   });
-  const { data: categoriesData, isLoading: isCategoriesLoading } = useCategories();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const { data: categoriesData, isLoading: isCategoriesLoading } =
+    useCategories();
+
+  const handleCategoryToggle = (categoryId: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(categoryId)) {
+        return prev.filter((id) => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,26 +65,51 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
         return;
       }
 
-      const { error } = await supabase.from("stores").insert({
-        name: store.name,
-        category: store.category,
-        description: store.description,
-        location_in_mall: store.location_in_mall,
-        contact_number: store.contact_number,
-        mall_id: mallId,
-        user_id: session.user.id,
-      });
+      if (selectedCategories.length === 0) {
+        toast.error("Debes seleccionar al menos una categoría");
+        return;
+      }
 
-      if (error) throw error;
+      // Insert the store first
+      const { data: newStore, error: storeError } = await supabase
+        .from("stores")
+        .insert({
+          name: store.name,
+          // Use the first category as the main category for backward compatibility
+          category:
+            categoriesData?.find((cat) => cat.id === selectedCategories[0])
+              ?.name || "",
+          description: store.description,
+          location_in_mall: store.location_in_mall,
+          contact_number: store.contact_number,
+          mall_id: mallId,
+          user_id: session.user.id,
+        })
+        .select("id")
+        .single();
+
+      if (storeError) throw storeError;
+
+      // Insert the store-category relationships
+      const storeCategoriesToInsert = selectedCategories.map((categoryId) => ({
+        store_id: newStore.id,
+        category_id: categoryId,
+      }));
+
+      const { error: categoriesError } = await supabase
+        .from("store_categories")
+        .insert(storeCategoriesToInsert);
+
+      if (categoriesError) throw categoriesError;
 
       toast.success("Tienda agregada exitosamente");
       setStore({
         name: "",
-        category: "",
         description: "",
         location_in_mall: "",
         contact_number: "",
       });
+      setSelectedCategories([]);
       onSuccess();
       onClose();
     } catch (error) {
@@ -78,7 +120,7 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Agregar Nueva Tienda</DialogTitle>
         </DialogHeader>
@@ -93,35 +135,47 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             />
           </div>
           <div>
-            <Label htmlFor="category">Categoría</Label>
-            <Select
-              value={store.category}
-              onValueChange={(value) => setStore({ ...store, category: value })}
-            >
-              <SelectTrigger id="category" className="w-full">
-                <SelectValue placeholder="Seleccionar categoría" />
-              </SelectTrigger>
-              <SelectContent>
-                {isCategoriesLoading ? (
-                  <SelectItem value="loading" disabled>Cargando categorías...</SelectItem>
-                ) : categoriesData?.length > 0 ? (
-                  categoriesData.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.name}>
-                      {cat.name}
-                    </SelectItem>
-                  ))
-                ) : (
-                  <SelectItem value="none" disabled>No hay categorías disponibles</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
+            <Label className="mb-2 block">
+              Categorías (selecciona al menos una)
+            </Label>
+            <ScrollArea className="h-[200px] border rounded-md p-4">
+              {isCategoriesLoading ? (
+                <div className="text-sm text-muted-foreground">
+                  Cargando categorías...
+                </div>
+              ) : categoriesData?.length > 0 ? (
+                <div className="space-y-2">
+                  {categoriesData.map((cat) => (
+                    <div key={cat.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`category-${cat.id}`}
+                        checked={selectedCategories.includes(cat.id)}
+                        onCheckedChange={() => handleCategoryToggle(cat.id)}
+                      />
+                      <Label
+                        htmlFor={`category-${cat.id}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {cat.name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  No hay categorías disponibles
+                </div>
+              )}
+            </ScrollArea>
           </div>
           <div>
             <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
               value={store.description}
-              onChange={(e) => setStore({ ...store, description: e.target.value })}
+              onChange={(e) =>
+                setStore({ ...store, description: e.target.value })
+              }
             />
           </div>
           <div>
@@ -129,7 +183,9 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             <Input
               id="location"
               value={store.location_in_mall}
-              onChange={(e) => setStore({ ...store, location_in_mall: e.target.value })}
+              onChange={(e) =>
+                setStore({ ...store, location_in_mall: e.target.value })
+              }
             />
           </div>
           <div>
@@ -137,7 +193,9 @@ export function AddStoreDialog({ mallId, isOpen, onClose, onSuccess }: AddStoreD
             <Input
               id="contact"
               value={store.contact_number}
-              onChange={(e) => setStore({ ...store, contact_number: e.target.value })}
+              onChange={(e) =>
+                setStore({ ...store, contact_number: e.target.value })
+              }
             />
           </div>
           <div className="flex justify-end gap-2">
