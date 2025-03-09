@@ -49,82 +49,85 @@ export function AddPromotionForm({
       try {
         console.log("Attempting to fetch promotion types from database...");
 
-        // First list all tables to confirm what's available
-        const { data: tablesData, error: tablesError } = await supabase
-          .from("pg_catalog.pg_tables")
-          .select("tablename")
-          .eq("schemaname", "public");
-
-        if (tablesError) {
-          console.log("Error checking tables:", tablesError);
-        } else {
-          console.log("Available tables:", tablesData);
-        }
-
-        // Now try to fetch from promotion_type table directly
+        // First check if promotion_type table has data
         const { data, error } = await supabase
           .from("promotion_type")
           .select("*");
 
-        // Log everything for debugging
         console.log("Raw promotion_type data:", data);
-        console.log("Promotion type fetch error:", error);
 
         if (error) {
           console.error("Error fetching promotion types:", error);
-          // Fallback to hardcoded values if table doesn't exist or can't be accessed
-          setPromotionTypes([
-            { id: "1c8930f0-9168-4247-9b3c-5a3c8d94a10e", name: "Promoción" },
-            { id: "2d7841a1-0279-5358-0c4d-6b4d7e05b11f", name: "Cupón" },
-            { id: "3e6752b2-1389-6469-1e5e-7c5e8f16c20g", name: "Oferta" },
-          ]);
           toast.error(`Failed to fetch promotion types: ${error.message}`);
           setIsLoading(false);
           return;
         }
 
         if (data && data.length > 0) {
-          // Log the first item to see the structure
-          console.log("First promotion type item structure:", data[0]);
-
-          // Map the data to our expected format based on the actual structure
-          // Try to be flexible with the column names
+          // Map the data based on the structure
           const formattedTypes = data.map((item) => {
-            // Extract id and name, with fallbacks for different column names
-            const id = item.id;
-            // Try 'type', 'name', 'title' or any property for the name
+            // Try to get the display name from the correct column
             const displayName =
-              item.type || item.name || item.title || Object.values(item)[1];
-
-            console.log(
-              `Mapping promotion type: ID=${id}, Name=${displayName}`
-            );
+              item.type || item.name || Object.values(item)[1];
 
             return {
-              id,
+              id: item.id,
               name: displayName,
             };
           });
 
-          console.log("Formatted promotion types:", formattedTypes);
+          console.log("Existing promotion types:", formattedTypes);
           setPromotionTypes(formattedTypes);
           toast.success(`Loaded ${formattedTypes.length} promotion types`);
         } else {
-          console.warn("No promotion types found in database, using defaults");
-          // Fallback if no data
-          setPromotionTypes([
-            { id: "1c8930f0-9168-4247-9b3c-5a3c8d94a10e", name: "Promoción" },
-            { id: "2d7841a1-0279-5358-0c4d-6b4d7e05b11f", name: "Cupón" },
-            { id: "3e6752b2-1389-6469-1e5e-7c5e8f16c20g", name: "Oferta" },
-          ]);
+          // No promotion types found, we need to create them
+          console.log("No promotion types found, creating default ones...");
+
+          // Define the default promotion types to create
+          const defaultTypes = [
+            { type: "Promoción" },
+            { type: "Cupón" },
+            { type: "Oferta" },
+          ];
+
+          // Insert the default types
+          const { data: insertedData, error: insertError } = await supabase
+            .from("promotion_type")
+            .insert(defaultTypes)
+            .select();
+
+          if (insertError) {
+            console.error("Error creating promotion types:", insertError);
+            toast.error(
+              `Failed to create promotion types: ${insertError.message}`
+            );
+
+            // Use fallback without real IDs
+            setPromotionTypes([
+              { id: "1", name: "Promoción" },
+              { id: "2", name: "Cupón" },
+              { id: "3", name: "Oferta" },
+            ]);
+          } else if (insertedData) {
+            console.log("Created promotion types:", insertedData);
+
+            // Map the newly inserted data
+            const newTypes = insertedData.map((item) => ({
+              id: item.id,
+              name: item.type,
+            }));
+
+            setPromotionTypes(newTypes);
+            toast.success(`Created ${newTypes.length} promotion types`);
+          }
         }
       } catch (err) {
-        console.error("Error fetching promotion types:", err);
-        // Fallback
+        console.error("Error handling promotion types:", err);
+        // Use fallback without real IDs as last resort
         setPromotionTypes([
-          { id: "1c8930f0-9168-4247-9b3c-5a3c8d94a10e", name: "Promoción" },
-          { id: "2d7841a1-0279-5358-0c4d-6b4d7e05b11f", name: "Cupón" },
-          { id: "3e6752b2-1389-6469-1e5e-7c5e8f16c20g", name: "Oferta" },
+          { id: "1", name: "Promoción" },
+          { id: "2", name: "Cupón" },
+          { id: "3", name: "Oferta" },
         ]);
       } finally {
         setIsLoading(false);
