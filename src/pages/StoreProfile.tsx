@@ -24,8 +24,12 @@ import { useSession } from "@/components/providers/SessionProvider";
 import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 
 // Helper function to validate promotion type
-const isValidPromotionType = (type: string): type is ValidPromotionType => {
-  return ["promotion", "coupon", "sale"].includes(type);
+const isValidPromotionType = (
+  type: string | null | undefined
+): type is ValidPromotionType => {
+  if (!type) return false;
+  const normalizedType = type.toString().toLowerCase();
+  return ["promotion", "coupon", "sale"].includes(normalizedType);
 };
 
 export default function StoreProfile() {
@@ -39,49 +43,57 @@ export default function StoreProfile() {
   const { data: store, isLoading: isStoreLoading } = useQuery({
     queryKey: ["store", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      console.log("Fetching store with ID:", id);
+      const { data: store, error } = await supabase
         .from("stores")
         .select(
-          "*, mall:shopping_malls(id, name, latitude, longitude, address)"
+          `
+            *,
+            mall:shopping_malls(id, name, latitude, longitude, address)
+          `
         )
-        .eq("id", id)
+        .eq("id", id as any)
         .maybeSingle();
       if (error) {
         toast.error("Failed to fetch store details");
         throw error;
       }
-      return data;
+      if (!store) {
+        toast.error("Store not found");
+        throw new Error("Store not found");
+      }
+      console.log("Store data:", store);
+      return store;
     },
+    enabled: !!id,
   });
 
   const {
-    data: promotions,
+    data: promotions = [],
     isLoading: isPromotionsLoading,
     refetch: refetchPromotions,
   } = useQuery({
     queryKey: ["promotions", id],
     queryFn: async () => {
-      console.log("Fetching promotions for store:", id);
-
-      // First get raw data with additional logging
+      console.log("Fetching promotions for store ID:", id);
       const { data: rawData, error } = await supabase
         .from("promotions")
         .select(
           `
-          *,
-          store:stores (
-            id,
-            name,
-            mall:shopping_malls (
+            *,
+            store:stores(
               id,
               name,
-              latitude,
-              longitude
+              mall:shopping_malls(
+                id,
+                name,
+                latitude,
+                longitude
+              )
             )
-          )
-        `
+          `
         )
-        .eq("store_id", id)
+        .eq("store_id", id as any)
         .order("start_date", { ascending: true });
 
       console.log("Raw promotions data:", rawData);
@@ -92,53 +104,90 @@ export default function StoreProfile() {
         throw error;
       }
 
-      if (!rawData || rawData.length === 0) {
+      if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
         console.log("No promotions found for this store");
         return [];
       }
 
       // Log each promotion to check column names
-      rawData.forEach((promo, index) => {
-        console.log(`Promotion ${index + 1}:`, {
-          id: promo.id,
-          typeColumn: promo.type,
-          promotionTypeColumn: promo.promotion_type,
-          title: promo.title,
-          startDate: promo.start_date,
-          endDate: promo.end_date,
-          isActive: promo.is_active,
-        });
+      rawData.forEach((promo: any, index) => {
+        if (promo && typeof promo === "object") {
+          console.log(`Promotion ${index + 1}:`, {
+            id: promo.id,
+            typeColumn: promo.type,
+            promotionTypeColumn: promo.promotion_type,
+            title: promo.title,
+            startDate: promo.start_date,
+            endDate: promo.end_date,
+            isActive: promo.is_active,
+          });
+        }
       });
 
-      // Handle both possible column names for type
-      const validPromotions = rawData
-        .filter((promotion) => {
+      const currentDate = new Date().toISOString();
+      console.log("Current date for comparison:", currentDate);
+
+      // Filter for valid promotions
+      const validPromotions = (rawData as any[])
+        .filter((promotion: any) => {
+          if (!promotion || typeof promotion !== "object") {
+            console.log("Skipping invalid promotion object:", promotion);
+            return false;
+          }
+
           // Try both column names, promotion_type is preferred if it exists
-          const typeValue = promotion.promotion_type || promotion.type;
+          const typeValue = promotion.promotion_type || promotion.type || "";
 
           // Check if it's a valid type
           const isValid = isValidPromotionType(typeValue);
 
-          if (!isValid) {
-            console.log(
-              `Promotion ${promotion.id} has invalid type: ${typeValue}`
-            );
-          }
+          // Check date range
+          const startDate = promotion.start_date
+            ? new Date(promotion.start_date)
+            : null;
+          const endDate = promotion.end_date
+            ? new Date(promotion.end_date)
+            : null;
+          const now = new Date();
 
-          return isValid;
+          const isInDateRange =
+            startDate && endDate ? startDate <= now && endDate >= now : true; // If no dates, assume it's valid
+
+          // Check active status if present
+          const isActive = promotion.is_active !== false; // Consider true if undefined or null
+
+          console.log(`Promotion ${promotion.id} evaluation:`, {
+            typeValue,
+            isValidType: isValid,
+            startDate: startDate?.toISOString(),
+            endDate: endDate?.toISOString(),
+            currentDate: now.toISOString(),
+            isInDateRange,
+            isActive,
+            shouldInclude: isValid && isInDateRange && isActive,
+          });
+
+          return isValid && isInDateRange && isActive;
         })
-        .map((promotion) => {
+        .map((promotion: any) => {
           // Normalize the type field to ensure consistent data
-          const effectiveType = promotion.promotion_type || promotion.type;
+          const effectiveType = (
+            promotion.promotion_type ||
+            promotion.type ||
+            ""
+          )
+            .toString()
+            .toLowerCase();
           return {
             ...promotion,
             type: effectiveType as ValidPromotionType,
           };
-        }) as DatabasePromotion[];
+        });
 
-      console.log("Filtered promotions:", validPromotions);
-      return validPromotions;
+      console.log("Final filtered promotions:", validPromotions.length);
+      return validPromotions as DatabasePromotion[];
     },
+    enabled: !!id,
   });
 
   const handleDeletePromotion = async (promotionId: string) => {
@@ -146,7 +195,7 @@ export default function StoreProfile() {
       const { error } = await supabase
         .from("promotions")
         .delete()
-        .eq("id", promotionId);
+        .eq("id", promotionId as any);
       if (error) throw error;
       toast.success("Promoción eliminada exitosamente");
       refetchPromotions();
@@ -156,25 +205,33 @@ export default function StoreProfile() {
     }
   };
 
-  const isOwner = session?.user?.id === store?.user_id;
+  const isOwner = session?.user?.id === (store as any)?.user_id;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-50 to-white">
       <Header />
       <main className="flex-grow pt-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-          <button
-            onClick={() => {
-              if (store?.mall_id) {
-                navigate(`/admin/mall/${store.mall_id}`);
-              } else {
-                navigate(-1);
-              }
-            }}
-            className="mb-4 sm:mb-6 lg:mb-8 text-purple-600 hover:text-purple-700 flex items-center gap-2 transition-colors"
-          >
-            ← Volver
-          </button>
+          <div className="flex flex-wrap gap-2 mb-6">
+            <button
+              onClick={() => navigate("/admin")}
+              className="text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
+            >
+              ← Volver al Panel Admin
+            </button>
+            <button
+              onClick={() => {
+                if ((store as any)?.mall_id) {
+                  navigate(`/admin/mall/${(store as any).mall_id}`);
+                } else {
+                  navigate(-1);
+                }
+              }}
+              className="text-sm font-medium text-purple-600 hover:text-purple-800 transition-colors"
+            >
+              ← Volver al Centro Comercial
+            </button>
+          </div>
 
           {isStoreLoading || isPromotionsLoading ? (
             <StoreLoadingState />
@@ -183,7 +240,7 @@ export default function StoreProfile() {
           ) : (
             <div className="space-y-6 sm:space-y-8">
               <div className="w-full">
-                <StoreInfo store={store} />
+                <StoreInfo store={store as any} />
               </div>
               <div className="w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
