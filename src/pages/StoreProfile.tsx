@@ -61,6 +61,9 @@ export default function StoreProfile() {
   } = useQuery({
     queryKey: ["promotions", id],
     queryFn: async () => {
+      console.log("Fetching promotions for store:", id);
+
+      // First get raw data with additional logging
       const { data: rawData, error } = await supabase
         .from("promotions")
         .select(
@@ -81,19 +84,59 @@ export default function StoreProfile() {
         .eq("store_id", id)
         .order("start_date", { ascending: true });
 
+      console.log("Raw promotions data:", rawData);
+
       if (error) {
+        console.error("Error fetching promotions:", error);
         toast.error("Failed to fetch promotions");
         throw error;
       }
 
-      // Filter and validate the promotion types
-      const validPromotions = rawData
-        .filter((promotion) => isValidPromotionType(promotion.type))
-        .map((promotion) => ({
-          ...promotion,
-          type: promotion.type as ValidPromotionType,
-        })) as DatabasePromotion[];
+      if (!rawData || rawData.length === 0) {
+        console.log("No promotions found for this store");
+        return [];
+      }
 
+      // Log each promotion to check column names
+      rawData.forEach((promo, index) => {
+        console.log(`Promotion ${index + 1}:`, {
+          id: promo.id,
+          typeColumn: promo.type,
+          promotionTypeColumn: promo.promotion_type,
+          title: promo.title,
+          startDate: promo.start_date,
+          endDate: promo.end_date,
+          isActive: promo.is_active,
+        });
+      });
+
+      // Handle both possible column names for type
+      const validPromotions = rawData
+        .filter((promotion) => {
+          // Try both column names, promotion_type is preferred if it exists
+          const typeValue = promotion.promotion_type || promotion.type;
+
+          // Check if it's a valid type
+          const isValid = isValidPromotionType(typeValue);
+
+          if (!isValid) {
+            console.log(
+              `Promotion ${promotion.id} has invalid type: ${typeValue}`
+            );
+          }
+
+          return isValid;
+        })
+        .map((promotion) => {
+          // Normalize the type field to ensure consistent data
+          const effectiveType = promotion.promotion_type || promotion.type;
+          return {
+            ...promotion,
+            type: effectiveType as ValidPromotionType,
+          };
+        }) as DatabasePromotion[];
+
+      console.log("Filtered promotions:", validPromotions);
       return validPromotions;
     },
   });

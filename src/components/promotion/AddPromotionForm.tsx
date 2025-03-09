@@ -169,6 +169,7 @@ export function AddPromotionForm({
         end_date: endDate.toISOString(),
         image: newPromotion.image || null,
         terms_conditions: newPromotion.terms_conditions || null,
+        is_active: true, // Ensure promotions are active by default
         user_id: session.user.id,
       };
 
