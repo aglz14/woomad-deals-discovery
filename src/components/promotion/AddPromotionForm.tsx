@@ -55,7 +55,6 @@ export function AddPromotionForm({
     end_date: getTomorrowEnd(),
     terms_conditions: "",
     image: "",
-    is_active: true,
     store_id: preselectedStoreId || "",
   });
 
@@ -187,7 +186,6 @@ export function AddPromotionForm({
         image: newPromotion.image || null,
         store_id: preselectedStoreId || newPromotion.store_id,
         user_id: session.user.id,
-        is_active: true,
       };
 
       console.log("Sending promotion data:", newPromotionData);

@@ -19,22 +19,20 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Pencil, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useSession } from "@/components/providers/SessionProvider";
 
 interface PromotionsListProps {
-  promotions: (DatabasePromotion & { status?: "active" | "inactive" })[];
+  promotions: DatabasePromotion[];
   onEdit: (promotion: DatabasePromotion) => void;
   onDelete: (id: string) => void;
-  showStatus?: boolean;
 }
 
 export function PromotionsList({
   promotions,
   onEdit,
   onDelete,
-  showStatus = false,
 }: PromotionsListProps) {
   const { session } = useSession();
 
@@ -50,11 +48,6 @@ export function PromotionsList({
     sale: "Oferta",
   };
 
-  const statusColors = {
-    active: "bg-green-100 text-green-800",
-    inactive: "bg-gray-100 text-gray-800",
-  };
-
   if (!promotions?.length) {
     return (
       <Card>
@@ -63,7 +56,7 @@ export function PromotionsList({
         </CardHeader>
         <CardContent>
           <p className="text-gray-500">
-            ¡Vuelve más tarde para ver nuevas promociones y ofertas!
+            ¡No hay promociones disponibles para esta tienda!
           </p>
         </CardContent>
       </Card>
@@ -74,41 +67,39 @@ export function PromotionsList({
     <div className="space-y-6">
       {promotions.map((promo) => {
         const isOwner = session?.user?.id === promo.user_id;
+
         const now = new Date();
-        const endDate = promo.end_date ? new Date(promo.end_date) : null;
-        const isExpired = endDate ? endDate < now : false;
-        const isActive =
-          promo.status === "active" || (!promo.status && !isExpired);
+        const startDate = new Date(promo.start_date);
+        const endDate = new Date(promo.end_date);
+        const isCurrent = startDate <= now && endDate >= now;
+
+        const typeKey = (promo.promotion_type || "").toLowerCase();
+        const typeLabel =
+          typeLabels[typeKey as keyof typeof typeLabels] || "Promoción";
+        const typeColor =
+          typeColors[typeKey as keyof typeof typeColors] ||
+          typeColors.promotion;
 
         return (
-          <Card key={promo.id} className={isActive ? "" : "opacity-75"}>
+          <Card
+            key={promo.id}
+            className="overflow-hidden transition-shadow hover:shadow-lg"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="space-y-2 text-left w-full">
                   <div className="flex flex-wrap gap-2 items-center">
-                    <Badge
-                      className={`${
-                        typeColors[promo.type as keyof typeof typeColors]
-                      } capitalize`}
-                    >
-                      {typeLabels[promo.type as keyof typeof typeLabels]}
+                    <Badge className={`${typeColor} capitalize`}>
+                      {typeLabel}
                     </Badge>
 
-                    {showStatus && (
-                      <Badge
-                        className={`${
-                          statusColors[isActive ? "active" : "inactive"]
-                        } capitalize`}
-                      >
-                        {isActive ? (
-                          <>
-                            <CheckCircle className="h-3 w-3 mr-1" /> Activa
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="h-3 w-3 mr-1" /> Inactiva
-                          </>
-                        )}
+                    {isCurrent ? (
+                      <Badge className="bg-green-100 text-green-800">
+                        Vigente
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-gray-100 text-gray-800">
+                        Expirada
                       </Badge>
                     )}
                   </div>
@@ -159,17 +150,25 @@ export function PromotionsList({
                 )}
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-gray-600 whitespace-pre-wrap text-left">
+            <CardContent>
+              <p className="text-gray-600 whitespace-pre-wrap text-left mb-4">
                 {promo.description}
               </p>
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar className="h-4 w-4 flex-shrink-0" />
+                <Calendar className="h-4 w-4" />
                 <span>
-                  {format(new Date(promo.start_date), "d MMM")} -{" "}
-                  {format(new Date(promo.end_date), "d MMM, yyyy")}
+                  {format(new Date(promo.start_date), "dd/MM/yyyy")} -{" "}
+                  {format(new Date(promo.end_date), "dd/MM/yyyy")}
                 </span>
               </div>
+              {promo.terms_conditions && (
+                <div className="mt-4 text-sm text-gray-500">
+                  <h4 className="font-medium">Términos y condiciones:</h4>
+                  <p className="whitespace-pre-wrap">
+                    {promo.terms_conditions}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         );

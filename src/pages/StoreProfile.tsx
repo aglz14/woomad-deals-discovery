@@ -27,17 +27,16 @@ import { Store } from "@/types/store";
 // Define types for raw database records
 interface RawPromotion {
   id: string;
+  created_at: string;
+  store_id?: string;
   title: string;
   description: string;
-  promotion_type?: string;
   start_date?: string;
   end_date?: string;
-  store_id?: string;
-  user_id?: string;
-  is_active?: boolean;
-  created_at: string;
-  terms_conditions?: string;
   image?: string;
+  user_id?: string;
+  promotion_type?: string;
+  terms_conditions?: string;
   store?: RawStore;
 }
 
@@ -66,23 +65,18 @@ const isValidPromotionType = (
 
 // Helper function to normalize promotion data
 const normalizePromotion = (promotion: RawPromotion): DatabasePromotion => {
-  const effectiveType = (promotion.promotion_type || "promotion")
-    .toString()
-    .toLowerCase();
-
   return {
     id: promotion.id,
-    type: effectiveType as ValidPromotionType,
+    created_at: promotion.created_at,
+    store_id: promotion.store_id,
     title: promotion.title,
     description: promotion.description,
     start_date: promotion.start_date || new Date().toISOString(),
     end_date: promotion.end_date || new Date().toISOString(),
-    terms_conditions: promotion.terms_conditions,
     image: promotion.image,
-    store_id: promotion.store_id,
     user_id: promotion.user_id,
-    created_at: promotion.created_at,
-    is_active: promotion.is_active,
+    promotion_type: promotion.promotion_type || "promotion",
+    terms_conditions: promotion.terms_conditions,
     store: promotion.store
       ? {
           id: promotion.store.id,
@@ -144,7 +138,7 @@ export default function StoreProfile() {
     enabled: !!id,
   });
 
-  // Fetch all promotions, calculate status based on new schema
+  // Fetch and display all promotions (no status filtering)
   const {
     data: promotions = [],
     isLoading: isPromotionsLoading,
@@ -184,59 +178,19 @@ export default function StoreProfile() {
         return [];
       }
 
-      // Process promotions according to new schema
+      // Process promotions - only filter out invalid objects, keep all valid promotions
       const processedPromotions = (data as unknown as RawPromotion[])
         .filter((promo) => {
           // Skip invalid objects
-          if (!promo || typeof promo !== "object") return false;
-
-          // Check if type is valid - now only using promotion_type
-          const typeValue = promo.promotion_type || "promotion";
-          return isValidPromotionType(typeValue);
+          return promo && typeof promo === "object";
         })
-        .map((promotion) => {
-          // Add status based on dates and is_active field
-          const now = new Date();
-          const startDate = promotion.start_date
-            ? new Date(promotion.start_date)
-            : null;
-          const endDate = promotion.end_date
-            ? new Date(promotion.end_date)
-            : null;
+        .map(normalizePromotion);
 
-          // A promotion is active if:
-          // 1. It's not explicitly marked inactive
-          // 2. Current date is within date range
-          const isDateActive =
-            startDate && endDate ? startDate <= now && endDate >= now : true;
-          const isExplicitlyActive = promotion.is_active !== false;
-
-          // Normalize promotion
-          const normalized = normalizePromotion(promotion);
-
-          // Add properly typed status field
-          return {
-            ...normalized,
-            status:
-              isDateActive && isExplicitlyActive
-                ? ("active" as const)
-                : ("inactive" as const),
-          };
-        });
-
+      console.log("All promotions:", processedPromotions.length);
       return processedPromotions;
     },
     enabled: !!id,
   });
-
-  // Get available (active) promotions for main display
-  const availablePromotions = promotions.filter(
-    (promo) => promo.status === "active"
-  );
-  // Get inactive promotions for secondary display
-  const inactivePromotions = promotions.filter(
-    (promo) => promo.status === "inactive"
-  );
 
   // Handle deleting a promotion
   const handleDeletePromotion = async (promotionId: string) => {
@@ -321,7 +275,7 @@ export default function StoreProfile() {
               <div className="w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                    Promociones Disponibles
+                    Promociones
                   </h2>
                   {isOwner && (
                     <Dialog
@@ -351,33 +305,14 @@ export default function StoreProfile() {
                   )}
                 </div>
 
-                {/* Available Promotions List */}
+                {/* Promotions List - show all promotions */}
                 <PromotionsList
-                  promotions={availablePromotions}
+                  promotions={promotions}
                   onEdit={setPromotionToEdit}
                   onDelete={handleDeletePromotion}
                   showStatus={false}
                 />
               </div>
-
-              {/* Inactive Promotions Section - Only show if there are any */}
-              {inactivePromotions.length > 0 && (
-                <div className="w-full border-t pt-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-700">
-                      Promociones Inactivas
-                    </h2>
-                  </div>
-
-                  {/* Inactive Promotions List */}
-                  <PromotionsList
-                    promotions={inactivePromotions}
-                    onEdit={setPromotionToEdit}
-                    onDelete={handleDeletePromotion}
-                    showStatus={true}
-                  />
-                </div>
-              )}
             </div>
           </div>
 

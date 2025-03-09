@@ -37,12 +37,11 @@ export function EditPromotionDialog({
   const [formData, setFormData] = useState({
     title: promotion.title,
     description: promotion.description,
-    promotion_type: promotion.type,
+    promotion_type: promotion.promotion_type,
     start_date: format(new Date(promotion.start_date), "yyyy-MM-dd'T'HH:mm"),
     end_date: format(new Date(promotion.end_date), "yyyy-MM-dd'T'HH:mm"),
     terms_conditions: promotion.terms_conditions || "",
     image: promotion.image || "",
-    is_active: promotion.is_active !== false,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -68,7 +67,6 @@ export function EditPromotionDialog({
           end_date: formData.end_date,
           terms_conditions: formData.terms_conditions || null,
           image: formData.image || null,
-          is_active: formData.is_active,
         })
         .eq("id", promotion.id);
 
@@ -186,20 +184,6 @@ export function EditPromotionDialog({
                 setFormData({ ...formData, image: e.target.value })
               }
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.is_active}
-                onChange={(e) =>
-                  setFormData({ ...formData, is_active: e.target.checked })
-                }
-                className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span>Promoción activa</span>
-            </Label>
           </div>
 
           <div className="flex justify-end space-x-2">

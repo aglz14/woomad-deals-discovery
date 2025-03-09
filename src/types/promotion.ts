@@ -2,18 +2,16 @@ export type ValidPromotionType = "promotion" | "coupon" | "sale";
 
 export interface DatabasePromotion {
   id: string;
-  type: ValidPromotionType;
+  created_at: string;
+  store_id?: string;
   title: string;
   description: string;
   start_date: string;
   end_date: string;
-  terms_conditions?: string;
   image?: string;
-  store_id?: string;
   user_id?: string;
-  created_at: string;
-  is_active?: boolean;
-  status?: "active" | "inactive";
+  promotion_type: string;
+  terms_conditions?: string;
   store?: {
     id: string;
     name: string;
