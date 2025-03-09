@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+// Remove supabase import since it's not found and we're using supabaseHelpers instead
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,13 +108,16 @@ export function AddPromotionForm({
 
       const result = await insertPromotion(newPromotionData);
 
-      if (result.error) throw result.error;
+      if (result.error) {
+        toast.error(`Error: ${result.error.message}`);
+        return;
+      }
 
       toast.success("Promoción creada exitosamente");
       onSuccess();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating promotion:", error);
-      toast.error(`Error: ${error.message || "Unknown error"}`);
+      toast.error("Error: Unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }

@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { EditMallDialog } from "@/components/mall/EditMallDialog";
 import { AddStoreDialog } from "@/components/mall/AddStoreDialog";
@@ -11,9 +10,16 @@ import { AdminMallLoadingState } from "@/components/mall/AdminMallLoadingState";
 import { AdminMallNotFound } from "@/components/mall/AdminMallNotFound";
 import { AdminMallContent } from "@/components/mall/AdminMallContent";
 import { toast } from "sonner";
+import {
+  getMallById,
+  getStoresByMallId,
+  deleteStore,
+  Mall,
+} from "@/utils/supabaseHelpers";
+import { Store } from "@/types/store";
 
 export default function AdminMallProfile() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddStoreDialogOpen, setIsAddStoreDialogOpen] = useState(false);
@@ -23,15 +29,13 @@ export default function AdminMallProfile() {
     data: mall,
     isLoading: isLoadingMall,
     refetch: refetchMall,
-  } = useQuery({
+  } = useQuery<Mall | null>({
     queryKey: ["mall", id],
     queryFn: async () => {
+      if (!id) throw new Error("Mall ID is required");
+
       console.log("Fetching mall with ID:", id);
-      const { data, error } = await supabase
-        .from("shopping_malls")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
+      const { data, error } = await getMallById(id);
 
       if (error) {
         console.error("Error fetching mall:", error);
@@ -43,39 +47,42 @@ export default function AdminMallProfile() {
 
       return data;
     },
+    enabled: !!id,
   });
 
   const {
     data: stores,
     isLoading: isLoadingStores,
     refetch: refetchStores,
-  } = useQuery({
+  } = useQuery<Store[] | null>({
     queryKey: ["mall-stores", id],
     enabled: !!id,
     queryFn: async () => {
+      if (!id) throw new Error("Mall ID is required");
+
       console.log("Fetching stores for mall:", id);
-      const { data, error } = await supabase
-        .from("stores")
-        .select("*")
-        .eq("mall_id", id);
+      const { data, error } = await getStoresByMallId(id);
 
       if (error) {
         console.error("Error fetching stores:", error);
         throw error;
       }
 
-      return data;
+      return data as Store[];
     },
   });
 
   const handleDeleteStore = async (storeId: string) => {
     try {
-      const { error } = await supabase
-        .from("stores")
-        .delete()
-        .eq("id", storeId);
+      const { error } = await deleteStore(storeId);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error deleting store:", error);
+        toast("Error", {
+          description: `Error al eliminar la tienda: ${error.message}`,
+        });
+        return;
+      }
 
       toast("Éxito", {
         description: "Tienda eliminada exitosamente",
@@ -84,7 +91,7 @@ export default function AdminMallProfile() {
     } catch (error) {
       console.error("Error deleting store:", error);
       toast("Error", {
-        description: "Error al eliminar la tienda",
+        description: "Error inesperado al eliminar la tienda",
       });
     }
   };
@@ -133,7 +140,7 @@ export default function AdminMallProfile() {
         }}
       />
 
-      {storeToEdit && stores?.find((s) => s.id === storeToEdit) && (
+      {storeToEdit && stores && stores.find((s) => s.id === storeToEdit) && (
         <EditStoreDialog
           store={stores.find((s) => s.id === storeToEdit)!}
           isOpen={true}

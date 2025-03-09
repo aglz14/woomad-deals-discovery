@@ -64,14 +64,17 @@ export function EditPromotionDialog({
 
       const { error } = await updatePromotion(promotion.id, promotionData);
 
-      if (error) throw error;
+      if (error) {
+        toast.error(`Error: ${error.message}`);
+        return;
+      }
 
       toast.success("Promoción actualizada exitosamente");
       onSuccess();
       onClose();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating promotion:", error);
-      toast.error(`Error: ${error.message || "Unknown error"}`);
+      toast.error("Error: Unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }

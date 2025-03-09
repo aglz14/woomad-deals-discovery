@@ -199,14 +199,17 @@ export default function StoreProfile() {
       try {
         const { error } = await deletePromotion(promotionId);
 
-        if (error) throw error;
+        if (error) {
+          toast.error(`Error: ${error.message}`);
+          return;
+        }
 
         // Update promotions list by filtering out the deleted one
         setPromotions(promotions.filter((p) => p.id !== promotionId));
         toast.success("Promoción eliminada exitosamente");
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error deleting promotion:", error);
-        toast.error(`Error: ${error.message || "Unknown error"}`);
+        toast.error("Error: Unexpected error occurred");
       }
     }
   };

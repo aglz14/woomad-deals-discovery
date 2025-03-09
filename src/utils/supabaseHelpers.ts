@@ -1,4 +1,20 @@
 import { supabase } from "../lib/supabase";
+import { PostgrestError } from "@supabase/supabase-js";
+import { Store } from "../types/store";
+
+/**
+ * Mall entity from database
+ */
+export interface Mall {
+  id: string;
+  name: string;
+  address: string;
+  description?: string;
+  latitude: number;
+  longitude: number;
+  user_id?: string;
+  created_at?: string;
+}
 
 /**
  * Interface for promotion type object
@@ -9,12 +25,11 @@ export interface PromotionType {
 }
 
 /**
- * Supabase error interface
+ * Standard error response format
  */
-export interface SupabaseError {
+export interface ErrorResponse {
   message: string;
   details?: string;
-  hint?: string;
   code?: string;
 }
 
@@ -34,6 +49,35 @@ export function getSafeProperty<T, K extends keyof T>(
  */
 export function generateFallbackId(): string {
   return `fallback-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+/**
+ * Converts any error to a standardized ErrorResponse
+ */
+export function normalizeError(error: unknown): ErrorResponse {
+  if (error instanceof PostgrestError) {
+    return {
+      message: error.message,
+      details: error.details,
+      code: error.code,
+    };
+  } else if (error instanceof Error) {
+    return {
+      message: error.message,
+    };
+  } else if (
+    typeof error === "object" &&
+    error !== null &&
+    "message" in error
+  ) {
+    return {
+      message: String((error as { message: unknown }).message),
+    };
+  }
+
+  return {
+    message: "Unknown error occurred",
+  };
 }
 
 /**
@@ -80,7 +124,7 @@ export async function fetchPromotionTypes(): Promise<PromotionType[]> {
 /**
  * Map raw promotion type data to PromotionType objects
  */
-function mapPromotionTypeData(data: any[]): PromotionType[] {
+function mapPromotionTypeData(data: Record<string, any>[]): PromotionType[] {
   if (!data || !Array.isArray(data)) return getFallbackPromotionTypes();
 
   return data.map((item) => {
@@ -110,9 +154,19 @@ export function getFallbackPromotionTypes(): PromotionType[] {
 }
 
 /**
+ * Type for database operations
+ */
+export type DbOperationResult<T = any> = {
+  data: T | null;
+  error: ErrorResponse | null;
+};
+
+/**
  * Insert a promotion with proper type handling
  */
-export async function insertPromotion(promotionData: any) {
+export async function insertPromotion(
+  promotionData: Record<string, unknown>
+): Promise<DbOperationResult> {
   try {
     // @ts-expect-error - Supabase types incompatibility
     const { data, error } = await supabase
@@ -120,18 +174,21 @@ export async function insertPromotion(promotionData: any) {
       .insert(promotionData)
       .select();
 
-    if (error) throw error;
+    if (error) return { data: null, error: normalizeError(error) };
     return { data, error: null };
-  } catch (error: SupabaseError | unknown) {
+  } catch (error) {
     console.error("Error inserting promotion:", error);
-    return { data: null, error };
+    return { data: null, error: normalizeError(error) };
   }
 }
 
 /**
  * Update a promotion with proper type handling
  */
-export async function updatePromotion(id: string, promotionData: any) {
+export async function updatePromotion(
+  id: string,
+  promotionData: Record<string, unknown>
+): Promise<DbOperationResult> {
   try {
     // @ts-expect-error - Supabase types incompatibility
     const { error } = await supabase
@@ -139,24 +196,81 @@ export async function updatePromotion(id: string, promotionData: any) {
       .update(promotionData)
       .eq("id", id);
 
-    if (error) throw error;
-    return { error: null };
-  } catch (error: SupabaseError | unknown) {
+    if (error) return { data: null, error: normalizeError(error) };
+    return { data: null, error: null };
+  } catch (error) {
     console.error("Error updating promotion:", error);
-    return { error };
+    return { data: null, error: normalizeError(error) };
   }
 }
 
 /**
  * Delete a promotion with proper error handling
  */
-export async function deletePromotion(id: string) {
+export async function deletePromotion(id: string): Promise<DbOperationResult> {
   try {
+    // @ts-expect-error - Supabase types incompatibility
     const { error } = await supabase.from("promotions").delete().eq("id", id);
-    if (error) throw error;
-    return { error: null };
-  } catch (error: SupabaseError | unknown) {
+
+    if (error) return { data: null, error: normalizeError(error) };
+    return { data: null, error: null };
+  } catch (error) {
     console.error("Error deleting promotion:", error);
-    return { error };
+    return { data: null, error: normalizeError(error) };
   }
+}
+
+/**
+ * Safely fetch, update or delete from any table with proper error handling
+ */
+export async function safeDbOperation<T = any>(
+  operation: () => Promise<{ data?: T; error?: PostgrestError | null }>
+): Promise<DbOperationResult<T>> {
+  try {
+    const { data, error } = await operation();
+
+    if (error) return { data: null, error: normalizeError(error) };
+    return { data: data || null, error: null };
+  } catch (error) {
+    console.error("Database operation error:", error);
+    return { data: null, error: normalizeError(error) };
+  }
+}
+
+/**
+ * Get a mall by ID
+ */
+export async function getMallById(
+  id: string
+): Promise<DbOperationResult<Mall>> {
+  return safeDbOperation(async () => {
+    // @ts-expect-error - Supabase types incompatibility
+    return await supabase
+      .from("shopping_malls")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+  });
+}
+
+/**
+ * Get stores by mall ID
+ */
+export async function getStoresByMallId(
+  mallId: string
+): Promise<DbOperationResult<Store[]>> {
+  return safeDbOperation(async () => {
+    // @ts-expect-error - Supabase types incompatibility
+    return await supabase.from("stores").select("*").eq("mall_id", mallId);
+  });
+}
+
+/**
+ * Delete a store by ID
+ */
+export async function deleteStore(storeId: string): Promise<DbOperationResult> {
+  return safeDbOperation(async () => {
+    // @ts-expect-error - Supabase types incompatibility
+    return await supabase.from("stores").delete().eq("id", storeId);
+  });
 }
