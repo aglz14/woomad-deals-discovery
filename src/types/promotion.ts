@@ -1,4 +1,14 @@
-export type ValidPromotionType = "promotion" | "coupon" | "sale";
+export type ValidPromotionType =
+  | "promotion"
+  | "coupon"
+  | "sale"
+  | "promoción"
+  | "cupón"
+  | "oferta"
+  | "promocion"
+  | "cupon"
+  | "descuento"
+  | "discount";
 
 export interface DatabasePromotion {
   id: string;
