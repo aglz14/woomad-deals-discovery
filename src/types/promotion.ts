@@ -7,7 +7,6 @@ export interface DatabasePromotion {
   description: string;
   start_date: string;
   end_date: string;
-  discount_value?: string;
   terms_conditions?: string;
   image_url?: string;
   store_id?: string;

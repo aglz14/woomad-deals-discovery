@@ -20,6 +20,21 @@ interface AddPromotionFormProps {
   preselectedStoreId?: string;
 }
 
+// Add helper functions for getting date values
+const getTomorrowStart = (): string => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  return tomorrow.toISOString().slice(0, 16);
+};
+
+const getTomorrowEnd = (): string => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(23, 59, 59, 999);
+  return tomorrow.toISOString().slice(0, 16);
+};
+
 export function AddPromotionForm({
   onSuccess,
   onCancel,
@@ -36,10 +51,12 @@ export function AddPromotionForm({
     title: "",
     description: "",
     promotion_type: "",
-    start_date: "",
-    end_date: "",
-    image: "",
+    start_date: getTomorrowStart(),
+    end_date: getTomorrowEnd(),
     terms_conditions: "",
+    image_url: "",
+    is_active: true,
+    store_id: preselectedStoreId || "",
   });
 
   // Fetch real promotion types from database
@@ -161,24 +178,24 @@ export function AddPromotionForm({
 
       // Logic to add a new promotion to the database
       const newPromotionData = {
-        store_id: preselectedStoreId,
         title: newPromotion.title,
         description: newPromotion.description,
         promotion_type: newPromotion.promotion_type, // This is now a UUID reference
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
-        image: newPromotion.image || null,
         terms_conditions: newPromotion.terms_conditions || null,
-        is_active: true, // Ensure promotions are active by default
+        image_url: newPromotion.image_url || null,
+        store_id: preselectedStoreId || newPromotion.store_id,
         user_id: session.user.id,
+        is_active: true,
       };
 
       console.log("Sending promotion data:", newPromotionData);
 
-      // Using 'as any' to bypass TypeScript issues with the Supabase types
+      // Use type assertion for database operations
       const { data, error } = await supabase
         .from("promotions")
-        .insert(newPromotionData as any)
+        .insert(newPromotionData as unknown as Record<string, unknown>)
         .select();
 
       if (error) throw error;
@@ -265,9 +282,9 @@ export function AddPromotionForm({
       <div>
         <Label>URL de la Imagen</Label>
         <Input
-          value={newPromotion.image}
+          value={newPromotion.image_url}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, image: e.target.value })
+            setNewPromotion({ ...newPromotion, image_url: e.target.value })
           }
           placeholder="Opcional"
         />

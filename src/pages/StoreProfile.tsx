@@ -29,7 +29,6 @@ interface RawPromotion {
   id: string;
   title: string;
   description: string;
-  type?: string;
   promotion_type?: string;
   start_date?: string;
   end_date?: string;
@@ -37,7 +36,6 @@ interface RawPromotion {
   user_id?: string;
   is_active?: boolean;
   created_at: string;
-  discount_value?: string;
   terms_conditions?: string;
   image_url?: string;
   store?: RawStore;
@@ -68,11 +66,7 @@ const isValidPromotionType = (
 
 // Helper function to normalize promotion data
 const normalizePromotion = (promotion: RawPromotion): DatabasePromotion => {
-  const effectiveType = (
-    promotion.promotion_type ||
-    promotion.type ||
-    "promotion"
-  )
+  const effectiveType = (promotion.promotion_type || "promotion")
     .toString()
     .toLowerCase();
 
@@ -83,7 +77,6 @@ const normalizePromotion = (promotion: RawPromotion): DatabasePromotion => {
     description: promotion.description,
     start_date: promotion.start_date || new Date().toISOString(),
     end_date: promotion.end_date || new Date().toISOString(),
-    discount_value: promotion.discount_value,
     terms_conditions: promotion.terms_conditions,
     image_url: promotion.image_url,
     store_id: promotion.store_id,
@@ -197,8 +190,8 @@ export default function StoreProfile() {
           // Skip invalid objects
           if (!promo || typeof promo !== "object") return false;
 
-          // Check if type is valid
-          const typeValue = promo.promotion_type || promo.type || "";
+          // Check if type is valid - now only using promotion_type
+          const typeValue = promo.promotion_type || "promotion";
           return isValidPromotionType(typeValue);
         })
         .map((promotion) => {

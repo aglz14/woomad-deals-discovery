@@ -1,6 +1,10 @@
-
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +13,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { DatabasePromotion, ValidPromotionType } from "@/types/promotion";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EditPromotionDialogProps {
   promotion: DatabasePromotion;
@@ -26,20 +37,38 @@ export function EditPromotionDialog({
   const [formData, setFormData] = useState({
     title: promotion.title,
     description: promotion.description,
-    type: promotion.type,
+    promotion_type: promotion.type,
     start_date: format(new Date(promotion.start_date), "yyyy-MM-dd'T'HH:mm"),
     end_date: format(new Date(promotion.end_date), "yyyy-MM-dd'T'HH:mm"),
+    terms_conditions: promotion.terms_conditions || "",
+    image_url: promotion.image_url || "",
+    is_active: promotion.is_active !== false,
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.title || !formData.description) {
+      toast.error("Por favor completa todos los campos requeridos");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       const { error } = await supabase
         .from("promotions")
         .update({
-          ...formData,
-          start_date: new Date(formData.start_date).toISOString(),
-          end_date: new Date(formData.end_date).toISOString(),
+          title: formData.title,
+          description: formData.description,
+          promotion_type: formData.promotion_type,
+          start_date: formData.start_date,
+          end_date: formData.end_date,
+          terms_conditions: formData.terms_conditions || null,
+          image_url: formData.image_url || null,
+          is_active: formData.is_active,
         })
         .eq("id", promotion.id);
 
@@ -50,73 +79,141 @@ export function EditPromotionDialog({
     } catch (error) {
       console.error("Error updating promotion:", error);
       toast.error("Error al actualizar la promoción");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Editar Promoción</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="title">Título</Label>
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               required
             />
           </div>
-          <div>
-            <Label htmlFor="type">Tipo</Label>
-            <select
-              id="type"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as ValidPromotionType })}
-              required
-            >
-              <option value="promotion">Promoción</option>
-              <option value="coupon">Cupón</option>
-              <option value="sale">Oferta</option>
-            </select>
-          </div>
-          <div>
-            <Label htmlFor="start_date">Fecha de inicio</Label>
-            <Input
-              type="datetime-local"
-              id="start_date"
-              value={formData.start_date}
-              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="end_date">Fecha de fin</Label>
-            <Input
-              type="datetime-local"
-              id="end_date"
-              value={formData.end_date}
-              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-              required
-            />
-          </div>
-          <div>
+
+          <div className="space-y-2">
             <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
               required
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+
+          <div className="space-y-2">
+            <Label htmlFor="promotion_type">Tipo</Label>
+            <Select
+              value={formData.promotion_type}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  promotion_type: value as ValidPromotionType,
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona un tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="promotion">Promoción</SelectItem>
+                <SelectItem value="coupon">Cupón</SelectItem>
+                <SelectItem value="sale">Oferta</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="start_date">Fecha de inicio</Label>
+              <Input
+                id="start_date"
+                type="datetime-local"
+                value={formData.start_date}
+                onChange={(e) =>
+                  setFormData({ ...formData, start_date: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end_date">Fecha de fin</Label>
+              <Input
+                id="end_date"
+                type="datetime-local"
+                value={formData.end_date}
+                onChange={(e) =>
+                  setFormData({ ...formData, end_date: e.target.value })
+                }
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="terms_conditions">Términos y condiciones</Label>
+            <Textarea
+              id="terms_conditions"
+              value={formData.terms_conditions}
+              onChange={(e) =>
+                setFormData({ ...formData, terms_conditions: e.target.value })
+              }
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image_url">URL de imagen</Label>
+            <Input
+              id="image_url"
+              value={formData.image_url}
+              onChange={(e) =>
+                setFormData({ ...formData, image_url: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={formData.is_active}
+                onChange={(e) =>
+                  setFormData({ ...formData, is_active: e.target.checked })
+                }
+                className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span>Promoción activa</span>
+            </Label>
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               Cancelar
             </Button>
-            <Button type="submit">Guardar</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Guardando..." : "Guardar cambios"}
+            </Button>
           </div>
         </form>
       </DialogContent>
