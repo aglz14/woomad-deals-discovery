@@ -109,7 +109,13 @@ export default function AdminMallProfile() {
       <Header />
       <main className="flex-grow mt-16">
         <AdminMallContent
-          mall={mall}
+          mall={{
+            id: mall.id,
+            name: mall.name,
+            address: mall.address,
+            description: mall.description,
+            user_id: mall.user_id!
+          }}
           stores={stores || []}
           onEditMall={() => setIsEditDialogOpen(true)}
           onAddStore={() => setIsAddStoreDialogOpen(true)}
