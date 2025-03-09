@@ -4,7 +4,8 @@ export interface Store {
   description?: string;
   image?: string;
   array_categories?: string[];
-  contact_number?: string;
+  phone?: string;
+  local_number?: string;
   floor?: string;
   mall_id: string;
   user_id: string;

@@ -33,35 +33,56 @@ export function EditStoreDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [storeData, setStoreData] = useState({
-    name: store.name || "",
-    description: store.description || "",
-    image: store.image || "",
-    floor: store.floor || "",
-    contact_number: store.contact_number || "",
+    name: "",
+    description: "",
+    image: "",
+    floor: "",
+    phone: "",
+    local_number: "",
   });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useCategories();
 
-  // Reset form data when store changes
+  // Reset form data when store changes or dialog opens
   useEffect(() => {
-    if (store) {
+    if (isOpen && store) {
       setStoreData({
         name: store.name || "",
         description: store.description || "",
         image: store.image || "",
         floor: store.floor || "",
-        contact_number: store.contact_number || "",
+        phone: store.phone || "",
+        local_number: store.local_number || "",
       });
-    }
-  }, [store]);
 
-  // Fetch store categories from junction table when dialog opens
-  useEffect(() => {
-    if (isOpen && store.id) {
-      fetchStoreCategories();
+      // Also fetch categories
+      if (store.id) {
+        fetchStoreCategories();
+      }
     }
-  }, [isOpen, store.id]);
+  }, [isOpen, store]);
+
+  // Reset form when dialog is closed
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
+
+  const resetForm = () => {
+    setStoreData({
+      name: "",
+      description: "",
+      image: "",
+      floor: "",
+      phone: "",
+      local_number: "",
+    });
+    setSelectedCategories([]);
+    setSubmitting(false);
+    setIsLoading(false);
+  };
 
   const fetchStoreCategories = async () => {
     try {
@@ -180,7 +201,8 @@ export function EditStoreDialog({
           description: storeData.description,
           image: storeData.image,
           floor: storeData.floor,
-          contact_number: storeData.contact_number,
+          phone: storeData.phone,
+          local_number: storeData.local_number,
           array_categories: categoryNames,
           mall_id: store.mall_id,
         })
@@ -236,6 +258,7 @@ export function EditStoreDialog({
       }
 
       toast.success("Tienda actualizada correctamente");
+      resetForm();
       onSuccess();
       onClose();
     } catch (error) {
@@ -250,8 +273,13 @@ export function EditStoreDialog({
     }
   };
 
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Editar Tienda</DialogTitle>
@@ -324,15 +352,27 @@ export function EditStoreDialog({
               />
             </div>
             <div>
-              <Label htmlFor="contact">Número de Contacto</Label>
+              <Label htmlFor="local_number">Local</Label>
               <Input
-                id="contact"
-                value={storeData.contact_number}
+                id="local_number"
+                value={storeData.local_number}
                 onChange={(e) =>
-                  setStoreData({ ...storeData, contact_number: e.target.value })
+                  setStoreData({ ...storeData, local_number: e.target.value })
                 }
+                placeholder="Ej: 101, A-12"
               />
             </div>
+          </div>
+          <div>
+            <Label htmlFor="phone">Teléfono de Contacto</Label>
+            <Input
+              id="phone"
+              value={storeData.phone}
+              onChange={(e) =>
+                setStoreData({ ...storeData, phone: e.target.value })
+              }
+              placeholder="Ej: +56 9 1234 5678"
+            />
           </div>
           <div>
             <Label htmlFor="image">URL de la Imagen (opcional)</Label>
@@ -349,7 +389,7 @@ export function EditStoreDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={submitting}
             >
               Cancelar

@@ -40,7 +40,8 @@ export function AddStoreDialog({
   const [store, setStore] = useState({
     name: "",
     description: "",
-    contact_number: "",
+    phone: "",
+    local_number: "",
     floor: "",
     image: "",
   });
@@ -48,6 +49,13 @@ export function AddStoreDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useCategories();
+
+  // Reset form when dialog is opened or closed
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
 
   const handleCategoryToggle = (categoryId: string) => {
     setSelectedCategories((prev) => {
@@ -93,7 +101,8 @@ export function AddStoreDialog({
         .insert({
           name: store.name,
           description: store.description,
-          contact_number: store.contact_number,
+          phone: store.phone,
+          local_number: store.local_number,
           floor: store.floor,
           image: store.image,
           array_categories: categoryNames,
@@ -165,15 +174,22 @@ export function AddStoreDialog({
     setStore({
       name: "",
       description: "",
-      contact_number: "",
+      phone: "",
+      local_number: "",
       floor: "",
       image: "",
     });
     setSelectedCategories([]);
+    setIsSubmitting(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Agregar Nueva Tienda</DialogTitle>
@@ -242,15 +258,25 @@ export function AddStoreDialog({
               />
             </div>
             <div>
-              <Label htmlFor="contact">Número de Contacto</Label>
+              <Label htmlFor="local_number">Local</Label>
               <Input
-                id="contact"
-                value={store.contact_number}
+                id="local_number"
+                value={store.local_number}
                 onChange={(e) =>
-                  setStore({ ...store, contact_number: e.target.value })
+                  setStore({ ...store, local_number: e.target.value })
                 }
+                placeholder="Ej: 101, A-12"
               />
             </div>
+          </div>
+          <div>
+            <Label htmlFor="phone">Teléfono de Contacto</Label>
+            <Input
+              id="phone"
+              value={store.phone}
+              onChange={(e) => setStore({ ...store, phone: e.target.value })}
+              placeholder="Ej: +56 9 1234 5678"
+            />
           </div>
           <div>
             <Label htmlFor="image">URL de la Imagen (opcional)</Label>
@@ -265,7 +291,7 @@ export function AddStoreDialog({
             <Button
               type="button"
               variant="outline"
-              onClick={onClose}
+              onClick={handleClose}
               disabled={isSubmitting}
             >
               Cancelar
