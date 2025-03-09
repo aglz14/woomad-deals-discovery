@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,11 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useSession } from "@/components/providers/SessionProvider";
+import {
+  fetchPromotionTypes,
+  PromotionType,
+  insertPromotion,
+} from "../../utils/supabaseHelpers";
 
 interface AddPromotionFormProps {
   onSuccess: () => void;
@@ -41,13 +46,11 @@ export function AddPromotionForm({
   preselectedStoreId,
 }: AddPromotionFormProps) {
   const { session } = useSession();
-  // Use proper IDs from the database instead of string identifiers
-  const [promotionTypes, setPromotionTypes] = useState<
-    { id: string; name: string }[]
-  >([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [promotionTypes, setPromotionTypes] = useState<PromotionType[]>([]);
 
-  const [newPromotion, setNewPromotion] = useState({
+  const [formState, setFormState] = useState({
     title: "",
     description: "",
     promotion_type: "",
@@ -58,152 +61,62 @@ export function AddPromotionForm({
     store_id: preselectedStoreId || "",
   });
 
-  // Fetch real promotion types from database
   useEffect(() => {
-    const fetchPromotionTypes = async () => {
+    const loadPromotionTypes = async () => {
       setIsLoading(true);
       try {
-        console.log("Attempting to fetch promotion types from database...");
-
-        // First check if promotion_type table has data
-        const { data, error } = await supabase
-          .from("promotion_type")
-          .select("*");
-
-        console.log("Raw promotion_type data:", data);
-
-        if (error) {
-          console.error("Error fetching promotion types:", error);
-          toast.error(`Failed to fetch promotion types: ${error.message}`);
-          setIsLoading(false);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          // Map the data based on the structure
-          const formattedTypes = data.map((item) => {
-            // Try to get the display name from the correct column
-            const displayName =
-              item.type || item.name || Object.values(item)[1];
-
-            return {
-              id: item.id,
-              name: displayName,
-            };
-          });
-
-          console.log("Existing promotion types:", formattedTypes);
-          setPromotionTypes(formattedTypes);
-          toast.success(`Loaded ${formattedTypes.length} promotion types`);
-        } else {
-          // No promotion types found, we need to create them
-          console.log("No promotion types found, creating default ones...");
-
-          // Define the default promotion types to create
-          const defaultTypes = [
-            { type: "Promoción" },
-            { type: "Cupón" },
-            { type: "Oferta" },
-          ];
-
-          // Insert the default types
-          const { data: insertedData, error: insertError } = await supabase
-            .from("promotion_type")
-            .insert(defaultTypes)
-            .select();
-
-          if (insertError) {
-            console.error("Error creating promotion types:", insertError);
-            toast.error(
-              `Failed to create promotion types: ${insertError.message}`
-            );
-
-            // Use fallback without real IDs
-            setPromotionTypes([
-              { id: "1", name: "Promoción" },
-              { id: "2", name: "Cupón" },
-              { id: "3", name: "Oferta" },
-            ]);
-          } else if (insertedData) {
-            console.log("Created promotion types:", insertedData);
-
-            // Map the newly inserted data
-            const newTypes = insertedData.map((item) => ({
-              id: item.id,
-              name: item.type,
-            }));
-
-            setPromotionTypes(newTypes);
-            toast.success(`Created ${newTypes.length} promotion types`);
-          }
-        }
+        const types = await fetchPromotionTypes();
+        setPromotionTypes(types);
+        toast.success(`Loaded ${types.length} promotion types`);
       } catch (err) {
-        console.error("Error handling promotion types:", err);
-        // Use fallback without real IDs as last resort
-        setPromotionTypes([
-          { id: "1", name: "Promoción" },
-          { id: "2", name: "Cupón" },
-          { id: "3", name: "Oferta" },
-        ]);
+        console.error("Error loading promotion types:", err);
+        toast.error("Failed to load promotion types");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchPromotionTypes();
+    loadPromotionTypes();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      !formState.title ||
+      !formState.description ||
+      !formState.promotion_type
+    ) {
+      toast.error("Por favor completa todos los campos obligatorios");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      if (!session?.user?.id) {
-        toast.error("Debes iniciar sesión para agregar una promoción");
-        return;
-      }
-
-      if (!newPromotion.promotion_type) {
-        toast.error("Selecciona un tipo de promoción");
-        return;
-      }
-
-      // Validate dates
-      const startDate = new Date(newPromotion.start_date);
-      const endDate = new Date(newPromotion.end_date);
-
-      if (endDate <= startDate) {
-        toast.error("La fecha de fin debe ser posterior a la fecha de inicio");
-        return;
-      }
-
-      // Logic to add a new promotion to the database
       const newPromotionData = {
-        title: newPromotion.title,
-        description: newPromotion.description,
-        promotion_type: newPromotion.promotion_type,
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
-        terms_conditions: newPromotion.terms_conditions || null,
-        image: newPromotion.image || null,
-        store_id: preselectedStoreId || newPromotion.store_id,
-        user_id: session.user.id,
+        title: formState.title,
+        description: formState.description,
+        promotion_type: formState.promotion_type,
+        start_date: formState.start_date,
+        end_date: formState.end_date,
+        terms_conditions: formState.terms_conditions,
+        image: formState.image,
+        store_id: preselectedStoreId || formState.store_id,
+        user_id: session?.user?.id || "",
       };
 
-      console.log("Sending promotion data:", newPromotionData);
+      const result = await insertPromotion(newPromotionData);
 
-      // Use type assertion for database operations
-      const { data, error } = await supabase
-        .from("promotions")
-        .insert(newPromotionData as unknown as Record<string, unknown>)
-        .select();
+      if (result.error) throw result.error;
 
-      if (error) throw error;
-
-      console.log("Promotion created:", data);
-      toast.success("Promoción agregada exitosamente");
+      toast.success("Promoción creada exitosamente");
       onSuccess();
-    } catch (error) {
-      console.error("Error adding promotion:", error);
-      toast.error("Error al agregar la promoción: " + JSON.stringify(error));
+    } catch (error: any) {
+      console.error("Error creating promotion:", error);
+      toast.error(`Error: ${error.message || "Unknown error"}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -215,9 +128,9 @@ export function AddPromotionForm({
       <div>
         <Label>Tipo de Promoción</Label>
         <Select
-          value={newPromotion.promotion_type}
+          value={formState.promotion_type}
           onValueChange={(value) =>
-            setNewPromotion({ ...newPromotion, promotion_type: value })
+            setFormState({ ...formState, promotion_type: value })
           }
           disabled={isLoading}
           required
@@ -239,14 +152,14 @@ export function AddPromotionForm({
 
       <div>
         <Label>
-          {newPromotion.promotion_type === couponTypeId
+          {formState.promotion_type === couponTypeId
             ? "Código del Cupón"
             : "Título"}
         </Label>
         <Input
-          value={newPromotion.title}
+          value={formState.title}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, title: e.target.value })
+            setFormState({ ...formState, title: e.target.value })
           }
           required
         />
@@ -255,9 +168,9 @@ export function AddPromotionForm({
       <div>
         <Label>Descripción</Label>
         <Textarea
-          value={newPromotion.description}
+          value={formState.description}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, description: e.target.value })
+            setFormState({ ...formState, description: e.target.value })
           }
           required
         />
@@ -266,10 +179,10 @@ export function AddPromotionForm({
       <div>
         <Label>Términos y Condiciones</Label>
         <Textarea
-          value={newPromotion.terms_conditions}
+          value={formState.terms_conditions}
           onChange={(e) =>
-            setNewPromotion({
-              ...newPromotion,
+            setFormState({
+              ...formState,
               terms_conditions: e.target.value,
             })
           }
@@ -280,9 +193,9 @@ export function AddPromotionForm({
       <div>
         <Label>URL de la Imagen</Label>
         <Input
-          value={newPromotion.image}
+          value={formState.image}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, image: e.target.value })
+            setFormState({ ...formState, image: e.target.value })
           }
           placeholder="Opcional"
         />
@@ -292,9 +205,9 @@ export function AddPromotionForm({
         <Label>Fecha de inicio</Label>
         <Input
           type="datetime-local"
-          value={newPromotion.start_date}
+          value={formState.start_date}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, start_date: e.target.value })
+            setFormState({ ...formState, start_date: e.target.value })
           }
           required
         />
@@ -304,9 +217,9 @@ export function AddPromotionForm({
         <Label>Fecha de fin</Label>
         <Input
           type="datetime-local"
-          value={newPromotion.end_date}
+          value={formState.end_date}
           onChange={(e) =>
-            setNewPromotion({ ...newPromotion, end_date: e.target.value })
+            setFormState({ ...formState, end_date: e.target.value })
           }
           required
         />

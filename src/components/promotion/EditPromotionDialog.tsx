@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { updatePromotion } from "../../utils/supabaseHelpers";
 
 interface EditPromotionDialogProps {
   promotion: DatabasePromotion;
@@ -48,35 +49,29 @@ export function EditPromotionDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.title || !formData.description) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
-        .from("promotions")
-        .update({
-          title: formData.title,
-          description: formData.description,
-          promotion_type: formData.promotion_type,
-          start_date: formData.start_date,
-          end_date: formData.end_date,
-          terms_conditions: formData.terms_conditions || null,
-          image: formData.image || null,
-        })
-        .eq("id", promotion.id);
+      const promotionData = {
+        title: formData.title,
+        description: formData.description,
+        promotion_type: formData.promotion_type,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        terms_conditions: formData.terms_conditions || null,
+        image: formData.image || null,
+      };
+
+      const { error } = await updatePromotion(promotion.id, promotionData);
 
       if (error) throw error;
 
       toast.success("Promoción actualizada exitosamente");
       onSuccess();
-    } catch (error) {
+      onClose();
+    } catch (error: any) {
       console.error("Error updating promotion:", error);
-      toast.error("Error al actualizar la promoción");
+      toast.error(`Error: ${error.message || "Unknown error"}`);
     } finally {
       setIsSubmitting(false);
     }

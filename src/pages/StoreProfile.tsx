@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 import { useSession } from "@/components/providers/SessionProvider";
 import { Store } from "@/types/store";
+import { deletePromotion } from "../utils/supabaseHelpers";
 
 // Define types for raw database records
 interface RawPromotion {
@@ -101,6 +102,7 @@ export default function StoreProfile() {
   const [isAddingPromotion, setIsAddingPromotion] = useState(false);
   const [promotionToEdit, setPromotionToEdit] =
     useState<DatabasePromotion | null>(null);
+  const [promotions, setPromotions] = useState<DatabasePromotion[]>([]);
 
   // Fetch store data
   const {
@@ -140,7 +142,7 @@ export default function StoreProfile() {
 
   // Fetch and display all promotions (no status filtering)
   const {
-    data: promotions = [],
+    data: promotionsData = [],
     isLoading: isPromotionsLoading,
     refetch: refetchPromotions,
   } = useQuery({
@@ -192,22 +194,20 @@ export default function StoreProfile() {
     enabled: !!id,
   });
 
-  // Handle deleting a promotion
   const handleDeletePromotion = async (promotionId: string) => {
-    try {
-      const { error } = await supabase
-        .from("promotions")
-        .delete()
-        // @ts-expect-error - Supabase types incompatibility
-        .eq("id", promotionId);
+    if (window.confirm("¿Estás seguro que deseas eliminar esta promoción?")) {
+      try {
+        const { error } = await deletePromotion(promotionId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast.success("Promoción eliminada exitosamente");
-      refetchPromotions();
-    } catch (error) {
-      console.error("Error deleting promotion:", error);
-      toast.error("Error al eliminar la promoción");
+        // Update promotions list by filtering out the deleted one
+        setPromotions(promotions.filter((p) => p.id !== promotionId));
+        toast.success("Promoción eliminada exitosamente");
+      } catch (error: any) {
+        console.error("Error deleting promotion:", error);
+        toast.error(`Error: ${error.message || "Unknown error"}`);
+      }
     }
   };
 
@@ -310,7 +310,6 @@ export default function StoreProfile() {
                   promotions={promotions}
                   onEdit={setPromotionToEdit}
                   onDelete={handleDeletePromotion}
-                  showStatus={false}
                 />
               </div>
             </div>
