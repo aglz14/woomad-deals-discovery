@@ -226,14 +226,22 @@ export async function updatePromotion(
   promotionData: Record<string, unknown>
 ): Promise<DbOperationResult> {
   try {
+    console.log("Updating promotion with ID:", id, "Data:", promotionData);
+
     // @ts-expect-error - Supabase types incompatibility
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("promotions")
       .update(promotionData)
-      .eq("id", id);
+      .eq("id", id)
+      .select(); // Add select to return the updated data
 
-    if (error) return { data: null, error: normalizeError(error) };
-    return { data: null, error: null };
+    if (error) {
+      console.error("Error in updatePromotion:", error);
+      return { data: null, error: normalizeError(error) };
+    }
+
+    console.log("Updated promotion data:", data);
+    return { data, error: null };
   } catch (error) {
     console.error("Error updating promotion:", error);
     return { data: null, error: normalizeError(error) };

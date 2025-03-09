@@ -89,13 +89,18 @@ export function EditPromotionDialog({
         image: formData.image || null,
       };
 
-      const { error } = await updatePromotion(promotion.id, promotionData);
+      console.log("Submitting promotion update:", promotionData);
+      const { data, error } = await updatePromotion(
+        promotion.id,
+        promotionData
+      );
 
       if (error) {
         toast.error(`Error: ${error.message}`);
         return;
       }
 
+      console.log("Promotion updated successfully:", data);
       toast.success("Promoción actualizada exitosamente");
       onSuccess();
       onClose();

@@ -208,8 +208,8 @@ export default function StoreProfile() {
           return;
         }
 
-        // Update promotions list by filtering out the deleted one
-        setPromotions(promotions.filter((p) => p.id !== promotionId));
+        // Refetch promotions instead of using setPromotions
+        refetchPromotions();
         toast.success("Promoción eliminada exitosamente");
       } catch (error) {
         console.error("Error deleting promotion:", error);
