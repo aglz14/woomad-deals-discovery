@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 import { PromotionsList } from "@/components/home/PromotionsList";
 import { Button } from "@/components/ui/button";
 import { DatabasePromotion } from "@/types/promotion";
+import { safeDbOperation } from "@/utils/supabaseHelpers";
 
 // Define a Mall interface to properly type mall data
 interface Mall {
@@ -39,22 +40,68 @@ export default function AllPromos() {
   const { data: promotions, isLoading } = useQuery<DatabasePromotion[]>({
     queryKey: ["all-promotions"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("promotions")
-        .select(
-          `
-          *,
-          store:stores (
-            *,
-            mall:shopping_malls (*)
-          )
-        `
-        )
-        .gte("end_date", new Date().toISOString())
-        .order("start_date", { ascending: true });
+      try {
+        console.log("Fetching all promotions...");
 
-      if (error) throw error;
-      return (data || []) as unknown as DatabasePromotion[];
+        // Simplify the query to avoid type issues
+        const { data, error } = await supabase
+          .from("promotions")
+          .select(
+            `
+            *,
+            store:stores (
+              *,
+              mall:shopping_malls (*)
+            )
+          `
+          )
+          .gte("end_date", new Date().toISOString())
+          .order("start_date", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching promotions:", error);
+          return [];
+        }
+
+        // Safely process the data
+        const processedPromotions: DatabasePromotion[] = [];
+
+        if (Array.isArray(data)) {
+          console.log(`Found ${data.length} promotions`);
+
+          // Process each promotion to ensure it has the correct structure
+          data.forEach((item) => {
+            if (item && typeof item === "object") {
+              const promotion: DatabasePromotion = {
+                id: item.id || "",
+                created_at: item.created_at || "",
+                title: item.title || "",
+                description: item.description || "",
+                start_date: item.start_date || "",
+                end_date: item.end_date || "",
+                promotion_type:
+                  item.promotion_type || (item as any).type || "promotion",
+                store: item.store,
+                image: item.image,
+                store_id: item.store_id,
+                user_id: item.user_id,
+                terms_conditions: item.terms_conditions,
+              };
+              processedPromotions.push(promotion);
+            }
+          });
+
+          // Log a sample promotion
+          if (processedPromotions.length > 0) {
+            console.log("Sample processed promotion:", processedPromotions[0]);
+          }
+        }
+
+        return processedPromotions;
+      } catch (err) {
+        console.error("Unexpected error fetching promotions:", err);
+        return [];
+      }
     },
   });
 
@@ -64,20 +111,47 @@ export default function AllPromos() {
     queryFn: async () => {
       if (!promotions || promotions.length === 0) return [];
 
-      // Extract unique mall IDs from active promotions
-      const mallIds = new Set(
-        promotions.map((promo) => promo.store?.mall?.id).filter(Boolean)
-      );
+      try {
+        // Get all unique mall IDs from promotions
+        const mallIdsFromPromos = new Set<string>();
+        promotions.forEach((promo) => {
+          if (promo.store?.mall?.id) {
+            mallIdsFromPromos.add(promo.store.mall.id);
+          }
+        });
 
-      // Get full mall data
-      // @ts-expect-error - Supabase types are complex
-      const { data, error } = await supabase
-        .from("shopping_malls")
-        .select("*")
-        .in("id", Array.from(mallIds) as any);
+        if (mallIdsFromPromos.size === 0) {
+          return [];
+        }
 
-      if (error) throw error;
-      return (data || []) as unknown as Mall[];
+        // Fetch all malls and filter manually
+        const { data, error } = await supabase
+          .from("shopping_malls")
+          .select("*");
+
+        if (error) {
+          console.error("Error fetching malls:", error);
+          return [];
+        }
+
+        // Manually filter the malls that match our IDs
+        // This avoids type issues with .in() and complex type assertions
+        const filteredMalls: Mall[] = [];
+
+        if (data) {
+          for (const mall of data) {
+            if (mall && mall.id && mallIdsFromPromos.has(mall.id)) {
+              // Use type assertion after verifying the mall has an id
+              filteredMalls.push(mall as unknown as Mall);
+            }
+          }
+        }
+
+        return filteredMalls;
+      } catch (err) {
+        console.error("Unexpected error fetching malls:", err);
+        return [];
+      }
     },
     enabled: !!promotions && promotions.length > 0,
   });
