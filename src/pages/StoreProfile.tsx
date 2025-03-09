@@ -22,6 +22,40 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AddPromotionForm } from "@/components/promotion/AddPromotionForm";
 import { useSession } from "@/components/providers/SessionProvider";
+import { Store } from "@/types/store";
+
+// Define types for raw database records
+interface RawPromotion {
+  id: string;
+  title: string;
+  description: string;
+  type?: string;
+  promotion_type?: string;
+  start_date?: string;
+  end_date?: string;
+  store_id?: string;
+  user_id?: string;
+  is_active?: boolean;
+  created_at: string;
+  discount_value?: string;
+  terms_conditions?: string;
+  image_url?: string;
+  store?: RawStore;
+}
+
+interface RawStore {
+  id: string;
+  name: string;
+  user_id?: string;
+  mall_id?: string;
+  mall?: {
+    id: string;
+    name: string;
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+}
 
 // Helper function to validate promotion type
 const isValidPromotionType = (
@@ -33,7 +67,7 @@ const isValidPromotionType = (
 };
 
 // Helper function to normalize promotion data
-const normalizePromotion = (promotion: any): DatabasePromotion => {
+const normalizePromotion = (promotion: RawPromotion): DatabasePromotion => {
   const effectiveType = (
     promotion.promotion_type ||
     promotion.type ||
@@ -43,8 +77,33 @@ const normalizePromotion = (promotion: any): DatabasePromotion => {
     .toLowerCase();
 
   return {
-    ...promotion,
+    id: promotion.id,
     type: effectiveType as ValidPromotionType,
+    title: promotion.title,
+    description: promotion.description,
+    start_date: promotion.start_date || new Date().toISOString(),
+    end_date: promotion.end_date || new Date().toISOString(),
+    discount_value: promotion.discount_value,
+    terms_conditions: promotion.terms_conditions,
+    image_url: promotion.image_url,
+    store_id: promotion.store_id,
+    user_id: promotion.user_id,
+    created_at: promotion.created_at,
+    is_active: promotion.is_active,
+    store: promotion.store
+      ? {
+          id: promotion.store.id,
+          name: promotion.store.name,
+          mall: promotion.store.mall
+            ? {
+                id: promotion.store.mall.id,
+                name: promotion.store.mall.name,
+                latitude: promotion.store.mall.latitude,
+                longitude: promotion.store.mall.longitude,
+              }
+            : undefined,
+        }
+      : undefined,
   };
 };
 
@@ -73,7 +132,8 @@ export default function StoreProfile() {
             mall:shopping_malls(id, name, latitude, longitude, address)
           `
         )
-        .eq("id", id as any)
+        // @ts-ignore - Supabase types incompatibility
+        .eq("id", id || "")
         .maybeSingle();
 
       if (error) {
@@ -86,7 +146,7 @@ export default function StoreProfile() {
         throw new Error("Store not found");
       }
 
-      return store;
+      return store as unknown as RawStore;
     },
     enabled: !!id,
   });
@@ -117,7 +177,8 @@ export default function StoreProfile() {
             )
           `
         )
-        .eq("store_id", id as any)
+        // @ts-ignore - Supabase types incompatibility
+        .eq("store_id", id || "")
         .order("created_at", { ascending: false }); // Show newest first
 
       if (error) {
@@ -131,8 +192,8 @@ export default function StoreProfile() {
       }
 
       // Process promotions according to new schema
-      const processedPromotions = data
-        .filter((promo: any) => {
+      const processedPromotions = (data as unknown as RawPromotion[])
+        .filter((promo) => {
           // Skip invalid objects
           if (!promo || typeof promo !== "object") return false;
 
@@ -140,7 +201,7 @@ export default function StoreProfile() {
           const typeValue = promo.promotion_type || promo.type || "";
           return isValidPromotionType(typeValue);
         })
-        .map((promotion: any) => {
+        .map((promotion) => {
           // Add status based on dates and is_active field
           const now = new Date();
           const startDate = promotion.start_date
@@ -190,7 +251,8 @@ export default function StoreProfile() {
       const { error } = await supabase
         .from("promotions")
         .delete()
-        .eq("id", promotionId as any);
+        // @ts-ignore - Supabase types incompatibility
+        .eq("id", promotionId);
 
       if (error) throw error;
 
@@ -203,7 +265,7 @@ export default function StoreProfile() {
   };
 
   // Check if the current user is the store owner
-  const isOwner = session?.user?.id === (store as any)?.user_id;
+  const isOwner = session?.user?.id === store?.user_id;
 
   // Show loading state while data is being fetched
   if (isStoreLoading || isPromotionsLoading) {
@@ -243,8 +305,8 @@ export default function StoreProfile() {
           <div className="flex flex-wrap gap-2 mb-6">
             <button
               onClick={() => {
-                if ((store as any)?.mall_id) {
-                  navigate(`/admin/mall/${(store as any).mall_id}`);
+                if (store?.mall_id) {
+                  navigate(`/admin/mall/${store.mall_id}`);
                 } else {
                   navigate(-1);
                 }
@@ -259,7 +321,7 @@ export default function StoreProfile() {
             <div className="space-y-6 sm:space-y-8">
               {/* Store Info Section */}
               <div className="w-full">
-                <StoreInfo store={store as any} />
+                <StoreInfo store={store as Store} />
               </div>
 
               {/* Available Promotions Section */}
