@@ -8,6 +8,7 @@ import {
   X,
   MapPin,
   Phone,
+  Tag,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 type Store = {
   id: string;
@@ -59,6 +61,11 @@ interface StoreCategoryMap {
   };
 }
 
+// Add interface for store promotions count
+interface StorePromotionsCount {
+  [storeId: string]: number;
+}
+
 export const MallStoresSection = ({
   stores,
   onStoreClick,
@@ -73,6 +80,49 @@ export const MallStoresSection = ({
     {}
   );
   const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch promotion counts for all stores
+  const { data: storePromotionsCount = {} } = useQuery<StorePromotionsCount>({
+    queryKey: ["store-promotions-count", stores.map((store) => store.id)],
+    queryFn: async () => {
+      if (!stores.length) return {};
+
+      try {
+        const now = new Date().toISOString();
+        const { data, error } = await supabase
+          .from("promotions")
+          .select("store_id, id")
+          .in(
+            "store_id",
+            stores.map((store) => store.id)
+          );
+
+        if (error) {
+          console.error("Error fetching store promotions:", error);
+          return {};
+        }
+
+        // Count promotions by store_id
+        const counts: StorePromotionsCount = {};
+        data.forEach((promo) => {
+          counts[promo.store_id] = (counts[promo.store_id] || 0) + 1;
+        });
+
+        // Ensure all stores have a count (even if 0)
+        stores.forEach((store) => {
+          if (!counts[store.id]) {
+            counts[store.id] = 0;
+          }
+        });
+
+        return counts;
+      } catch (err) {
+        console.error("Error fetching promotion counts:", err);
+        return {};
+      }
+    },
+    enabled: stores.length > 0,
+  });
 
   useEffect(() => {
     const fetchCategoriesForStores = async () => {
@@ -338,6 +388,24 @@ export const MallStoresSection = ({
                       <span>{store.contact_number}</span>
                     </div>
                   )}
+
+                  {/* Promotion count badge */}
+                  <div className="flex items-center mt-3">
+                    <Badge
+                      variant={
+                        storePromotionsCount[store.id] > 0
+                          ? "secondary"
+                          : "outline"
+                      }
+                      className="flex items-center gap-1"
+                    >
+                      <Tag className="h-3 w-3" />
+                      <span>
+                        {storePromotionsCount[store.id] || 0} promoción
+                        {storePromotionsCount[store.id] !== 1 ? "es" : ""}
+                      </span>
+                    </Badge>
+                  </div>
                 </div>
               </CardContent>
             </Card>
