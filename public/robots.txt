@@ -1,0 +1,13 @@
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://woomad.mx/sitemap.xml
+
+# Disallow specific paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login/
+Disallow: /logout/
+Disallow: /register/ 

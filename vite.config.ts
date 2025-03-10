@@ -21,9 +21,10 @@ export default defineConfig(({ mode }) => ({
       ], // Added robots.txt
       selfDestroying: false,
       manifest: {
-        name: "Woomad - Ofertas en centros comerciales", // Kept original name
+        name: "Woomad - Ofertas en centros comerciales cerca de ti",
         short_name: "Woomad",
-        description: "Encuentra ofertas en centros comerciales cerca de ti", //Kept original description
+        description:
+          "Descubre promociones cerca de ti de tiendas en centros comerciales",
         theme_color: "#7c3aed",
         background_color: "#ffffff",
         display: "standalone",
@@ -46,6 +47,11 @@ export default defineConfig(({ mode }) => ({
             purpose: "maskable",
           },
         ],
+        start_url: "/",
+        categories: ["shopping", "lifestyle", "business"],
+        lang: "es-MX",
+        dir: "ltr",
+        prefer_related_applications: false,
       },
       workbox: {
         skipWaiting: true,
