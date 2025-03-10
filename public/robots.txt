@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://woomad.mx/sitemap.xml
+Sitemap: https://woomad.com/sitemap.xml
 
 # Disallow specific paths
 Disallow: /admin/
