@@ -10,6 +10,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { LocationProvider } from "@/contexts/LocationContext";
+import { AdminRoute } from "@/components/auth/AdminRoute";
 
 // Lazy imports for code splitting and better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -82,17 +83,30 @@ function App() {
                         path="/terminos"
                         element={<TermsAndConditions />}
                       />
+                      {/* Admin routes protected by AdminRoute */}
                       <Route
                         path="/admin/promotions"
-                        element={<Promotions />}
+                        element={
+                          <AdminRoute>
+                            <Promotions />
+                          </AdminRoute>
+                        }
                       />
                       <Route
                         path="/admin/mall/:id"
-                        element={<AdminMallProfile />}
+                        element={
+                          <AdminRoute>
+                            <AdminMallProfile />
+                          </AdminRoute>
+                        }
                       />
                       <Route
                         path="/admin/store/:id"
-                        element={<StoreProfile />}
+                        element={
+                          <AdminRoute>
+                            <StoreProfile />
+                          </AdminRoute>
+                        }
                       />
                       <Route path="/mall/:id" element={<PublicMallProfile />} />
                       <Route
@@ -105,7 +119,11 @@ function App() {
                       />
                       <Route
                         path="/mall-management/:mallId"
-                        element={<MallManagement />}
+                        element={
+                          <AdminRoute>
+                            <MallManagement />
+                          </AdminRoute>
+                        }
                       />
                       <Route path="/allpromos" element={<AllPromos />} />
                       <Route path="/allmalls" element={<AllMalls />} />
