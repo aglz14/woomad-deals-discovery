@@ -21,102 +21,83 @@ export default function TermsAndConditions() {
         {/* Content Section */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
-            <div className="prose prose-lg mx-auto">
-              <h2>Aceptación de los términos</h2>
-              <p>
-                Al acceder y utilizar los servicios de Woomad, aceptas estar
-                legalmente obligado por estos Términos y Condiciones. Si no
-                estás de acuerdo con alguno de estos términos, no debes utilizar
-                nuestros servicios.
+            <div className="prose prose-lg text-left">
+              <h2 className="text-2xl font-semibold mb-4 text-left">
+                Términos y Condiciones
+              </h2>
+              <p className="mb-6 text-left">
+                Fecha de última actualización: 8 de marzo de 2025
               </p>
 
-              <h2>Cambios en los términos</h2>
-              <p>
-                Nos reservamos el derecho de modificar estos términos en
-                cualquier momento. Te notificaremos sobre cualquier cambio
-                publicando los nuevos términos en esta página. Los cambios
-                entrarán en vigor inmediatamente después de su publicación.
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                1. ACEPTACIÓN DE LOS TÉRMINOS
+              </h3>
+              <p className="mb-6 text-left">
+                Al acceder, utilizar o descargar la aplicación móvil Woomad (en
+                adelante "la Aplicación"), el usuario (en adelante "el Usuario")
+                acepta cumplir con estos Términos y Condiciones de Uso (en
+                adelante "los Términos"). Si el Usuario no está de acuerdo con
+                estos Términos, deberá abstenerse de utilizar la Aplicación.
               </p>
 
-              <h2>Uso de nuestros servicios</h2>
-              <p>
-                Nuestros servicios están destinados a ser utilizados tal como se
-                ofrecen. No debes utilizar nuestros servicios:
-              </p>
-              <ul>
-                <li>
-                  De manera ilegal o de forma que infrinja cualquier ley o
-                  regulación local, nacional o internacional
-                </li>
-                <li>
-                  Para enviar, recibir, cargar, descargar o utilizar cualquier
-                  material que no cumpla con nuestros estándares de contenido
-                </li>
-                <li>
-                  Para transmitir o facilitar el envío de cualquier material
-                  publicitario o promocional no solicitado
-                </li>
-                <li>
-                  Para causar molestias, inconvenientes o ansiedad innecesaria
-                </li>
-              </ul>
-
-              <h2>Cuentas de usuario</h2>
-              <p>
-                Cuando creas una cuenta con nosotros, debes proporcionar
-                información precisa, completa y actualizada en todo momento.
-                Eres responsable de mantener la confidencialidad de tu cuenta y
-                contraseña, y de restringir el acceso a tu computadora y/o
-                dispositivo móvil.
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                2. DESCRIPCIÓN DE LA APLICACIÓN
+              </h3>
+              <p className="mb-6 text-left">
+                La Aplicación es una plataforma digital que permite al Usuario
+                acceder a promociones y descuentos de negocios ubicados en
+                centros comerciales cercanos a su ubicación. La Aplicación
+                ofrece un servicio de localización y notificaciones en tiempo
+                real sobre ofertas disponibles, permitiendo que el Usuario se
+                beneficie de las promociones de manera sencilla.
               </p>
 
-              <h2>Propiedad intelectual</h2>
-              <p>
-                El contenido de nuestro sitio web y servicios, incluyendo pero
-                no limitado a textos, gráficos, logotipos, iconos, imágenes,
-                clips de audio, descargas digitales y compilaciones de datos, es
-                propiedad de Woomad o de sus proveedores de contenido y está
-                protegido por las leyes de propiedad intelectual.
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                3. USO DE LA APLICACIÓN
+              </h3>
+              <p className="mb-6 text-left">
+                El Usuario se compromete a usar la Aplicación únicamente para
+                fines legales y conforme a estos Términos. El Usuario no podrá:
               </p>
-
-              <h2>Limitación de responsabilidad</h2>
-              <p>
-                En ningún caso Woomad, sus directores, empleados, socios,
-                agentes, proveedores o afiliados serán responsables por
-                cualquier daño indirecto, incidental, especial, consecuente o
-                punitivo, incluyendo sin limitación, pérdida de beneficios,
-                datos, uso, buena voluntad u otras pérdidas intangibles,
-                resultantes de:
-              </p>
-              <ul>
-                <li>Tu uso o incapacidad para usar nuestros servicios</li>
-                <li>
-                  Cualquier acceso no autorizado o uso de nuestros servidores
-                  seguros y/o toda la información personal almacenada en ellos
+              <ul className="list-disc pl-6 mb-6">
+                <li className="mb-3 text-left">
+                  Utilizar la Aplicación de manera que interfiera con su
+                  correcto funcionamiento.
                 </li>
-                <li>
-                  Cualquier interrupción o cese de la transmisión hacia o desde
-                  nuestros servicios
+                <li className="mb-3 text-left">
+                  Modificar, adaptar o hackear la Aplicación.
                 </li>
-                <li>
-                  Cualquier error, virus, troyano o similar que pueda ser
-                  transmitido a través de nuestros servicios
+                <li className="mb-3 text-left">
+                  Violar derechos de propiedad intelectual o los derechos de
+                  privacidad de otros usuarios.
                 </li>
               </ul>
 
-              <h2>Ley aplicable</h2>
-              <p>
-                Estos términos se regirán e interpretarán de acuerdo con las
-                leyes del país donde Woomad tiene su sede principal, sin tener
-                en cuenta sus disposiciones sobre conflictos de leyes.
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                4. REGISTRO Y CUENTA DE USUARIO
+              </h3>
+              <p className="mb-6 text-left">
+                Para acceder a ciertos servicios de la Aplicación, el Usuario
+                deberá registrarse proporcionando información personal verídica
+                y actualizada. El Usuario es responsable de mantener la
+                confidencialidad de su cuenta y contraseña.
               </p>
 
-              <h2>Contacto</h2>
-              <p>
-                Si tienes alguna pregunta sobre estos Términos y Condiciones,
-                contáctanos a través de nuestro formulario de contacto o
-                envíanos un correo electrónico.
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                5. PROMOCIONES Y DESCUENTOS
+              </h3>
+              <p className="mb-6 text-left">
+                La Aplicación ofrece promociones y descuentos proporcionados por
+                los comercios asociados. Estas ofertas están sujetas a cambios
+                sin previo aviso y dependen de la disponibilidad de los
+                comercios participantes. La Aplicación no es responsable de la
+                validez o cumplimiento de las promociones ofrecidas por los
+                comercios.
               </p>
+
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                6. PRIVACIDAD Y PROTECCIÓN DE DATOS PERSONALES
+              </h3>
             </div>
           </div>
         </section>
