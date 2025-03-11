@@ -22,95 +22,96 @@ export default function PrivacyPolicy() {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="prose prose-lg mx-auto">
-              <h2>Introducción</h2>
-              <p>
-                En Woomad, respetamos tu privacidad y nos comprometemos a
-                proteger tus datos personales. Esta política de privacidad te
-                informará sobre cómo cuidamos tus datos personales cuando
-                visitas nuestro sitio web y te informará sobre tus derechos de
-                privacidad y cómo la ley te protege.
+              <h2 className="text-2xl font-semibold mb-4">
+                Aviso de Privacidad
+              </h2>
+              <p className="mb-6">
+                Fecha de última actualización: 8 de marzo de 2025
               </p>
 
-              <h2>Datos que recopilamos</h2>
-              <p>
-                Podemos recopilar, usar, almacenar y transferir diferentes tipos
-                de datos personales sobre ti, que hemos agrupado de la siguiente
-                manera:
+              <p className="mb-6">
+                En Woomad (en adelante "la Aplicación"), respetamos tu
+                privacidad y estamos comprometidos a proteger tus datos
+                personales y a mantener con nosotros. El presente Aviso de
+                Privacidad tiene como objetivo informarte sobre cómo
+                recolectamos, usamos, almacenamos y protegemos tu información
+                personal, así como los derechos que tienes sobre tus datos.
               </p>
-              <ul>
-                <li>
-                  Datos de identidad: nombre, apellido, nombre de usuario o
-                  identificador similar
+
+              <h3 className="text-xl font-semibold mt-8 mb-4">
+                1. Información que recabamos
+              </h3>
+              <p className="mb-4">
+                La Aplicación recaba la siguiente información personal:
+              </p>
+              <ul className="list-disc pl-6 mb-6">
+                <li className="mb-3">
+                  <span className="font-medium">
+                    Datos proporcionados por el usuario:
+                  </span>{" "}
+                  Cuando te registras en la Aplicación o haces uso de ciertas
+                  funcionalidades, podemos solicitarte que nos proporciones
+                  información personal como tu nombre, correo electrónico, y
+                  contraseña.
                 </li>
-                <li>
-                  Datos de contacto: dirección de correo electrónico y números
-                  de teléfono
+                <li className="mb-3">
+                  <span className="font-medium">Datos de ubicación:</span> Con
+                  el fin de mostrarte promociones cercanas a tu ubicación,
+                  recolectamos tu ubicación geográfica de manera anónima. La
+                  información de ubicación solo se utilizará para ofrecerte un
+                  mejor servicio.
                 </li>
-                <li>
-                  Datos técnicos: dirección IP, datos de inicio de sesión, tipo
-                  y versión del navegador
-                </li>
-                <li>
-                  Datos de uso: información sobre cómo utilizas nuestro sitio
-                  web y servicios
+                <li className="mb-3">
+                  <span className="font-medium">
+                    Datos de uso de la aplicación:
+                  </span>{" "}
+                  Recolectamos información relacionada con tu uso de la
+                  Aplicación, tales como las promociones que visualizas o las
+                  interacciones que realizas dentro de la plataforma.
                 </li>
               </ul>
 
-              <h2>Cómo utilizamos tus datos</h2>
-              <p>
-                Utilizamos tus datos personales solo cuando la ley nos lo
-                permite. Más comúnmente, utilizaremos tus datos personales en
-                las siguientes circunstancias:
-              </p>
-              <ul>
-                <li>Para registrarte como nuevo usuario</li>
-                <li>Para procesar y entregar tus solicitudes</li>
-                <li>Para gestionar nuestra relación contigo</li>
-                <li>
-                  Para mejorar nuestro sitio web, productos/servicios y
-                  marketing
+              <h3 className="text-xl font-semibold mt-8 mb-4">
+                2. Información que recolectamos se utiliza para los siguientes
+                fines:
+              </h3>
+              <ul className="list-disc pl-6 mb-6">
+                <li className="mb-3">
+                  Proporcionar y mejorar la experiencia de la Aplicación,
+                  incluyendo la personalización de las promociones basadas en tu
+                  ubicación.
+                </li>
+                <li className="mb-3">
+                  Enviar notificaciones relacionadas con las promociones y
+                  actualizaciones de la Aplicación.
+                </li>
+                <li className="mb-3">
+                  Analizar el uso de la Aplicación con fines estadísticos para
+                  mejorar su funcionamiento.
+                </li>
+                <li className="mb-3">
+                  Cumplir con las obligaciones legales y fiscales relacionadas
+                  con el uso de la Aplicación.
                 </li>
               </ul>
 
-              <h2>Seguridad de datos</h2>
-              <p>
-                Hemos implementado medidas de seguridad apropiadas para evitar
-                que tus datos personales se pierdan, se usen o se acceda a ellos
-                de manera no autorizada, se modifiquen o se divulguen.
+              <h3 className="text-xl font-semibold mt-8 mb-4">
+                3. Servicios de terceros
+              </h3>
+              <p className="mb-6">
+                La Aplicación utiliza servicios de terceros para almacenar y
+                gestionar los datos, específicamente Supabase, que es un
+                servicio que nos ayuda a gestionar la base de datos y la
+                autenticación de usuarios. Estos proveedores de servicios están
+                sujetos a sus propias políticas de privacidad, y solo accederán
+                a los datos de los usuarios según sea necesario para brindar los
+                servicios. No compartimos tus datos con terceros para fines de
+                marketing sin tu consentimiento.
               </p>
 
-              <h2>Tus derechos legales</h2>
-              <p>
-                Bajo ciertas circunstancias, tienes derechos bajo las leyes de
-                protección de datos en relación con tus datos personales,
-                incluyendo el derecho a:
-              </p>
-              <ul>
-                <li>Solicitar acceso a tus datos personales</li>
-                <li>Solicitar la corrección de tus datos personales</li>
-                <li>Solicitar la eliminación de tus datos personales</li>
-                <li>Oponerte al procesamiento de tus datos personales</li>
-                <li>
-                  Solicitar la restricción del procesamiento de tus datos
-                  personales
-                </li>
-                <li>Solicitar la transferencia de tus datos personales</li>
-                <li>Retirar el consentimiento</li>
-              </ul>
-
-              <h2>Cambios a esta política de privacidad</h2>
-              <p>
-                Podemos actualizar nuestra política de privacidad de vez en
-                cuando. Te notificaremos cualquier cambio publicando la nueva
-                política de privacidad en esta página.
-              </p>
-
-              <h2>Contacto</h2>
-              <p>
-                Si tienes alguna pregunta sobre esta política de privacidad o
-                nuestras prácticas de privacidad, contáctanos a través de
-                nuestro formulario de contacto o envíanos un correo electrónico.
-              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4">
+                4. Conservación de datos
+              </h3>
             </div>
           </div>
         </section>
