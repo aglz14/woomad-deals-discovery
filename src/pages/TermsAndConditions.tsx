@@ -98,6 +98,86 @@ export default function TermsAndConditions() {
               <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
                 6. PRIVACIDAD Y PROTECCIÓN DE DATOS PERSONALES
               </h3>
+              <p className="mb-6 text-left">
+                El tratamiento de los datos personales del Usuario se realiza
+                conforme a nuestra Política de Privacidad, que está disponible
+                en la Aplicación. El Usuario autoriza el uso de sus datos
+                personales para las finalidades descritas en dicha política,
+                incluyendo la localización para personalizar las promociones
+                ofrecidas.
+              </p>
+
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                7. GEOLOCALIZACIÓN Y NOTIFICACIONES
+              </h3>
+              <p className="mb-6 text-left">
+                La Aplicación utiliza servicios de geolocalización para
+                identificar la ubicación del Usuario y ofrecer promociones
+                cercanas. El Usuario podrá desactivar esta función en cualquier
+                momento desde los ajustes de su dispositivo móvil.
+              </p>
+              <p className="mb-6 text-left">
+                La Aplicación también enviará notificaciones push sobre nuevas
+                promociones, descuentos y ofertas. El Usuario podrá gestionar
+                las notificaciones desde los ajustes de su dispositivo.{" "}
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                8. DERECHOS DE PROPIEDAD
+              </h3>
+              <p className="mb-6 text-left">
+                La Aplicación, su diseño, contenido, logotipos, marcas
+                comerciales y demás elementos relacionados son propiedad
+                exclusiva de Woomad o de sus licenciatarios. El Usuario no podrá
+                reproducir, distribuir ni utilizar estos elementos sin el
+                permiso expreso y por escrito de los titulares de los derechos
+                correspondientes.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                9. LIMITACIÓN DE RESPONSABILIDAD
+              </h3>
+              <p className="mb-6 text-left">
+                La Aplicación no garantiza la disponibilidad continua o la
+                exactitud de las promociones. El Usuario reconoce y acepta que
+                las promociones y descuentos dependen de los comercios
+                participantes y que estos pueden cambiar o cancelarse sin previo
+                aviso.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                10. TERMINACIÓN DE LA CUENTA
+              </h3>
+              <p className="mb-6 text-left">
+                El Usuario puede desactivar su cuenta en cualquier momento desde
+                la Aplicación. Woomad se reserva el derecho de suspender o
+                cancelar la cuenta de un Usuario si se detecta el incumplimiento
+                de estos Términos.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                11. MODIFICACIONES A LOS TÉRMINOS
+              </h3>
+              <p className="mb-6 text-left">
+                Woomad se reserva el derecho de modificar estos Términos en
+                cualquier momento. Cualquier modificación será publicada en la
+                Aplicación y entrará en vigor inmediatamente después de su
+                publicación. El uso continuado de la Aplicación después de los
+                cambios implica la aceptación de los nuevos Términos.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                12. LEY APLICABLE Y JURISDICCIÓN
+              </h3>
+              <p className="mb-6 text-left">
+                Estos Términos se regirán e interpretarán de acuerdo con las
+                leyes de los Estados Unidos Mexicanos. En caso de cualquier
+                controversia, las partes se someten a la jurisdicción de los
+                tribunales competentes de Monterrey, México.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                13. CONTACTO
+              </h3>
+              <p className="mb-6 text-left">
+                Si el Usuario tiene alguna pregunta o comentario sobre estos
+                Términos, puede ponerse en contacto con nosotros a través de la
+                siguiente dirección de correo electrónico: info@woomad.com
+              </p>
             </div>
           </div>
         </section>

@@ -112,6 +112,64 @@ export default function PrivacyPolicy() {
               <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
                 4. Conservación de datos
               </h3>
+              <p className="mb-6 text-left">
+                Tus datos serán almacenados mientras tengas una cuenta activa en
+                la Aplicación y por el tiempo necesario para cumplir con los
+                fines descritos en este Aviso de Privacidad. En caso de que
+                decidas eliminar tu cuenta, tus datos serán eliminados conforme
+                a las políticas de Supabase y según lo que se indica en el
+                siguiente apartado.
+              </p>
+              <p className="mb-6 text-left">
+                Tienes derecho a acceder, rectificar, cancelar u oponerte al
+                tratamiento de tus datos personales. Si deseas ejercer
+                cualquiera de estos derechos o solicitar la eliminación de tu
+                cuenta, por favor contacta con nosotros a través del siguiente
+                correo electrónico: info@woomad.com.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                5. Eliminar tus datos
+              </h3>
+              <p className="mb-6 text-left">
+                Si deseas eliminar tu cuenta y todos los datos asociados, puedes
+                hacerlo de las siguientes maneras:
+              </p>
+              <ul className="list-disc pl-6 mb-6">
+                <li className="mb-3 text-left">
+                  A través de correo electrónico: Envía una solicitud de
+                  eliminación de datos a info@woomad.com, y procederemos con la
+                  eliminación de tu cuenta y datos asociados.
+                </li>
+              </ul>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                6. Seguridad de los datos
+              </h3>
+              <p className="mb-6 text-left">
+                Implementamos medidas de seguridad razonables para proteger tus
+                datos personales, sin embargo, ningún sistema de seguridad es
+                infalible. No podemos garantizar la seguridad absoluta de la
+                información, aunque trabajamos continuamente para mejorar
+                nuestras protecciones.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                7. Modificaciones al Aviso de Privacidad
+              </h3>
+              <p className="mb-6 text-left">
+                Nos reservamos el derecho de modificar este Aviso de Privacidad
+                en cualquier momento. Cualquier cambio será notificado a través
+                de la Aplicación o por correo electrónico. Te recomendamos
+                revisar periódicamente este Aviso de Privacidad para estar al
+                tanto de cualquier modificación.
+              </p>
+              <h3 className="text-xl font-semibold mt-8 mb-4 text-left">
+                8. Contacto
+              </h3>
+              <p className="mb-6 text-left">
+                Si tienes alguna pregunta o comentarios sobre este Aviso de
+                Privacidad, o si deseas ejercer cualquiera de tus derechos en
+                relación con tus datos personales, puedes contactarnos en
+                info@woomad.com
+              </p>
             </div>
           </div>
         </section>
