@@ -2,7 +2,8 @@ import { Info, Users, Building2 } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 export default function Nosotros() {
-  return <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow pt-16">
         {/* Hero Section */}
@@ -12,7 +13,8 @@ export default function Nosotros() {
               Sobre Nosotros
             </h1>
             <p className="text-xl text-center max-w-2xl mx-auto">
-              Transformando la experiencia de compra en centros comerciales a través de la innovación digital
+              Transformando la experiencia de compra en centros comerciales a
+              través de la innovación digital
             </p>
           </div>
         </div>
@@ -20,7 +22,7 @@ export default function Nosotros() {
         {/* Description Section */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <p className="text-lg text-gray-600 text-center max-w-3xl mx-auto leading-relaxed">En Woomad, nos dedicamos a revolucionar la forma en que las personas interactúan con los centros comerciales. Nuestra plataforma conecta a comerciantes y consumidores, creando una experiencia de compra más inteligente, personalizada y eficiente.</p>
+            {/* Description content removed */}
           </div>
         </section>
 
@@ -51,8 +53,8 @@ export default function Nosotros() {
                   Innovación
                 </h3>
                 <p className="text-gray-600">
-                  Buscamos constantemente nuevas formas de mejorar la experiencia
-                  de compra a través de soluciones tecnológicas.
+                  Buscamos constantemente nuevas formas de mejorar la
+                  experiencia de compra a través de soluciones tecnológicas.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -72,5 +74,6 @@ export default function Nosotros() {
         </section>
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 }
