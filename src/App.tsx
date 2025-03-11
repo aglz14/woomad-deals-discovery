@@ -19,6 +19,8 @@ const Signup = lazy(() => import("./pages/Signup"));
 const About = lazy(() => import("./pages/About"));
 const Nosotros = lazy(() => import("./pages/Nosotros"));
 const Contacto = lazy(() => import("./pages/Contacto"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 const Promotions = lazy(() => import("./pages/Promotions"));
 const PublicMallProfile = lazy(() => import("./pages/PublicMallProfile"));
 const PublicStoreProfile = lazy(() => import("./pages/PublicStoreProfile"));
@@ -75,6 +77,11 @@ function App() {
                       <Route path="/about" element={<About />} />
                       <Route path="/nosotros" element={<Nosotros />} />
                       <Route path="/contacto" element={<Contacto />} />
+                      <Route path="/privacidad" element={<PrivacyPolicy />} />
+                      <Route
+                        path="/terminos"
+                        element={<TermsAndConditions />}
+                      />
                       <Route
                         path="/admin/promotions"
                         element={<Promotions />}
